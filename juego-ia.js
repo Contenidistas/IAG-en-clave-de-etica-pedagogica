@@ -290,7 +290,7 @@ function updateTimeline() {
  */
 function sendResultToServer(payload) {
   // 📌 URL de tu Google Apps Script (implementación)
-  const url = "https://script.google.com/macros/s/AKfycby3MLzeVhESPlPxpjNzx8Gt2tn2trcqgpPrMTRG1bPQ_e1zPAwe_TsEz_uw1qr_icG5/exec";
+  const url = "https://script.google.com/macros/s/AKfycbwaYbC5ebLgVjexSkxhgYR6Gvqr8Tcq6drUsl6DXL_OKl2eHLeATMaBMUzV4G3YyG9j/exec";
   
   console.log('═══════════════════════════════════');
   console.log('🚀 ENVIANDO DATOS A GOOGLE SHEETS');
