@@ -59,6 +59,28 @@ const elements = {
   downloadBtn: document.getElementById('downloadBtn'),
   copyBtn: document.getElementById('copyBtn'),
   restartBtn: document.getElementById('restartBtn'),
+
+  // Estadísticas anónimas
+  refreshStatsBtn: document.getElementById('refreshStatsBtn'),
+  statsStatus: document.getElementById('statsStatus'),
+  statsContent: document.getElementById('statsContent'),
+  statVisits: document.getElementById('statVisits'),
+  statCompleted: document.getElementById('statCompleted'),
+  statAverage: document.getElementById('statAverage'),
+  statTopLevel: document.getElementById('statTopLevel'),
+  statsLevels: document.getElementById('statsLevels'),
+  statsProfiles: document.getElementById('statsProfiles'),
+  statsIndicators: document.getElementById('statsIndicators'),
+  opinionsStatus: document.getElementById('opinionsStatus'),
+  opinionsCarousel: document.getElementById('opinionsCarousel'),
+  prevOpinionBtn: document.getElementById('prevOpinionBtn'),
+  nextOpinionBtn: document.getElementById('nextOpinionBtn'),
+
+  // Valoración de la herramienta
+  toolRatingRadios: document.querySelectorAll('input[name="toolRating"]'),
+  toolSuggestion: document.getElementById('toolSuggestion'),
+  sendToolFeedbackBtn: document.getElementById('sendToolFeedbackBtn'),
+  toolFeedbackStatus: document.getElementById('toolFeedbackStatus'),
   
   // Tema
   themeToggle: document.getElementById('themeToggle'),
@@ -127,6 +149,76 @@ const modal = {
     document.body.style.overflow = '';
   }
 };
+
+const QUICK_GUIDE_KEY = 'iag_quick_guide_seen';
+
+function mostrarGuiaRapidaInicial() {
+  try {
+    if (localStorage.getItem(QUICK_GUIDE_KEY) === 'true') return;
+    localStorage.setItem(QUICK_GUIDE_KEY, 'true');
+  } catch (err) {
+    console.warn('No se pudo guardar el estado de la guia rapida:', err);
+  }
+
+  modal.show('Guía rápida de la herramienta', `
+    <div class="quick-guide">
+      <p class="quick-guide-purpose">
+        Esta app propone un recorrido de reflexión sobre el uso ético, crítico y pedagógico de la inteligencia artificial generativa. No busca calificarte, sino ayudarte a revisar decisiones, transparentar usos y fortalecer criterios propios.
+      </p>
+
+      <div class="quick-guide-grid">
+        <section class="quick-guide-item">
+          <span>1</span>
+          <div>
+            <h4>Fundamentación</h4>
+            <p>Presenta los marcos que sostienen la propuesta y permite ampliar la lectura pedagógica.</p>
+          </div>
+        </section>
+
+        <section class="quick-guide-item">
+          <span>2</span>
+          <div>
+            <h4>Diagnóstico guiado</h4>
+            <p>Te hace preguntas situadas según tu perfil para pensar cómo usás o proponés usar IAG.</p>
+          </div>
+        </section>
+
+        <section class="quick-guide-item quick-guide-item-highlight">
+          <span>3</span>
+          <div>
+            <h4>Asistente Pedagógico</h4>
+            <p>Usa IA generativa para explicar preguntas, interpretar respuestas y sugerir mejoras. Sus orientaciones deben verificarse con criterio pedagógico.</p>
+          </div>
+        </section>
+
+        <section class="quick-guide-item">
+          <span>4</span>
+          <div>
+            <h4>Reporte final</h4>
+            <p>Resume tu recorrido y ofrece recomendaciones para fortalecer transparencia, verificación, autoría y reflexión crítica.</p>
+          </div>
+        </section>
+
+        <section class="quick-guide-item">
+          <span>5</span>
+          <div>
+            <h4>Datos anónimos</h4>
+            <p>Muestra estadísticas agregadas y opiniones sin exponer respuestas individuales ni datos identificables.</p>
+          </div>
+        </section>
+      </div>
+
+      <div class="quick-guide-actions">
+        <button type="button" class="btn btn-primary" id="quickGuideClose">Entendido</button>
+      </div>
+    </div>
+  `);
+
+  setTimeout(() => {
+    const closeGuide = document.getElementById('quickGuideClose');
+    if (closeGuide) closeGuide.addEventListener('click', () => modal.hide());
+  }, 0);
+}
 
 if (modal.closeBtn) {
   modal.closeBtn.addEventListener('click', () => modal.hide());
@@ -346,6 +438,11 @@ function updateCarousel() {
   const offset = -state.currentSlide * 100;
   elements.carouselTrack.style.transform = `translateX(${offset}%)`;
 
+  const activeSlide = elements.carouselTrack.children[state.currentSlide];
+  if (activeSlide) {
+    elements.carouselTrack.style.height = `${activeSlide.offsetHeight}px`;
+  }
+
   if (elements.carouselDots && elements.carouselDots.length) {
     elements.carouselDots.forEach((dot, index) => 
       dot.classList.toggle('active', index === state.currentSlide)
@@ -395,8 +492,21 @@ if (elements.carouselDots && elements.carouselDots.length) {
   );
 }
 
+const goToDiagnosticBtn = document.getElementById('goToDiagnosticBtn');
+if (goToDiagnosticBtn) {
+  goToDiagnosticBtn.addEventListener('click', (event) => {
+    event.preventDefault();
+    state.currentSlide = 1;
+    updateCarousel();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
 /* ========================================
    🔧 HABILITAR / DESHABILITAR BOTÓN INICIO (CORREGIDO)
+   ======================================== */
+/* ========================================
+   🔧 HABILITAR / DESHABILITAR BOTÓN INICIO (RECTIFICADA)
    ======================================== */
 function updateStartButtonState() {
   if (!elements.startBtn) return;
@@ -432,21 +542,38 @@ function updateStartButtonState() {
     console.log('✓ Recursos OK:', recursosOk);
   }
 
-  // 5) 🔧 AGREGADO: Consentimiento (OBLIGATORIO)
+  // 5) Consentimiento (OBLIGATORIO)
   let consentOk = true;
   if (elements.consentTracking) {
     consentOk = elements.consentTracking.checked;
     console.log('✓ Consentimiento OK:', consentOk);
   }
 
-  // 🔑 Botón habilitado SOLO si TODO está completo
+  // 🔑 Lógica de Habilitación y Visibilidad
   const todasOk = perfilOk && nivelOk && famOk && recursosOk && consentOk;
+  const nextSlideBtn = document.getElementById('nextSlide');
+
   console.log('━━━━━━━━━━━━━━━━━━━━━━');
   console.log('📊 RESULTADO:', todasOk ? '✅ TODAS OK' : '❌ FALTAN CAMPOS');
-  console.log('🎯 Botón:', todasOk ? '🟢 HABILITADO' : '🔴 DESHABILITADO');
-  console.log('━━━━━━━━━━━━━━━━━━━━━━\n');
+  
+if (todasOk) {
+  elements.startBtn.disabled = false;
+  elements.startBtn.classList.remove('hidden');
+  elements.startBtn.classList.add('enabled');
 
-  elements.startBtn.disabled = !todasOk;
+  if (nextSlideBtn) nextSlideBtn.classList.add('hidden');
+
+  console.log('🎯 Botón Inicio: MOSTRADO, VERDE Y HABILITADO');
+} else {
+  elements.startBtn.disabled = true;
+  elements.startBtn.classList.add('hidden');
+  elements.startBtn.classList.remove('enabled');
+
+  if (nextSlideBtn) nextSlideBtn.classList.remove('hidden');
+
+  console.log('🎯 Botón Inicio: OCULTO Y DESHABILITADO');
+}
+  console.log('━━━━━━━━━━━━━━━━━━━━━━\n');
 }
 
 /* ========================================
@@ -541,6 +668,25 @@ function showScreen(screenName) {
   if (screens[screenName]) {
     screens[screenName].classList.remove('hidden');
     screens[screenName].classList.add('fade-in');
+  }
+
+  // --- 🆕 LÓGICA DE ASISTENCIA PROACTIVA ---
+  if (screenName === 'result') {
+    // Si el puntaje es bajo (margen de mejora o proceso inicial)
+    if (window.state && window.state.evidence <= 40) {
+      setTimeout(() => {
+        const tooltip = document.getElementById('chatbotTooltip');
+        if (tooltip) {
+          tooltip.classList.remove('hidden');
+          const p = tooltip.querySelector('p');
+          if (p) p.innerText = "Analicé tus respuestas del recorrido y puedo ayudarte a priorizar mejoras. Hablemos.";
+        }
+        
+        // Animamos el botón para llamar la atención
+        const btn = document.querySelector('.chatbot-toggle');
+        if (btn) btn.style.animation = "pulse 2s infinite";
+      }, 1500);
+    }
   }
 }
 
@@ -644,6 +790,51 @@ if (homeBtn) {
     }
   });
 }
+document.getElementById('btnVerAutores').addEventListener('click', function() {
+    const info = document.getElementById('infoAutores');
+    const title = this.querySelector('.btn-academic-title');
+    const icon = this.querySelector('.btn-academic-icon');
+    const isHidden = info.style.display === 'none';
+
+    info.style.display = isHidden ? 'block' : 'none';
+
+    if (title) title.textContent = isHidden ? 'Cerrar información' : '¿Quiénes somos?';
+    if (icon) icon.textContent = isHidden ? '↑' : '👥';
+    setTimeout(updateCarousel, 0);
+});
+
+
+/* ========================================
+   🤖 INTEGRACIÓN PROACTIVA CON CHATBOT
+   ======================================== */
+function activarAsistenteProactivo(mensajeParaIA) {
+  // 1. Abrir el chatbot si está cerrado (simulando click en el botón)
+  const chatbotToggle = document.querySelector('.chatbot-toggle');
+  const chatbotWindow = document.querySelector('.chatbot-window');
+  
+  if (chatbotToggle && chatbotWindow && !chatbotWindow.classList.contains('active')) {
+    chatbotToggle.click();
+  }
+
+  // 2. Si hay un mensaje específico (ej: "ayudame a mejorar"), lo enviamos
+  // Esto requiere que la función sendMessage sea accesible globalmente
+  if (mensajeParaIA && window.sendMessage) {
+    // Pequeño delay para que la animación de apertura termine
+    setTimeout(() => {
+      window.sendMessage(mensajeParaIA);
+    }, 500);
+  }
+}
+
+
+
+
+
+
+
+
+
+
 
 /* ========================================
    MODAL HERRAMIENTAS (se usa en resultados)
@@ -651,29 +842,346 @@ if (homeBtn) {
 function mostrarHerramientas(tipo) {
   if (!modal) return;
 
-  let titulo = 'Herramientas recomendadas';
-  let cuerpo = '';
+  const grupos = {
+    educativo: {
+      titulo: 'Asistentes con uso educativo',
+      intro: 'Herramientas útiles para estudiar, preparar materiales o trabajar con fuentes propias. Conviene usarlas con consignas claras, verificación humana y declaración de uso.',
+      items: [
+        {
+          nombre: 'NotebookLM',
+          url: 'https://notebooklm.google.com/',
+          desc: 'Permite trabajar con documentos propios y obtener respuestas apoyadas en fuentes cargadas por el usuario.'
+        },
+        {
+          nombre: 'ChatGPT',
+          url: 'https://chatgpt.com/',
+          desc: 'Asistente general para ideación, explicación, revisión de borradores y planificación, siempre con contraste de fuentes.'
+        },
+        {
+          nombre: 'ChatGPT Edu',
+          url: 'https://openai.com/chatgpt/education/',
+          desc: 'Opción institucional para educación superior, con controles administrativos y de privacidad.'
+        }
+      ]
+    },
+    citador: {
+      titulo: 'Búsqueda académica y citación',
+      intro: 'Recursos para localizar fuentes, organizar bibliografía y sostener mejor la verificación. No reemplazan la lectura crítica de los textos.',
+      items: [
+        {
+          nombre: 'Zotero',
+          url: 'https://www.zotero.org/',
+          desc: 'Gestor bibliográfico libre para organizar fuentes, insertar citas y crear bibliografías.'
+        },
+        {
+          nombre: 'Semantic Scholar',
+          url: 'https://www.semanticscholar.org/',
+          desc: 'Buscador académico con apoyo de IA para explorar literatura científica y relaciones entre artículos.'
+        },
+        {
+          nombre: 'Consensus',
+          url: 'https://consensus.app/',
+          desc: 'Buscador académico que vincula respuestas con artículos científicos y ayuda a revisar evidencia.'
+        },
+        {
+          nombre: 'Elicit',
+          url: 'https://elicit.com/',
+          desc: 'Asistente para revisión de literatura, extracción de hallazgos y comparación de artículos.'
+        }
+      ]
+    },
+    sesgos: {
+      titulo: 'Revisión crítica de sesgos',
+      intro: 'Estos recursos pueden ayudar a detectar señales de sesgo, toxicidad o problemas de equidad, pero no ofrecen una validación definitiva. La revisión pedagógica y contextual sigue siendo central.',
+      items: [
+        {
+          nombre: 'Perspective API',
+          url: 'https://perspectiveapi.com/',
+          desc: 'Analiza rasgos de toxicidad en texto. Útil como apoyo inicial, no como juicio automático.'
+        },
+        {
+          nombre: 'IBM AI Fairness 360',
+          url: 'https://aif360.res.ibm.com/',
+          desc: 'Kit de herramientas para explorar métricas de equidad y sesgos en sistemas de IA.'
+        },
+        {
+          nombre: 'Guía UNESCO sobre IAG',
+          url: 'https://unesdoc.unesco.org/ark:/48223/pf0000389227',
+          desc: 'Marco para discutir riesgos, equidad, inclusión y gobernanza en educación e investigación.'
+        }
+      ]
+    },
+    prompts: {
+      titulo: 'Prompts éticos y reflexivos',
+      intro: 'Recursos para diseñar consignas que pidan justificar, verificar, comparar fuentes y explicitar límites, en lugar de delegar todo el trabajo intelectual.',
+      items: [
+        {
+          nombre: 'OpenAI - Prompt engineering',
+          url: 'https://platform.openai.com/docs/guides/prompt-engineering',
+          desc: 'Guía técnica para formular instrucciones claras, con criterios, contexto y ejemplos.'
+        },
+        {
+          nombre: 'Anthropic - Prompt engineering',
+          url: 'https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview',
+          desc: 'Orientaciones para estructurar instrucciones, ejemplos y criterios de salida.'
+        },
+        {
+          nombre: 'Guía FING 2026',
+          url: 'https://www.fing.edu.uy/sites/default/files/2026-02/guia-de-etica-fing_2026.pdf',
+          desc: 'Incluye criterios sobre restricciones, documentación del proceso y explicación del razonamiento.'
+        }
+      ]
+    }
+  };
 
-  switch (tipo) {
-    case 'educativo':
-      titulo = 'Asistentes con modo educativo';
-      cuerpo = '<p>Ejemplos: asistentes en modo educativo que promueven verificación y citación.</p>';
-      break;
-    case 'citador':
-      titulo = 'Editores con citador integrado';
-      cuerpo = '<p>Ejemplos: procesadores de texto con sugerencias de fuentes y citas.</p>';
-      break;
-    case 'sesgos':
-      titulo = 'Verificadores de sesgos';
-      cuerpo = '<p>Herramientas que analizan texto para detectar posibles sesgos o discriminaciones.</p>';
-      break;
-    case 'prompts':
-      titulo = 'Plataformas de prompts éticos';
-      cuerpo = '<p>Recursos que enseñan a formular consultas alineadas con pensamiento crítico y ética.</p>';
-      break;
+  const grupo = grupos[tipo] || grupos.educativo;
+  const cuerpo = `
+    <p class="tool-modal-intro">${grupo.intro}</p>
+    <div class="tool-modal-list">
+      ${grupo.items.map(item => `
+        <a class="tool-link-card" href="${item.url}" target="_blank" rel="noopener noreferrer">
+          <strong>${item.nombre}</strong>
+          <span>${item.desc}</span>
+        </a>
+      `).join('')}
+    </div>
+    <p class="tool-modal-note">Sugerencia: usar cualquier herramienta junto con una consigna explícita de verificación, declaración de uso y revisión humana.</p>
+  `;
+
+  modal.show(grupo.titulo, cuerpo);
+}
+
+/* ========================================
+   ESTADÍSTICAS ANÓNIMAS
+   ======================================== */
+function formatNumber(value) {
+  return new Intl.NumberFormat('es-UY').format(Number(value || 0));
+}
+
+function normalizeStatsCollection(value) {
+  if (!value) return [];
+  if (Array.isArray(value)) return value;
+  return Object.entries(value).map(([label, count]) => ({ label, count }));
+}
+
+function renderStatsBars(container, rows) {
+  if (!container) return;
+  const normalized = normalizeStatsCollection(rows)
+    .filter(row => row && row.label)
+    .map(row => ({
+      label: row.label,
+      count: Number(row.count || row.value || 0)
+    }));
+
+  if (!normalized.length) {
+    container.innerHTML = '<p class="stats-empty">Sin datos suficientes.</p>';
+    return;
   }
 
-  modal.show(titulo, cuerpo);
+  const max = Math.max(...normalized.map(row => row.count), 1);
+  container.innerHTML = normalized.map(row => {
+    const pct = Math.round((row.count / max) * 100);
+    return `
+      <div class="stats-bar-row">
+        <div class="stats-bar-label">
+          <span>${row.label}</span>
+          <span>${formatNumber(row.count)}</span>
+        </div>
+        <div class="stats-bar-track">
+          <div class="stats-bar-fill" style="width:${pct}%"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderStats(data) {
+  const summary = data.summary || data;
+  if (elements.statVisits) elements.statVisits.textContent = formatNumber(summary.visits || summary.totalVisits);
+  if (elements.statCompleted) elements.statCompleted.textContent = formatNumber(summary.completed || summary.totalCompleted);
+  if (elements.statAverage) elements.statAverage.textContent = summary.averageScore != null ? Number(summary.averageScore).toFixed(1) : '—';
+  if (elements.statTopLevel) elements.statTopLevel.textContent = summary.topLevel || '—';
+
+  renderStatsBars(elements.statsLevels, data.levels || data.byLevel);
+  renderStatsBars(elements.statsProfiles, data.profiles || data.byProfile);
+  renderStatsBars(elements.statsIndicators, data.indicators || data.weakIndicators);
+
+  if (elements.statsStatus) elements.statsStatus.classList.add('hidden');
+  if (elements.statsContent) elements.statsContent.classList.remove('hidden');
+}
+
+async function cargarEstadisticasAnonimas() {
+  if (!elements.statsStatus || !CONFIG.statsEndpoint) return;
+
+  elements.statsStatus.classList.remove('hidden');
+  elements.statsStatus.textContent = 'Cargando estadísticas anónimas...';
+  if (elements.statsContent) elements.statsContent.classList.add('hidden');
+
+  try {
+    const response = await fetch(CONFIG.statsEndpoint, { method: 'GET' });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    renderStats(data);
+  } catch (error) {
+    console.warn('No se pudieron cargar estadísticas anónimas:', error);
+    elements.statsStatus.innerHTML = `
+      Las estadísticas todavía no están disponibles. Para activarlas, la API con base de datos debe publicar un endpoint de lectura con datos agregados y anónimos.
+    `;
+  }
+}
+
+if (elements.refreshStatsBtn) {
+  elements.refreshStatsBtn.addEventListener('click', cargarEstadisticasAnonimas);
+}
+
+/* ========================================
+   OPINIONES ANÓNIMAS
+   ======================================== */
+let currentOpinionIndex = 0;
+
+function escapeHtml(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function renderOpinions(opinions) {
+  if (!elements.opinionsCarousel || !elements.opinionsStatus) return;
+
+  if (!opinions || !opinions.length) {
+    elements.opinionsStatus.classList.remove('hidden');
+    elements.opinionsStatus.textContent = 'Todavía no hay opiniones públicas suficientes.';
+    elements.opinionsCarousel.classList.add('hidden');
+    return;
+  }
+
+  currentOpinionIndex = 0;
+  elements.opinionsCarousel.innerHTML = opinions.map((opinion, index) => {
+    const stars = '★'.repeat(Math.max(1, Math.min(5, Number(opinion.rating || 0))));
+    const meta = [opinion.profile, opinion.nivelEducativo].filter(Boolean).join(' · ');
+    return `
+      <article class="opinion-card ${index === 0 ? 'active' : ''}">
+        <div class="opinion-rating" aria-label="Valoración ${Number(opinion.rating || 0)} de 5">${stars}</div>
+        <blockquote>“${escapeHtml(opinion.suggestion)}”</blockquote>
+        ${meta ? `<div class="opinion-meta">${escapeHtml(meta)}</div>` : ''}
+      </article>
+    `;
+  }).join('');
+
+  elements.opinionsStatus.classList.add('hidden');
+  elements.opinionsCarousel.classList.remove('hidden');
+}
+
+function showOpinion(index) {
+  if (!elements.opinionsCarousel) return;
+  const cards = elements.opinionsCarousel.querySelectorAll('.opinion-card');
+  if (!cards.length) return;
+
+  currentOpinionIndex = (index + cards.length) % cards.length;
+  cards.forEach((card, cardIndex) => {
+    card.classList.toggle('active', cardIndex === currentOpinionIndex);
+  });
+}
+
+async function cargarOpinionesAnonimas() {
+  if (!elements.opinionsStatus || !CONFIG.opinionsEndpoint) return;
+
+  elements.opinionsStatus.classList.remove('hidden');
+  elements.opinionsStatus.textContent = 'Cargando opiniones...';
+
+  try {
+    const response = await fetch(CONFIG.opinionsEndpoint, { method: 'GET' });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    renderOpinions(data.opinions || []);
+  } catch (error) {
+    console.warn('No se pudieron cargar opiniones anónimas:', error);
+    elements.opinionsStatus.textContent = 'Las opiniones todavía no están disponibles.';
+  }
+}
+
+if (elements.prevOpinionBtn) {
+  elements.prevOpinionBtn.addEventListener('click', () => showOpinion(currentOpinionIndex - 1));
+}
+if (elements.nextOpinionBtn) {
+  elements.nextOpinionBtn.addEventListener('click', () => showOpinion(currentOpinionIndex + 1));
+}
+
+/* ========================================
+   VALORACIÓN Y SUGERENCIAS
+   ======================================== */
+function getSelectedToolRating() {
+  if (!elements.toolRatingRadios || !elements.toolRatingRadios.length) return '';
+  const selected = Array.from(elements.toolRatingRadios).find(radio => radio.checked);
+  return selected ? selected.value : '';
+}
+
+function buildToolFeedbackPayload() {
+  return {
+    eventType: 'feedback',
+    timestamp: new Date().toISOString(),
+    sessionId: typeof getAnalyticsSessionId === 'function' ? getAnalyticsSessionId() : '',
+    rating: Number(getSelectedToolRating()),
+    suggestion: elements.toolSuggestion ? elements.toolSuggestion.value.trim() : '',
+    profile: state.profileBase || state.profile || '',
+    profileKey: state.profileKey || '',
+    country: state.country || '',
+    nivelEducativo: state.nivelEducativo || ''
+  };
+}
+
+function enviarValoracionHerramienta() {
+  if (!elements.sendToolFeedbackBtn || !CONFIG.dataEndpoint) return;
+
+  const rating = getSelectedToolRating();
+  if (!rating) {
+    if (elements.toolFeedbackStatus) {
+      elements.toolFeedbackStatus.textContent = 'Seleccioná una valoración del 1 al 5 para enviar tu aporte.';
+      elements.toolFeedbackStatus.classList.add('is-warning');
+    }
+    return;
+  }
+
+  elements.sendToolFeedbackBtn.disabled = true;
+  elements.sendToolFeedbackBtn.textContent = 'Enviando...';
+  if (elements.toolFeedbackStatus) {
+    elements.toolFeedbackStatus.textContent = 'Guardando tu valoración...';
+    elements.toolFeedbackStatus.classList.remove('is-warning');
+  }
+
+  fetch(CONFIG.dataEndpoint, {
+    method: 'POST',
+    mode: 'cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(buildToolFeedbackPayload())
+  })
+    .then(response => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    })
+    .then(() => {
+      elements.sendToolFeedbackBtn.textContent = 'Valoración enviada';
+      if (elements.toolFeedbackStatus) {
+        elements.toolFeedbackStatus.textContent = 'Gracias. Tu aporte quedó registrado de forma anónima.';
+      }
+      cargarOpinionesAnonimas();
+    })
+    .catch(err => {
+      console.warn('No se pudo enviar la valoración:', err);
+      elements.sendToolFeedbackBtn.disabled = false;
+      elements.sendToolFeedbackBtn.textContent = 'Enviar valoración';
+      if (elements.toolFeedbackStatus) {
+        elements.toolFeedbackStatus.textContent = 'No se pudo enviar ahora. Probá nuevamente en unos segundos.';
+        elements.toolFeedbackStatus.classList.add('is-warning');
+      }
+    });
+}
+
+if (elements.sendToolFeedbackBtn) {
+  elements.sendToolFeedbackBtn.addEventListener('click', enviarValoracionHerramienta);
 }
 
 /* ========================================
@@ -722,4 +1230,17 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('🔍 Validando estado inicial del botón...');
     updateStartButtonState();
   }, 100);
+
+  const afterVisit = typeof sendVisitToServer === 'function'
+    ? Promise.resolve(sendVisitToServer())
+    : Promise.resolve(false);
+
+  afterVisit.finally(cargarEstadisticasAnonimas);
+  cargarOpinionesAnonimas();
+
+  setTimeout(mostrarGuiaRapidaInicial, 450);
+});
+
+window.addEventListener('resize', () => {
+  updateCarousel();
 });

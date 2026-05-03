@@ -134,6 +134,10 @@ function iniciarJuego() {
   updateProgress();
   updateLikert();
   updateTimeline();
+
+  if (typeof window.showChatbotQuizIntro === 'function') {
+    setTimeout(window.showChatbotQuizIntro, 500);
+  }
 }
 
 /* ========================================
@@ -322,15 +326,14 @@ function updateTimeline() {
    ENVÍO DE DATOS A GOOGLE SHEETS
    ======================================== */
 /**
- * Envía los datos del cuestionario completado a Google Apps Script
+ * Envía los datos del cuestionario completado a la API de persistencia
  * @param {Object} payload - Objeto con todos los datos del usuario y respuestas
  */
 function sendResultToServer(payload) {
-  // 📌 URL de tu implementación de Apps Script
-  const url = "https://script.google.com/macros/s/AKfycbwaYbC5ebLgVjexSkxhgYR6Gvqr8Tcq6drUsl6DXL_OKl2eHLeATMaBMUzV4G3YyG9j/exec";
+  const url = CONFIG.dataEndpoint;
 
   console.log('═══════════════════════════════════');
-  console.log('🚀 ENVIANDO DATOS A GOOGLE SHEETS');
+  console.log('🚀 ENVIANDO DATOS A BASE DE DATOS');
   console.log('📍 URL:', url);
   console.log('📦 Payload completo:');
   console.log(JSON.stringify(payload, null, 2));
@@ -338,17 +341,74 @@ function sendResultToServer(payload) {
 
   fetch(url, {
     method: "POST",
-    mode: "no-cors",              // Necesario para Apps Script
+    mode: "cors",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
   })
-    .then(() => {
-      console.log('✅ Datos enviados exitosamente a Google Sheets');
+    .then(response => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    })
+    .then(data => {
+      console.log('✅ Datos enviados exitosamente a la base de datos:', data);
     })
     .catch(err => {
       console.error("❌ Error al enviar datos:", err);
       console.error("Detalles del error:", err.message);
     });
+}
+
+function getAnalyticsSessionId() {
+  try {
+    const key = 'iagAnalyticsSessionId';
+    let sessionId = sessionStorage.getItem(key);
+    if (!sessionId) {
+      sessionId = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+      sessionStorage.setItem(key, sessionId);
+    }
+    return sessionId;
+  } catch (err) {
+    return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+  }
+}
+
+function sendVisitToServer() {
+  if (!CONFIG.dataEndpoint) return Promise.resolve(false);
+
+  try {
+    if (sessionStorage.getItem('iagVisitSent') === 'true') return Promise.resolve(false);
+    sessionStorage.setItem('iagVisitSent', 'true');
+  } catch (err) {
+    console.warn('No se pudo acceder a sessionStorage para controlar visitas:', err);
+  }
+
+  const payload = {
+    eventType: 'visit',
+    timestamp: new Date().toISOString(),
+    sessionId: getAnalyticsSessionId(),
+    page: 'index',
+    anonymous: true
+  };
+
+  return fetch(CONFIG.dataEndpoint, {
+    method: "POST",
+    mode: "cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+    .then(response => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return true;
+    })
+    .catch(err => {
+    try {
+      sessionStorage.removeItem('iagVisitSent');
+    } catch (storageErr) {
+      console.warn('No se pudo restablecer el control de visita:', storageErr);
+    }
+    console.warn('No se pudo registrar la visita anonima:', err);
+    return false;
+  });
 }
 
 /**
@@ -365,6 +425,8 @@ function buildResultPayload() {
 
   const payload = {
     timestamp: new Date().toISOString(),
+    eventType: 'completion',
+    sessionId: getAnalyticsSessionId(),
 
     // Perfiles
     profile:    state.profileBase || state.profile, // docente | estudiante
@@ -392,7 +454,7 @@ function buildResultPayload() {
 
   // 🔍 DEBUG en consola
   console.log('═══════════════════════════════════');
-  console.log('📤 PAYLOAD A ENVIAR A SHEETS');
+  console.log('📤 PAYLOAD A ENVIAR A BASE DE DATOS');
   console.log('profile:', payload.profile);
   console.log('profileKey:', payload.profileKey);
   console.log('userName:', payload.userName);
@@ -484,7 +546,7 @@ function mostrarResultados() {
     try {
       const payload = buildResultPayload();
       sendResultToServer(payload);
-      console.log("✅ Registro enviado:", payload);
+      console.log("✅ Registro enviado a base de datos:", payload);
     } catch (err) {
       console.error("❌ Error preparando registro:", err);
     }

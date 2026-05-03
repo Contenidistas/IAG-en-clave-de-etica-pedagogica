@@ -1,5 +1,5 @@
 // ==========================================
-// CHATBOT ANEP - Asistente Pedagógico (v2.1)
+// CHATBOT - Asistente Pedagógico (v2.1)
 // Integrado con Worker Cloudflare + Gemini 2.5
 // ==========================================
 
@@ -17,6 +17,30 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
+    .typing-indicator {
+      display: flex;
+      gap: 4px;
+      padding: 4px 8px;
+      align-items: center;
+    }
+
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+      background: #94a3b8;
+      border-radius: 50%;
+      animation: bounce 1.4s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+    .typing-dot:nth-child(3) { animation-delay: 0s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1); }
+    }
+
     .chatbot-toggle {
       width: 60px;
       height: 60px;
@@ -31,6 +55,22 @@
       justify-content: center;
       font-size: 1.5rem;
       transition: all 0.3s ease;
+    }
+
+    .chatbot-floating-label {
+      position: absolute;
+      right: 72px;
+      bottom: 9px;
+      background: #ffffff;
+      color: #312e81;
+      border: 1px solid #c7d2fe;
+      border-radius: 999px;
+      padding: 0.5rem 0.75rem;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.14);
+      font-size: 0.82rem;
+      font-weight: 700;
+      white-space: nowrap;
+      pointer-events: none;
     }
 
     .chatbot-toggle:hover {
@@ -234,6 +274,23 @@
       margin-bottom: 1.5rem;
     }
 
+    .chatbot-ai-disclosure {
+      margin: 0 1rem 0.75rem;
+      padding: 0.65rem 0.8rem;
+      border-radius: 10px;
+      background: #eef2ff;
+      border: 1px solid #c7d2fe;
+      color: #3730a3;
+      font-size: 0.78rem;
+      line-height: 1.45;
+    }
+
+    .chatbot-ai-disclosure strong {
+      display: block;
+      margin-bottom: 0.2rem;
+      color: #312e81;
+    }
+
     .chatbot-tooltip {
       position: absolute;
       bottom: 70px;
@@ -245,20 +302,11 @@
       box-shadow: 0 8px 24px rgba(245, 158, 11, 0.4);
       max-width: 280px;
       z-index: 10000;
-      animation: tooltipBounce 2s ease-in-out infinite;
       position: relative;
     }
 
     .chatbot-tooltip::after {
-      content: '';
-      position: absolute;
-      bottom: -8px;
-      right: 24px;
-      width: 0;
-      height: 0;
-      border-left: 10px solid transparent;
-      border-right: 10px solid transparent;
-      border-top: 10px solid var(--accent, #f59e0b);
+      content: none;
     }
 
     .chatbot-tooltip-title {
@@ -283,19 +331,19 @@
       background: transparent;
       border: none;
       color: white;
-      font-size: 1.5rem;
+      font-size: 0.8rem;
       cursor: pointer;
-      width: 28px;
-      height: 28px;
+      min-width: 28px;
+      min-height: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
       border-radius: 50%;
       transition: background 0.2s;
-      padding: 0;
+      padding: 0 0.35rem;
       line-height: 1;
       z-index: 10001;
-      font-weight: bold;
+      font-weight: 700;
     }
 
     .chatbot-tooltip-close:hover {
@@ -304,11 +352,6 @@
 
     .chatbot-tooltip.hidden {
       display: none !important;
-    }
-
-    @keyframes tooltipBounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
     }
 
     @media (max-width: 768px) {
@@ -322,6 +365,10 @@
       .chatbot-tooltip {
         max-width: 240px;
         right: 0;
+      }
+
+      .chatbot-floating-label {
+        display: none;
       }
     }
 
@@ -350,27 +397,31 @@
   const chatbotHTML = `
     <div class="chatbot-wrapper">
       <div class="chatbot-tooltip" id="chatbotTooltip">
-        <button class="chatbot-tooltip-close" id="chatbotTooltipClose" aria-label="Cerrar" type="button">×</button>
-        <div class="chatbot-tooltip-title">💡 Oportunidad de Profundización</div>
+        <button class="chatbot-tooltip-close" id="chatbotTooltipClose" aria-label="Cerrar" type="button">Cerrar</button>
+        <div class="chatbot-tooltip-title">Oportunidad de profundización</div>
         <p>Consultá al Asistente Pedagógico para resolver dudas sobre el uso crítico de IA.</p>
       </div>
+      <span class="chatbot-floating-label">Asistente Pedagógico</span>
       <button class="chatbot-toggle" id="chatbotToggle" aria-label="Abrir asistente pedagógico">💬</button>
       <div class="chatbot-window" id="chatbotWindow">
         <div class="chatbot-header">
           <div class="chatbot-header-title">
-            <span>🤖</span>
             <div>
-              <h3>Asistente Pedagógico ANEP</h3>
-              <p class="chatbot-header-subtitle">Consultame sobre IA educativa</p>
+              <h3>Asistente Pedagógico</h3>
+              <p class="chatbot-header-subtitle">Asistencia generada con IA</p>
             </div>
           </div>
           <button class="chatbot-close" id="chatbotClose">×</button>
         </div>
         <div class="chatbot-messages" id="chatbotMessages">
           <div class="chatbot-welcome">
-            <h4>👋 ¡Hola! Soy tu asistente pedagógico</h4>
-            <p>Estoy aquí para ayudarte con dudas sobre el uso crítico de IA en educación, basándome en el Marco ANEP.</p>
+            <h4>Hola, soy tu Asistente Pedagógico</h4>
+            <p>Puedo ayudarte a interpretar tus respuestas, revisar preguntas del recorrido y pensar mejoras para un uso crítico de IA en educación.</p>
           </div>
+        </div>
+        <div class="chatbot-ai-disclosure">
+          <strong>Transparencia de uso</strong>
+          Este asistente usa IA generativa para orientar la reflexión. Sus respuestas pueden requerir verificación y no sustituyen el criterio docente, académico o institucional.
         </div>
         <div class="chatbot-input-area">
           <input type="text" id="chatbotInput" class="chatbot-input" placeholder="Escribí tu consulta..." maxlength="500" />
@@ -387,6 +438,7 @@
   };
 
   const TOOLTIP_DISMISSED_KEY = 'chatbot_tooltip_dismissed';
+  const QUIZ_INTRO_TOOLTIP_KEY = 'chatbot_quiz_intro_shown';
 
   // ========== ELEMENTOS ==========
   const el = {
@@ -419,21 +471,112 @@
       .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
   };
 
-  const addMessage = (content, type = 'bot') => {
+const addMessage = (content, type = 'bot', save = true) => {
     const welcome = el.messages.querySelector('.chatbot-welcome');
     if (welcome) welcome.remove();
 
     const msg = document.createElement('div');
     msg.className = `chatbot-message ${type}`;
+    
+    // Si es el indicador de carga, usamos los puntos animados
+    const htmlContent = content === 'TYPING_INDICATOR' 
+      ? `<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`
+      : markdownToHTML(content);
+
     msg.innerHTML = `
       <div class="chatbot-message-avatar">${type === 'bot' ? '🤖' : '👤'}</div>
-      <div class="chatbot-message-content">${markdownToHTML(content)}</div>
+      <div class="chatbot-message-content">${htmlContent}</div>
     `;
     el.messages.appendChild(msg);
     scrollToBottom();
+
+    // Guardar en sesión para persistencia (solo mensajes reales)
+    if (save && content !== 'TYPING_INDICATOR') {
+      const history = JSON.parse(sessionStorage.getItem('chatbot_history') || '[]');
+      history.push({ content, type });
+      sessionStorage.setItem('chatbot_history', JSON.stringify(history));
+    }
+
+    return msg;
   };
 
-  const sendMessage = async (message) => {
+  const buildQuestionContext = () => {
+    const appState = window.state || {};
+    const appConfig = window.CONFIG || {};
+    const profileKey = appState.profileKey || appState.profile;
+    const perfil = appConfig.perfiles && profileKey ? appConfig.perfiles[profileKey] : null;
+    const currentNode = perfil && appState.currentId && appState.currentId !== 'FIN'
+      ? perfil.nodos[appState.currentId]
+      : null;
+
+    const questions = perfil
+      ? Object.entries(perfil.nodos)
+          .filter(([id]) => id !== 'FIN')
+          .map(([id, node]) => ({
+            id,
+            pregunta: node.title,
+            ayuda: node.help,
+            referencia: node.anepRef
+          }))
+      : [];
+
+    return {
+      instruccionPrioritaria: 'Si la consulta del usuario menciona "esto", "acá", "esta pregunta", "la pregunta" o pide qué significa algo del sitio, respondé sobre la preguntaActual del recorrido. No comiences hablando del puntaje ni evalúes el resultado salvo que el usuario lo pida explícitamente.',
+      perfil: appState.profileBase || appState.profile || null,
+      perfilRecorrido: profileKey || null,
+      nivelEducativo: appState.nivelEducativo || null,
+      familiaridadInicial: appState.familiaridadInicial || null,
+      recursosSimilares: appState.recursosSimilares || null,
+      estadoDelRecorrido: {
+        evidenciaAcumulada: appState.evidence || 0,
+        preguntaNumero: appState.currentQuestion || null,
+        totalPreguntas: appState.totalQuestions || null
+      },
+      preguntaActual: currentNode ? {
+        id: appState.currentId,
+        pregunta: currentNode.title,
+        ayuda: currentNode.help,
+        contexto: currentNode.context,
+        referencia: currentNode.anepRef
+      } : null,
+      respuestasDelRecorrido: Array.isArray(appState.path)
+        ? appState.path.map((step, index) => ({
+            orden: index + 1,
+            id: step.id,
+            pregunta: step.question,
+            respuesta: step.answer ? 'Sí' : 'No',
+            feedback: step.feedback
+          }))
+        : [],
+      preguntasDelPerfil: questions
+    };
+  };
+
+  const userAsksAboutCurrentQuestion = (text) => {
+    const normalized = String(text || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+
+    return /\b(esto|aca|aqui|pregunta|consigna|que me pregunta|que seria|que significa)\b/.test(normalized);
+  };
+
+  const buildWorkerMessage = (message, context) => {
+    if (!userAsksAboutCurrentQuestion(message) || !context.preguntaActual) {
+      return message;
+    }
+
+    return [
+      message,
+      '',
+      'Contexto de la interfaz: el usuario se refiere a la pregunta actual del recorrido.',
+      `Pregunta actual: ${context.preguntaActual.pregunta}`,
+      `Ayuda visible: ${context.preguntaActual.ayuda}`,
+      'Respondé explicando qué está preguntando esa consigna y cómo pensarla. No hables del puntaje salvo que el usuario lo pida.'
+    ].join('\n');
+  };
+
+ const sendMessage = async (message) => {
     if (!message || isTyping) return;
 
     addMessage(message, 'user');
@@ -442,25 +585,39 @@
     el.input.disabled = true;
     isTyping = true;
 
-    addMessage('⌛ Pensando...', 'bot');
+    const typingMessage = addMessage('TYPING_INDICATOR', 'bot', false); // Indicador visual sin guardar
 
-    try {
-      const response = await fetch(CONFIG.WORKER_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message }),
-      });
+   try {
+  const userContext = buildQuestionContext();
+  const workerMessage = buildWorkerMessage(message, userContext);
 
-      const data = await response.json();
-      el.messages.lastElementChild.remove(); // elimina "pensando"
+  const response = await fetch(CONFIG.WORKER_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      message: workerMessage,
+      context: userContext
+    })
+  });
 
-      let reply = data.reply || '❌ No se pudo generar respuesta.';
-      reply = reply.replace(/\\n/g, '\n').replace(/\n{2,}/g, '\n\n');
-      addMessage(reply, 'bot');
-    } catch (err) {
-      console.error(err);
-      addMessage('❌ Error al conectar con el asistente. Intentá de nuevo.', 'bot');
-    } finally {
+  if (!response.ok) {
+    throw new Error(`Error HTTP: ${response.status}`);
+  }
+
+  const data = await response.json();
+  console.log("Respuesta IA:", data);
+
+  // 👇 MOSTRAR RESPUESTA
+  if (typingMessage && typingMessage.parentNode) typingMessage.remove();
+  addMessage(data.reply || "No pude responder en este momento.", 'bot');
+
+} catch (error) {
+  console.error("Error en chatbot:", error);
+  if (typingMessage && typingMessage.parentNode) typingMessage.remove();
+  addMessage("⚠️ Hubo un problema al conectar con la IA.", 'bot');
+} finally {
       el.send.disabled = false;
       el.input.disabled = false;
       el.input.focus();
@@ -468,10 +625,42 @@
     }
   };
 
+  window.sendMessage = sendMessage;
+
   const dismissTooltip = () => {
     el.tooltip.classList.add('hidden');
     localStorage.setItem(TOOLTIP_DISMISSED_KEY, 'true');
   };
+
+  const showTooltip = (title, text, options = {}) => {
+    if (!el.tooltip) return;
+    const titleEl = el.tooltip.querySelector('.chatbot-tooltip-title');
+    const textEl = el.tooltip.querySelector('p');
+
+    if (titleEl) titleEl.textContent = title;
+    if (textEl) textEl.textContent = text;
+    el.tooltip.classList.remove('hidden');
+
+    if (options.autoHideMs) {
+      window.clearTimeout(showTooltip.hideTimer);
+      showTooltip.hideTimer = window.setTimeout(() => {
+        el.tooltip.classList.add('hidden');
+      }, options.autoHideMs);
+    }
+  };
+
+  const showQuizIntroTooltip = () => {
+    if (sessionStorage.getItem(QUIZ_INTRO_TOOLTIP_KEY) === 'true') return;
+    sessionStorage.setItem(QUIZ_INTRO_TOOLTIP_KEY, 'true');
+
+    showTooltip(
+      'Asistente Pedagógico',
+      'Uso IA generativa para explicar preguntas, interpretar respuestas y sugerir mejoras. Conviene verificar mis orientaciones con criterio pedagógico.',
+      { autoHideMs: 12000 }
+    );
+  };
+
+  window.showChatbotQuizIntro = showQuizIntroTooltip;
 
   // ========== EVENTOS ==========
   el.toggle.addEventListener('click', () => {
@@ -517,5 +706,21 @@
     el.tooltip.classList.add('hidden');
   }
 
-  console.log('💬 Chatbot Pedagógico ANEP (v2.1) iniciado');
+
+
+  // ========== INICIALIZACIÓN ==========
+  
+  // Cargar historial previo de la sesión
+  const savedHistory = sessionStorage.getItem('chatbot_history');
+  if (savedHistory) {
+    const history = JSON.parse(savedHistory);
+    history.forEach(msg => addMessage(msg.content, msg.type, false));
+  }
+
+  if (localStorage.getItem(TOOLTIP_DISMISSED_KEY) === 'true') {
+    el.tooltip.classList.add('hidden');
+  }
+
+  console.log('Chatbot Pedagógico (v2.1) iniciado con persistencia');
+  
 })();

@@ -27,6 +27,52 @@ function agregarTextoMultilinea(doc, texto, x, y, maxWidth, lineHeight) {
   return y;
 }
 
+function obtenerNombreApp() {
+  const titulo = document.querySelector('.home-btn span');
+  return titulo ? titulo.textContent.replace('🏠', '').trim() : 'IAG en clave de ética pedagógica';
+}
+
+function obtenerNombreParticipante() {
+  const nombreEstado = state.name ? state.name.trim() : '';
+  const nombreInput = elements.playerName ? elements.playerName.value.trim() : '';
+  return nombreEstado || nombreInput || 'No indicado';
+}
+
+function obtenerPerfilReporte() {
+  const base = state.profileBase || state.profile;
+  const perfilBase = base === 'docente' ? 'Docente' : 'Estudiante';
+  return state.nivelEducativo ? `${perfilBase} - ${state.nivelEducativo}` : perfilBase;
+}
+
+function construirRetroalimentacionMarco(nodo, respuesta) {
+  const respuestaTexto = respuesta ? 'La respuesta afirmativa muestra una práctica alineada con los marcos de referencia.' : 'La respuesta negativa señala una oportunidad concreta de mejora y formación.';
+  const referencia = nodo.anepRef || 'ANEP / UNESCO / FING';
+  const titulo = (nodo.title || '').toLowerCase();
+  let foco = 'conviene documentar el proceso, contrastar la información generada por IA con fuentes confiables y explicitar qué parte del trabajo corresponde a criterio humano';
+
+  if (titulo.includes('verific') || titulo.includes('contrast')) {
+    foco = 'es importante contrastar la respuesta de la IA con bibliografía, documentos institucionales o fuentes confiables, evitando tomar la salida generada como verdad suficiente';
+  } else if (titulo.includes('autor') || titulo.includes('cit') || titulo.includes('asistencia')) {
+    foco = 'la transparencia exige declarar cuándo intervino la IA, qué herramienta se usó y cuál fue el aporte humano en la producción final';
+  } else if (titulo.includes('sesg') || titulo.includes('divers') || titulo.includes('contexto')) {
+    foco = 'la revisión crítica debe atender sesgos, omisiones culturales, exclusiones y desajustes con el contexto real del grupo o de la tarea';
+  } else if (titulo.includes('regla') || titulo.includes('límite') || titulo.includes('permitido')) {
+    foco = 'los acuerdos previos sobre usos permitidos, límites, documentación y criterios de evaluación reducen ambigüedades y fortalecen la confianza pedagógica';
+  } else if (titulo.includes('aporte') || titulo.includes('personal') || titulo.includes('original')) {
+    foco = 'el valor educativo aparece cuando la IA no sustituye el pensamiento propio, sino que ayuda a elaborar, revisar, comparar o ampliar una producción con autoría humana reconocible';
+  } else if (titulo.includes('prompt') || titulo.includes('proceso') || titulo.includes('decisiones')) {
+    foco = 'FING enfatiza la importancia de registrar prompts, decisiones y validaciones para que el proceso pueda ser explicado y evaluado, no solo el resultado final';
+  } else if (titulo.includes('previo') || titulo.includes('base') || titulo.includes('fundamento')) {
+    foco = 'antes de delegar tareas en la IA, conviene asegurar comprensión conceptual suficiente para evaluar la calidad, pertinencia y límites de la respuesta generada';
+  }
+
+  return `${respuestaTexto} Desde ANEP, UNESCO y FING, este punto debe leerse en clave de responsabilidad pedagógica: ${foco}. Referencia vinculada: ${referencia}.`;
+}
+
+function construirSintesisMarco(nivel) {
+  return `El resultado debe interpretarse como un punto de partida para la reflexión, no como una calificación cerrada. Desde UNESCO, el uso de IA en educación requiere transparencia, agencia humana, equidad y revisión crítica de posibles sesgos. Desde ANEP, implica formar ciudadanía digital, promover pensamiento crítico y evitar usos acríticos o indiscriminados. Desde FING, se refuerza la necesidad de definir restricciones claras por tarea, documentar prompts y decisiones, preservar la originalidad y poder explicar el proceso de trabajo. En este recorrido, el nivel "${nivel.id}" orienta qué acuerdos conviene fortalecer para sostener un uso ético, crítico y reflexivo de la IAG.`;
+}
+
 /* ========================================
    ACCIONES FINALES
    ======================================== */
@@ -34,8 +80,10 @@ if (elements.downloadBtn) {
   elements.downloadBtn.addEventListener('click', async () => {
     const nivel = CONFIG.likert.find(l => state.evidence >= l.min && l.max >= state.evidence);
     const fecha = new Date().toLocaleDateString('es-UY');
-    const nombre = state.name || 'Sin nombre';
-    const perfilHumano = state.profile === 'docente' ? 'Docente' : 'Estudiante';
+    const appName = obtenerNombreApp();
+    const nombre = obtenerNombreParticipante();
+    const perfilHumano = obtenerPerfilReporte();
+    const perfil = CONFIG.perfiles[state.profileKey || state.profile];
 
     try {
       await cargarJsPDF();
@@ -48,9 +96,9 @@ if (elements.downloadBtn) {
       doc.setTextColor(255, 255, 255);
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(18);
-      doc.text('IA Educativa ANEP', 15, 20);
+      doc.text(appName, 15, 20);
       doc.setFontSize(12);
-      doc.text('Uso crítico y reflexivo de IA en educación', 15, 28);
+      doc.text('Reporte de reflexión ética, crítica y pedagógica sobre IAG', 15, 28);
 
       // Datos principales
       doc.setTextColor(0, 0, 0);
@@ -72,6 +120,17 @@ if (elements.downloadBtn) {
       y = agregarTextoMultilinea(doc, nivel.desc, 15, y, 180, 7);
       y += 6;
 
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.setTextColor(33, 33, 33);
+      doc.text('Lectura desde los marcos de referencia', 15, y); y += 8;
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(11);
+      doc.setTextColor(55, 55, 55);
+      y = agregarTextoMultilinea(doc, construirSintesisMarco(nivel), 15, y, 180, 6);
+      y += 6;
+
       // Recorrido completo
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(14);
@@ -82,14 +141,13 @@ if (elements.downloadBtn) {
       doc.setFontSize(11);
       doc.setTextColor(55, 55, 55);
 
-      const perfil = CONFIG.perfiles[state.profile];
       state.path.forEach((item, i) => {
         const nodo = perfil.nodos[item.id];
         const respuesta = item.answer ? 'Sí' : 'No';
         y = agregarTextoMultilinea(doc, `${i + 1}. ${nodo.title}`, 15, y, 180, 6);
         y = agregarTextoMultilinea(doc, `   Respuesta: ${respuesta}`, 15, y, 180, 6);
-        y = agregarTextoMultilinea(doc, `   Devolución: ${item.feedback}`, 15, y, 180, 6);
-        y = agregarTextoMultilinea(doc, `   Referencia ANEP: ${nodo.anepRef}`, 15, y, 180, 6);
+        y = agregarTextoMultilinea(doc, `   Retroalimentación inicial: ${item.feedback}`, 15, y, 180, 6);
+        y = agregarTextoMultilinea(doc, `   Lectura desde marcos: ${construirRetroalimentacionMarco(nodo, item.answer)}`, 15, y, 180, 6);
         y += 4;
       });
 
@@ -99,7 +157,7 @@ if (elements.downloadBtn) {
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(14);
       doc.setTextColor(33, 33, 33);
-      doc.text('Acuerdos didácticos ANEP', 15, y); y += 8;
+      doc.text('Acuerdos didácticos sugeridos', 15, y); y += 8;
 
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(11);
@@ -119,11 +177,14 @@ if (elements.downloadBtn) {
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(11);
       doc.setTextColor(55, 55, 55);
-      y = agregarTextoMultilinea(doc, 'Basado en el documento "La inteligencia artificial en la educación" (ANEP, 2024).', 15, y, 180, 6);
+      y = agregarTextoMultilinea(doc, 'ANEP: La inteligencia artificial en la educación (2024).', 15, y, 180, 6);
+      y = agregarTextoMultilinea(doc, 'UNESCO: Guía para el uso de IA generativa en educación e investigación.', 15, y, 180, 6);
+      y = agregarTextoMultilinea(doc, 'FING: Guía de ética para el uso de IA en unidades curriculares (2026).', 15, y, 180, 6);
       y = agregarTextoMultilinea(doc, 'Artículo académico: https://horizontespedagogicos.ibero.edu.co/article/view/3235', 15, y, 180, 6);
+      y = agregarTextoMultilinea(doc, 'Artículo académico: https://www.ucuauhtemoc.edu.mx/hubfs/revista-vol-6-num-1/Art%202%20Cuando%20el%20ocultamiento%20se%20hace%20visible.pdf', 15, y, 180, 6);
 
-      doc.save(`certificado-ia-anep-${Date.now()}.pdf`);
-      modal.show('Descarga completada', '<p>El certificado se ha descargado exitosamente en <strong>PDF</strong>.</p>');
+      doc.save(`reporte-iag-etica-pedagogica-${Date.now()}.pdf`);
+      modal.show('Descarga completada', '<p>El reporte se ha descargado exitosamente en <strong>PDF</strong>.</p>');
     } catch (e) {
       console.error(e);
       modal.show('Error al generar PDF', '<p>No se pudo generar el PDF. Verificá la conexión a Internet para cargar jsPDF.</p>');
@@ -134,18 +195,25 @@ if (elements.downloadBtn) {
 if (elements.copyBtn) {
   elements.copyBtn.addEventListener('click', () => {
     const nivel = CONFIG.likert.find(l => state.evidence >= l.min && l.max >= state.evidence);
-    const perfil = CONFIG.perfiles[state.profile];
-    const resumen = `IA Educativa ANEP - Resultados
+    const perfil = CONFIG.perfiles[state.profileKey || state.profile];
+    const appName = obtenerNombreApp();
+    const nombre = obtenerNombreParticipante();
+    const resumen = `${appName} - Reporte de resultados
 
-Perfil: ${state.profile}
-${state.name ? `Nombre: ${state.name}` : ''}
+Participante: ${nombre}
+Perfil: ${obtenerPerfilReporte()}
 Nivel: ${nivel.id}
+
+Lectura desde marcos:
+${construirSintesisMarco(nivel)}
 
 Respuestas:
 ${state.path.map((p, i) => {
   const nodo = perfil.nodos[p.id];
-  return `${i + 1}. ${nodo.title} → ${p.answer ? 'Sí' : 'No'}`;
-}).join('\n')}`;
+  return `${i + 1}. ${nodo.title} → ${p.answer ? 'Sí' : 'No'}
+   Retroalimentación: ${p.feedback}
+   Marco: ${construirRetroalimentacionMarco(nodo, p.answer)}`;
+}).join('\n\n')}`;
     navigator.clipboard.writeText(resumen).then(() => {
       elements.copyBtn.innerHTML = '<span>✓ Copiado</span>';
       setTimeout(() => { elements.copyBtn.innerHTML = '<span>Copiar resumen</span>'; }, 2000);
@@ -179,6 +247,18 @@ if (elements.restartBtn) {
       elements.recursosSimilaresRadios.forEach(r => { r.checked = false; });
     }
     if (elements.consentTracking) elements.consentTracking.checked = true;
+    if (elements.toolRatingRadios && elements.toolRatingRadios.length) {
+      elements.toolRatingRadios.forEach(r => { r.checked = false; });
+    }
+    if (elements.toolSuggestion) elements.toolSuggestion.value = '';
+    if (elements.toolFeedbackStatus) {
+      elements.toolFeedbackStatus.textContent = '';
+      elements.toolFeedbackStatus.classList.remove('is-warning');
+    }
+    if (elements.sendToolFeedbackBtn) {
+      elements.sendToolFeedbackBtn.disabled = false;
+      elements.sendToolFeedbackBtn.textContent = 'Enviar valoración';
+    }
 
     updateStartButtonState();
     updateCarousel();

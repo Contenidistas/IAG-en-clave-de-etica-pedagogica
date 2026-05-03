@@ -8,7 +8,7 @@
 -->
 
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#6366f1">
   <title>IA Educativa ANEP - Uso Crítico y Reflexivo</title>
   <link rel="stylesheet" href="styles.css">
@@ -21,14 +21,29 @@
   <header class="app-header">
     <h1 id="homeBtn" class="home-btn" style="cursor:pointer; display:flex; align-items:center; gap:0.5rem;">
       <div class="logo">AI</div>
-      <span>🏠 IA Educativa ANEP</span>
+      <span>🏠 IAG en clave de ética pedagógica</span>
     </h1>
 
     <div class="header-actions">
       <a href="https://horizontespedagogicos.ibero.edu.co/article/view/3235" 
          target="_blank" 
+         rel="noopener noreferrer"
          class="btn-academic">
-        📄 Artículo académico
+        <span class="btn-academic-icon">📄</span>
+        <span class="btn-academic-text">
+          <span class="btn-academic-label">Artículo 2025</span>
+          <span class="btn-academic-title">Percepciones del uso de IAG</span>
+        </span>
+      </a>
+      <a href="https://www.ucuauhtemoc.edu.mx/hubfs/revista-vol-6-num-1/Art%202%20Cuando%20el%20ocultamiento%20se%20hace%20visible.pdf"
+         target="_blank"
+         rel="noopener noreferrer"
+         class="btn-academic">
+        <span class="btn-academic-icon">📄</span>
+        <span class="btn-academic-text">
+          <span class="btn-academic-label">Artículo 2026</span>
+          <span class="btn-academic-title">Ocultamiento visible de la IAG</span>
+        </span>
       </a>
       <button class="theme-toggle" id="themeToggle" aria-label="Cambiar tema">
         <span id="themeIcon">☾</span>
@@ -47,92 +62,141 @@
     <section id="screenIntro" class="fade-in">
       <div class="card">
         <div class="carousel">
-
-          <!-- TRACK: CONTENEDOR DE SLIDES -->
           <div class="carousel-track" id="carouselTrack">
-            
-            <!-- ==========================================
-                 SLIDE 1: QUIÉNES SOMOS + POR QUÉ (FUSIONADO)
-                 ========================================== -->
-            <div class="carousel-slide">
-              <div class="intro-slide intro-slide-fusionado">
-                
-                <!-- Sección: Quiénes somos -->
-                <div class="seccion-quienes-somos">
-                  <h2>Quiénes somos</h2>
 
-                  <div class="team-grid">
-                    <div class="team-member">
-                      <h4>Prof. Santiago Hernández</h4>
-                      <p>Especialista en Tecnología Educativa</p>
-                      <p>Maestrando en Educación</p>
-                      <p>Diplomado en IA y educación</p>
-                      <p>Investigador</p>
-                      <p><a href="https://orcid.org/0009-0001-9086-1490" target="_blank">🔗 ORCID</a></p>
-                    </div>
+            <div class="carousel-slide intro-overview-slide">
+              <div class="intro-overview">
+                <div class="intro-overview-copy">
+                  <p class="section-kicker">Herramienta educativa</p>
+                  <h2>IAG en clave de ética pedagógica</h2>
+                  <p>
+                    Un recorrido de autoevaluación para revisar prácticas con inteligencia artificial generativa desde la evidencia, la experiencia de aula y los marcos de referencia actuales.
+                  </p>
+                </div>
 
-                    <div class="team-member">
-                      <h4>Prof. Diego Daluz</h4>
-                      <p>Diplomado en Ciencias Sociales y nuevas tecnologías</p>
-                      <p>Maestrando en Educación</p>
-                      <p>Investigador</p>
-                      <p><a href="https://orcid.org/0009-0007-3089-6652" target="_blank">🔗 ORCID</a></p>
-                    </div>
-                  </div>
-                  
-                  <!-- Card de información del proyecto -->
-                  <div class="card card-info-proyecto">
-                    <div style="display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.85rem; color: var(--text-secondary);">
-                      <p><strong style="color: var(--primary);">📅 Fecha de creación:</strong> Octubre 2024</p>
-                      <p><strong style="color: var(--primary);">📄 Publicación académica:</strong> <a href="https://horizontespedagogicos.ibero.edu.co/article/view/3235" target="_blank" style="color: var(--primary); text-decoration: none;">Horizontes Pedagógicos</a></p>
-                      <p><strong style="color: var(--primary);">📖 Marco referencial:</strong> <a href="https://www.anep.edu.uy/sites/default/files/images/2024/noticias/julio/240709/Documento%20IA.pdf" target="_blank" style="color: var(--primary); text-decoration: none;">ANEP - IA en Educación (2024)</a></p>
-                      <p><strong style="color: var(--primary);">©️ Derechos de uso:</strong> Herramienta de uso libre para fines educativos. Se permite copiar, modificar y distribuir citando autoría.</p>
-                    </div>
+                <div class="intro-action-grid">
+                  <button type="button" class="btn-academic btn-authors" id="btnVerAutores">
+                    <span class="btn-academic-icon">👥</span>
+                    <span class="btn-academic-text">
+                      <span class="btn-academic-label">Autores</span>
+                      <span class="btn-academic-title">¿Quiénes somos?</span>
+                    </span>
+                  </button>
+
+              <a href="fundamentacion.html" class="btn-academic btn-authors">
+                <span class="btn-academic-icon">↗</span>
+                <span class="btn-academic-text">
+                  <span class="btn-academic-label">Base pedagógica</span>
+                  <span class="btn-academic-title">Fundamentación</span>
+                </span>
+              </a>
+
+              <a href="#diagnosticoInicio" class="btn-academic btn-authors" id="goToDiagnosticBtn">
+                <span class="btn-academic-icon">↓</span>
+                <span class="btn-academic-text">
+                  <span class="btn-academic-label">Diagnóstico</span>
+                  <span class="btn-academic-title">Comenzar</span>
+                </span>
+              </a>
+            </div>
+
+                <div class="intro-feature-grid" aria-label="Ejes principales de la herramienta">
+                  <article class="intro-feature-card">
+                    <span>01</span>
+                    <h3>Reflexión situada</h3>
+                    <p>Parte de prácticas reales de aula, formación docente e investigación empírica.</p>
+                  </article>
+                  <article class="intro-feature-card">
+                    <span>02</span>
+                    <h3>Marcos de referencia</h3>
+                    <p>Articula aportes de UNESCO, ANEP y FING para orientar decisiones pedagógicas.</p>
+                  </article>
+                  <article class="intro-feature-card">
+                    <span>03</span>
+                    <h3>Reporte final</h3>
+                    <p>Genera una devolución con criterios éticos, críticos y reflexivos sobre el uso de IAG.</p>
+                  </article>
+                </div>
+
+                <div id="infoAutores" class="hidden-content team-panel" style="display: none;">
+              <div class="team-grid-vertical">
+                <div class="team-member-detail">
+                  <h4>Prof. Esp. Santiago Hernández</h4>
+                  <p>Desarrollador responsable de la herramienta, investigador</p>
+                  <div class="links-autores">
+                    <a href="https://orcid.org/0009-0001-9086-1490" target="_blank" rel="noopener noreferrer">🔗 ORCID</a>
+                    <a href="https://exportcvuy.anii.org.uy/cv/?8242b38f35c3b4fc9b8d3442700f810e" target="_blank" rel="noopener noreferrer">📄 CVUY</a>
                   </div>
                 </div>
 
-                <!-- Divisor visual entre secciones -->
-                <div class="section-divider"></div>
+                <div class="divider-small"></div>
 
-                <!-- Sección: Por qué esta herramienta -->
-                <div class="seccion-porque">
-                  <h2>Por qué esta herramienta</h2>
-                  <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5; max-width: 750px; margin: 0.8rem auto;">
-                    Ante la enorme cantidad de tensiones que se generan en contextos educativos en relación con la Inteligencia Artificial Generativa, esta herramienta surge como una guía práctica tanto para docentes como para estudiantes.
-                  </p>
-                  <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5; max-width: 750px; margin: 0.8rem auto;">
-                    Basada en el marco de referencia de ANEP sobre IA en Educación, busca promover un uso crítico, reflexivo y responsable de las tecnologías de inteligencia artificial en el ámbito educativo.
-                  </p>
-
-                  <!-- Card de objetivos -->
-                  <div class="card card-objetivos">
-                    <h3 style="margin-bottom: 0.6rem; font-size: 1.1rem;">Objetivos principales:</h3>
-                    <ul style="color: var(--text-secondary); line-height: 1.5; font-size: 0.9rem;">
-                      <li>Autoevaluar prácticas actuales de uso de IA</li>
-                      <li>Identificar áreas de mejora propia</li>
-                      <li>Proporcionar recomendaciones personalizadas</li>
-                      <li>Fomentar la reflexión crítica sobre el uso de IA</li>
-                    </ul>
+                <div class="team-member-detail">
+                  <h4>Prof. Mag. Diego Daluz</h4>
+                  <p>Investigador y revisor</p>
+                  <div class="links-autores">
+                    <a href="https://orcid.org/0009-0007-3089-6652" target="_blank" rel="noopener noreferrer">🔗 ORCID</a>
+                    <a href="https://exportcvuy.anii.org.uy/cv/?8242b38f35c3b4fc9b8d3442700f810e" target="_blank" rel="noopener noreferrer">📄 CVUY</a>
                   </div>
                 </div>
-
+              </div>
+                </div>
               </div>
             </div>
-            <!-- FIN SLIDE 1 -->
+
+
+
+
+
+
+
 
             <!-- ==========================================
                  SLIDE 2: FORMULARIO DE CARACTERIZACIÓN
                  ========================================== -->
             <div class="carousel-slide">
               <div class="intro-slide">
-                <h2>Comenzar el proceso de reflexión crítica de mis prácticas</h2>
+                <div id="diagnosticoInicio" class="diagnostic-heading">
+                  <p class="section-kicker">Diagnóstico guiado</p>
+                  <h2>Comenzar el proceso de reflexión crítica de mis prácticas</h2>
+                </div>
                 <p style="color: var(--text-secondary); font-size: 1.125rem; line-height: 1.6; margin-bottom: 2rem;">
                   Este cuestionario interactivo te ayudará a evaluar tu práctica y recibir recomendaciones personalizadas.
                 </p>
 
-                <!-- Principios clave UNESCO/ANEP -->
-                <div class="card" style="background: var(--bg-main); text-align: left; margin: 2rem auto; max-width: 800px;">
-                  <h3 style="margin-bottom: 1rem;">Marcos de UNESCO y ANEP - Principios clave</h3>
+                <!-- Principios clave UNESCO/ANEP/FING -->
+                <div class="card framework-card">
+                  <div class="framework-hero">
+                    <p class="section-kicker">Fundamentación de la herramienta</p>
+                    <h3>Marcos de UNESCO, ANEP y FING</h3>
+                    <p>
+                      Una propuesta construida desde investigación, formación docente y experiencia de aula para pensar el uso ético, crítico y reflexivo de la IA.
+                    </p>
+                    <a href="fundamentacion.html" class="framework-read-more">Leer fundamentación completa</a>
+                  </div>
+
+                  <div class="framework-context">
+                    <strong>Sentido de la propuesta</strong>
+                    <p>
+                      Como formadores de formadores, entendemos que estas herramientas requieren criterios compartidos, transparencia y espacios de reflexión pedagógica situada.
+                    </p>
+                  </div>
+
+                  <div class="framework-links" aria-label="Accesos directos a marcos de referencia">
+                    <a href="https://www.anep.edu.uy/sites/default/files/images/2024/noticias/julio/240709/Documento%20IA.pdf" target="_blank" rel="noopener noreferrer" class="framework-link">
+                      <span class="framework-link-label">ANEP</span>
+                      <span class="framework-link-title">IA en educación</span>
+                    </a>
+                    <a href="https://unesdoc.unesco.org/ark:/48223/pf0000389227" target="_blank" rel="noopener noreferrer" class="framework-link">
+                      <span class="framework-link-label">UNESCO</span>
+                      <span class="framework-link-title">IA generativa en educación</span>
+                    </a>
+                    <a href="https://www.fing.edu.uy/sites/default/files/2026-02/guia-de-etica-fing_2026.pdf" target="_blank" rel="noopener noreferrer" class="framework-link">
+                      <span class="framework-link-label">FING</span>
+                      <span class="framework-link-title">Uso ético y crítico de IA</span>
+                    </a>
+                  </div>
+                  <h4 class="principles-title">Principios para orientar la reflexión</h4>
                   <div class="grid grid-2">
                     
                     <div class="resource-card principle-card">
@@ -289,34 +353,104 @@
                CONTROLES DEL CARRUSEL
                (Botones de navegación + Dots + Botón inicio)
                ========================================== -->
-          <div class="carousel-controls">
-            <!-- Botón "Anterior" (oculto al inicio) -->
-            <button class="carousel-btn" id="prevSlide" style="display: none;">
-              ← Anterior
-            </button>
-            
-            <!-- Dots de navegación (2 puntos para 2 slides) -->
-            <div class="carousel-dots">
-              <span class="carousel-dot active" data-slide="0"></span>
-              <span class="carousel-dot" data-slide="1"></span>
-            </div>
+   <div class="carousel-controls" style="display: flex; justify-content: center; align-items: center; position: relative; min-height: 60px; gap: 1rem;">
+  
+  <button class="carousel-btn" id="prevSlide" style="display: none;">
+    ← Anterior
+  </button>
+  
+  <div class="carousel-dots" style="display: flex; gap: 5px;">
+    <span class="carousel-dot active" data-slide="0"></span>
+    <span class="carousel-dot" data-slide="1"></span>
+  </div>
 
-            <!-- Botón "Siguiente" (visible al inicio) -->
-            <button class="carousel-btn" id="nextSlide">
-              Siguiente →
-            </button>
+  <div class="action-buttons" style="position: relative; display: flex; align-items: center;">
+    
+    <button class="carousel-btn" id="nextSlide">
+      Siguiente →
+    </button>
 
-            <!-- Botón "Comenzar cuestionario" (aparece en el último slide) -->
-            <button class="btn btn-primary hidden" id="startBtn">
-              Comenzar cuestionario
-            </button>
-          </div>
+    <button class="btn btn-primary hidden" id="startBtn">
+      Comenzar cuestionario
+    </button>
+    
+  </div>
+</div>
           <!-- FIN CONTROLES DEL CARRUSEL -->
 
         </div>
         <!-- FIN CAROUSEL -->
       </div>
       <!-- FIN CARD -->
+
+      <section class="stats-section" aria-labelledby="statsTitle">
+        <div class="stats-header">
+          <div>
+            <p class="section-kicker">Datos anónimos de uso</p>
+            <h2 id="statsTitle">Estadísticas globales</h2>
+          </div>
+          <button type="button" class="btn btn-outline" id="refreshStatsBtn">Actualizar</button>
+        </div>
+
+        <p class="stats-note">
+          Estos indicadores muestran datos agregados: sesiones anónimas y cuestionarios efectivamente guardados en la hoja Detalle. No se publican nombres, respuestas individuales ni datos identificables.
+        </p>
+
+        <div id="statsStatus" class="stats-status">Cargando estadísticas...</div>
+
+        <div id="statsContent" class="stats-content hidden">
+          <div class="stats-kpis">
+            <div class="stats-kpi">
+              <span class="stats-kpi-label">Sesiones registradas</span>
+              <strong id="statVisits">0</strong>
+            </div>
+            <div class="stats-kpi">
+              <span class="stats-kpi-label">Cuestionarios completados</span>
+              <strong id="statCompleted">0</strong>
+            </div>
+            <div class="stats-kpi">
+              <span class="stats-kpi-label">Puntaje promedio</span>
+              <strong id="statAverage">0</strong>
+            </div>
+            <div class="stats-kpi">
+              <span class="stats-kpi-label">Nivel más frecuente</span>
+              <strong id="statTopLevel">—</strong>
+            </div>
+          </div>
+
+          <div class="stats-grid">
+            <article class="stats-card">
+              <h3>Distribución por nivel</h3>
+              <div id="statsLevels" class="stats-bars"></div>
+            </article>
+
+            <article class="stats-card">
+              <h3>Perfiles participantes</h3>
+              <div id="statsProfiles" class="stats-bars"></div>
+            </article>
+
+            <article class="stats-card">
+              <h3>Indicadores a fortalecer</h3>
+              <div id="statsIndicators" class="stats-bars"></div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="opinions-section" aria-labelledby="opinionsTitle">
+        <div class="opinions-header">
+          <div>
+            <p class="section-kicker">Opiniones anónimas</p>
+            <h2 id="opinionsTitle">Qué dicen quienes la usaron</h2>
+          </div>
+          <div class="opinions-controls" aria-label="Controles de opiniones">
+            <button type="button" class="opinion-nav-btn" id="prevOpinionBtn" aria-label="Opinión anterior">‹</button>
+            <button type="button" class="opinion-nav-btn" id="nextOpinionBtn" aria-label="Opinión siguiente">›</button>
+          </div>
+        </div>
+        <div id="opinionsStatus" class="opinions-status">Cargando opiniones...</div>
+        <div id="opinionsCarousel" class="opinions-carousel hidden" aria-live="polite"></div>
+      </section>
     </section>
     <!-- FIN PANTALLA 1: INTRO + CARRUSEL -->
 
@@ -326,7 +460,7 @@
     <div id="principleTooltip" class="principle-tooltip hidden" role="dialog" aria-modal="true">
       <div class="tooltip-header">
         <span id="tooltipTitle" class="tooltip-title">Principio</span>
-        <button type="button" class="tooltip-close" aria-label="Cerrar">×</button>
+        <button type="button" class="tooltip-close" aria-label="Cerrar">Cerrar</button>
       </div>
 
       <div class="tooltip-tabs">
@@ -438,20 +572,23 @@
               <div class="resource-content">
                 <h4>Asistentes con modo educativo</h4>
                 <p>Interfaces que promueven verificación, citas y transparencia</p>
+                <span class="resource-action">Ver opciones y enlaces</span>
               </div>
             </div>
 
             <div class="resource-card" onclick="mostrarHerramientas('citador')" style="cursor: pointer;">
               <div class="resource-content">
-                <h4>Editores con citador integrado</h4>
-                <p>Herramientas que sugieren fuentes verificables automáticamente</p>
+                <h4>Búsqueda académica y citación</h4>
+                <p>Recursos para localizar, organizar y citar fuentes verificables</p>
+                <span class="resource-action">Ver opciones y enlaces</span>
               </div>
             </div>
 
             <div class="resource-card" onclick="mostrarHerramientas('sesgos')" style="cursor: pointer;">
               <div class="resource-content">
-                <h4>Verificadores de sesgos</h4>
-                <p>Analizan texto generado para identificar posibles sesgos</p>
+                <h4>Revisión crítica de sesgos</h4>
+                <p>Apoyos para detectar señales de sesgo, toxicidad o problemas de equidad</p>
+                <span class="resource-action">Ver opciones y enlaces</span>
               </div>
             </div>
 
@@ -459,6 +596,7 @@
               <div class="resource-content">
                 <h4>Plataformas de prompts éticos</h4>
                 <p>Enseñan a formular consultas que promuevan pensamiento crítico</p>
+                <span class="resource-action">Ver opciones y enlaces</span>
               </div>
             </div>
           </div>
@@ -473,7 +611,7 @@
 
       <!-- Recursos educativos adicionales -->
       <div class="card mt-3">
-        <h3 style="margin-bottom: 1rem;">Recursos educativos ANEP - UNESCO - CEIBAL</h3>
+        <h3 style="margin-bottom: 1rem;">Recursos educativos ANEP - UNESCO - FING - CEIBAL</h3>
         <div class="grid">
           <a href="https://www.anep.edu.uy/sites/default/files/images/2024/noticias/julio/240709/Documento%20IA.pdf" target="_blank" class="resource-card" style="text-decoration: none; color: inherit;">
             <div class="resource-content">
@@ -489,12 +627,69 @@
             </div>
           </a>
 
+          <a href="https://www.fing.edu.uy/sites/default/files/2026-02/guia-de-etica-fing_2026.pdf" target="_blank" rel="noopener noreferrer" class="resource-card" style="text-decoration: none; color: inherit;">
+            <div class="resource-content">
+              <h4>Guía FING 2026</h4>
+              <p>Uso ético y crítico de IA en unidades curriculares universitarias</p>
+            </div>
+          </a>
+
           <a href="https://documentos.ceibal.edu.uy/portal/2024/06/Construyendo-Inteligencia-Artificial-para-la-educacion.pdf" target="_blank" class="resource-card" style="text-decoration: none; color: inherit;">
             <div class="resource-content">
               <h4>CEIBAL</h4>
               <p>Construyendo Inteligencia Artificial para la educación</p>
             </div>
           </a>
+        </div>
+      </div>
+
+      <div class="card mt-3 feedback-survey" id="toolFeedbackCard">
+        <div class="feedback-survey-header">
+          <div>
+            <p class="section-kicker">Mejora continua</p>
+            <h3>Valorá esta herramienta</h3>
+          </div>
+          <span class="feedback-survey-badge">Anónimo</span>
+        </div>
+
+        <p class="feedback-survey-copy">
+          Tu valoración y tus sugerencias nos ayudan a ajustar la herramienta desde la experiencia real de quienes la usan. Los comentarios pueden mostrarse de forma anónima en el inicio.
+        </p>
+
+        <div class="feedback-survey-field">
+          <span class="feedback-survey-label">Valoración general</span>
+          <div class="rating-options" role="radiogroup" aria-label="Valoración de la herramienta">
+            <label class="rating-option">
+              <input type="radio" name="toolRating" value="1">
+              <span>1</span>
+            </label>
+            <label class="rating-option">
+              <input type="radio" name="toolRating" value="2">
+              <span>2</span>
+            </label>
+            <label class="rating-option">
+              <input type="radio" name="toolRating" value="3">
+              <span>3</span>
+            </label>
+            <label class="rating-option">
+              <input type="radio" name="toolRating" value="4">
+              <span>4</span>
+            </label>
+            <label class="rating-option">
+              <input type="radio" name="toolRating" value="5">
+              <span>5</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="feedback-survey-field">
+          <label for="toolSuggestion" class="feedback-survey-label">Sugerencias, comentarios o aspectos a mejorar</label>
+          <textarea id="toolSuggestion" class="input feedback-textarea" rows="4" maxlength="800" placeholder="Escribí aquí tu sugerencia..."></textarea>
+        </div>
+
+        <div class="feedback-survey-actions">
+          <button class="btn btn-primary" id="sendToolFeedbackBtn" type="button">Enviar valoración</button>
+          <p id="toolFeedbackStatus" class="feedback-survey-status" aria-live="polite"></p>
         </div>
       </div>
 
@@ -517,11 +712,27 @@
   <footer class="app-footer">
     <p>
       Creado por <strong>Prof. Esp. Santiago Hernández</strong> y <strong>Prof. Diego Daluz</strong><br>
-      Basado en el <a href="https://www.anep.edu.uy/sites/default/files/images/2024/noticias/julio/240709/Documento%20IA.pdf" target="_blank">Marco ANEP sobre IA en Educación</a>
+      Basado en marcos de
+      <a href="https://www.anep.edu.uy/sites/default/files/images/2024/noticias/julio/240709/Documento%20IA.pdf" target="_blank" rel="noopener noreferrer">ANEP</a>,
+      <a href="https://unesdoc.unesco.org/ark:/48223/pf0000389227" target="_blank" rel="noopener noreferrer">UNESCO</a> y
+      <a href="https://www.fing.edu.uy/sites/default/files/2026-02/guia-de-etica-fing_2026.pdf" target="_blank" rel="noopener noreferrer">FING</a>
     </p>
-    <p style="margin-top: 0.75rem;">
-      📄 <a href="https://horizontespedagogicos.ibero.edu.co/article/view/3235" target="_blank">Artículo académico publicado</a>
-    </p>
+    <div class="footer-article-links" aria-label="Artículos académicos">
+      <a href="https://horizontespedagogicos.ibero.edu.co/article/view/3235" target="_blank" rel="noopener noreferrer" class="btn-academic">
+        <span class="btn-academic-icon">📄</span>
+        <span class="btn-academic-text">
+          <span class="btn-academic-label">Artículo 2025</span>
+          <span class="btn-academic-title">Percepciones del uso de IAG en futuras maestras</span>
+        </span>
+      </a>
+      <a href="https://www.ucuauhtemoc.edu.mx/hubfs/revista-vol-6-num-1/Art%202%20Cuando%20el%20ocultamiento%20se%20hace%20visible.pdf" target="_blank" rel="noopener noreferrer" class="btn-academic">
+        <span class="btn-academic-icon">📄</span>
+        <span class="btn-academic-text">
+          <span class="btn-academic-label">Artículo 2026</span>
+          <span class="btn-academic-title">Cuando el ocultamiento se hace visible</span>
+        </span>
+      </a>
+    </div>
     <p style="margin-top: 0.75rem; font-size: 0.85rem; opacity: 0.8;">
       🔄 Sitio en constante actualización con nuevas funcionalidades y mejoras
     </p>
@@ -540,14 +751,21 @@
     </div>
   </div>
 
+
+
+
+
+
   <!-- ==========================================
        SCRIPTS JAVASCRIPT
        ========================================== -->
   <script src="configuracion-ia.js"></script>
   <script src="ui-ia.js"></script>
   <script src="juego-ia.js"></script>
-  <script src="certificado-ia.js"></script>
   <script src="chatbot-component.js"></script>
+  <script src="certificado-ia.js"></script>
 
+
+  <div id="chatbotContainer"></div>
 </body>
 </html>
