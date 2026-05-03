@@ -17,6 +17,9 @@ const CONFIG = {
   get opinionsEndpoint() {
     return `${this.apiBaseUrl}/opinions`;
   },
+  get emailReportEndpoint() {
+    return `${this.apiBaseUrl}/email-report`;
+  },
 
   // Escala Likert alineada a documento ANEP
 likert: [

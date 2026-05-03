@@ -393,7 +393,7 @@
         </div>
 
         <p class="stats-note">
-          Estos indicadores muestran datos agregados: sesiones anónimas y cuestionarios efectivamente guardados en la hoja Detalle. No se publican nombres, respuestas individuales ni datos identificables.
+          Estos indicadores muestran datos agregados: sesiones anónimas y cuestionarios efectivamente guardados en la base D1. No se publican nombres, respuestas individuales ni datos identificables.
         </p>
 
         <div id="statsStatus" class="stats-status">Cargando estadísticas...</div>
@@ -429,7 +429,7 @@
               <div id="statsProfiles" class="stats-bars"></div>
             </article>
 
-            <article class="stats-card">
+            <article class="stats-card stats-card--improvement">
               <h3>Indicadores a fortalecer</h3>
               <div id="statsIndicators" class="stats-bars"></div>
             </article>
@@ -696,6 +696,7 @@
       <!-- Botones de acción finales -->
       <div class="flex flex-center gap-2 flex-wrap mt-3">
         <button class="btn btn-primary" id="downloadBtn">Descargar reporte</button>
+        <button class="btn btn-outline btn-email-report" id="emailReportBtn" type="button">Enviar por correo</button>
         <button class="btn btn-outline" id="copyBtn">Copiar resumen</button>
         <button class="btn btn-outline" id="restartBtn">Reiniciar</button>
       </div>

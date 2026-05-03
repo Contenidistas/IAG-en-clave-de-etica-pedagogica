@@ -73,6 +73,137 @@ function construirSintesisMarco(nivel) {
   return `El resultado debe interpretarse como un punto de partida para la reflexión, no como una calificación cerrada. Desde UNESCO, el uso de IA en educación requiere transparencia, agencia humana, equidad y revisión crítica de posibles sesgos. Desde ANEP, implica formar ciudadanía digital, promover pensamiento crítico y evitar usos acríticos o indiscriminados. Desde FING, se refuerza la necesidad de definir restricciones claras por tarea, documentar prompts y decisiones, preservar la originalidad y poder explicar el proceso de trabajo. En este recorrido, el nivel "${nivel.id}" orienta qué acuerdos conviene fortalecer para sostener un uso ético, crítico y reflexivo de la IAG.`;
 }
 
+function construirMejorasPropuestas(perfil) {
+  const mejoras = state.path
+    .filter(item => !item.answer)
+    .map(item => {
+      const nodo = perfil?.nodos?.[item.id] || {};
+      return {
+        title: nodo.title || item.question || 'Criterio de reflexión',
+        feedback: item.feedback || 'Área de mejora identificada.',
+        recommendation: construirRetroalimentacionMarco(nodo, false)
+      };
+    });
+
+  if (mejoras.length) return mejoras;
+
+  return [{
+    title: 'Consolidar buenas prácticas',
+    feedback: 'El recorrido no marcó respuestas negativas, pero conviene sostener una revisión periódica.',
+    recommendation: 'Como mejora continua, documentá prompts, criterios de verificación, fuentes usadas y decisiones humanas para que el uso de IAG siga siendo explicable y evaluable.'
+  }];
+}
+
+function construirPayloadReporteCorreo(email, includeAnswers) {
+  const nivel = CONFIG.likert.find(l => state.evidence >= l.min && l.max >= state.evidence);
+  const perfil = CONFIG.perfiles[state.profileKey || state.profile];
+
+  return {
+    email,
+    participantName: obtenerNombreParticipante(),
+    profile: obtenerPerfilReporte(),
+    evidence: state.evidence,
+    likertLevel: nivel?.id || '',
+    levelDescription: nivel?.desc || '',
+    synthesis: nivel ? construirSintesisMarco(nivel) : '',
+    improvements: construirMejorasPropuestas(perfil),
+    consentAccepted: true,
+    includeAnswers,
+    answers: includeAnswers ? state.path.map((item, index) => {
+      const nodo = perfil?.nodos?.[item.id] || {};
+      return {
+        number: index + 1,
+        question: nodo.title || item.question || '',
+        answer: item.answer ? 'Sí' : 'No',
+        feedback: item.feedback || ''
+      };
+    }) : [],
+    references: [
+      'ANEP: La inteligencia artificial en la educación (2024).',
+      'UNESCO: Guía para el uso de IA generativa en educación e investigación.',
+      'FING: Guía de ética para el uso de IA en unidades curriculares (2026).'
+    ]
+  };
+}
+
+function mostrarModalCorreoReporte() {
+  if (!modal || !elements.emailReportBtn) return;
+
+  modal.show('Recibir informe por correo', `
+    <form class="email-report-form" id="emailReportForm">
+      <p class="email-report-copy">
+        El correo se usará únicamente para enviarte este informe. No se guardará en la base de datos ni se mostrará en estadísticas.
+      </p>
+
+      <div class="email-report-field">
+        <label for="reportEmail">Correo electrónico</label>
+        <input id="reportEmail" class="input" type="email" autocomplete="email" placeholder="nombre@correo.com" required>
+      </div>
+
+      <label class="email-report-check">
+        <input id="includeReportAnswers" type="checkbox">
+        <span>Incluir también mis respuestas en el correo. Si no marco esta opción, recibiré solo la síntesis y las mejoras propuestas.</span>
+      </label>
+
+      <label class="email-report-check">
+        <input id="emailReportConsent" type="checkbox" required>
+        <span>Acepto enviar mi correo y el contenido mínimo del informe para recibir esta devolución. Entiendo que el correo no se almacenará.</span>
+      </label>
+
+      <div class="email-report-actions">
+        <button class="btn btn-primary" id="sendEmailReportBtn" type="submit">Enviar informe</button>
+        <p class="email-report-status" id="emailReportStatus" aria-live="polite"></p>
+      </div>
+    </form>
+  `);
+
+  const form = document.getElementById('emailReportForm');
+  const emailInput = document.getElementById('reportEmail');
+  const includeAnswersInput = document.getElementById('includeReportAnswers');
+  const consentInput = document.getElementById('emailReportConsent');
+  const sendButton = document.getElementById('sendEmailReportBtn');
+  const status = document.getElementById('emailReportStatus');
+
+  form?.addEventListener('submit', async event => {
+    event.preventDefault();
+    const email = emailInput.value.trim();
+
+    if (!emailInput.checkValidity() || !consentInput.checked) {
+      status.textContent = 'Ingresá un correo válido y confirmá el consentimiento.';
+      status.className = 'email-report-status is-warning';
+      return;
+    }
+
+    sendButton.disabled = true;
+    sendButton.textContent = 'Enviando...';
+    status.textContent = 'Preparando y enviando el informe...';
+    status.className = 'email-report-status';
+
+    try {
+      const response = await fetch(CONFIG.emailReportEndpoint, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(construirPayloadReporteCorreo(email, includeAnswersInput.checked))
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || data.ok === false) {
+        throw new Error(data.error || `HTTP ${response.status}`);
+      }
+
+      sendButton.textContent = 'Informe enviado';
+      status.textContent = 'Listo. Revisá tu bandeja de entrada o spam.';
+      status.className = 'email-report-status is-success';
+    } catch (error) {
+      console.warn('No se pudo enviar el informe por correo:', error);
+      sendButton.disabled = false;
+      sendButton.textContent = 'Enviar informe';
+      status.textContent = 'No se pudo enviar ahora. Probá descargar el PDF o intentá nuevamente en unos minutos.';
+      status.className = 'email-report-status is-warning';
+    }
+  });
+}
+
 /* ========================================
    ACCIONES FINALES
    ======================================== */
@@ -190,6 +321,10 @@ if (elements.downloadBtn) {
       modal.show('Error al generar PDF', '<p>No se pudo generar el PDF. Verificá la conexión a Internet para cargar jsPDF.</p>');
     }
   });
+}
+
+if (elements.emailReportBtn) {
+  elements.emailReportBtn.addEventListener('click', mostrarModalCorreoReporte);
 }
 
 if (elements.copyBtn) {

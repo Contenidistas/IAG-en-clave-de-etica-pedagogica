@@ -26,6 +26,10 @@ export default {
         return json(await buildOpinions(env));
       }
 
+      if (request.method === 'POST' && url.pathname === '/email-report') {
+        return json(await sendEmailReport(request, env));
+      }
+
       if (request.method === 'GET' && url.pathname === '/admin/summary') {
         requireAdmin(request, env);
         return json(await buildAdminSummary(env));
@@ -53,7 +57,7 @@ export default {
 
       return json({
         ok: true,
-        message: 'Backend D1 activo. Use POST /events, GET /stats, GET /opinions o rutas /admin protegidas.',
+        message: 'Backend D1 activo. Use POST /events, POST /email-report, GET /stats, GET /opinions o rutas /admin protegidas.',
       });
     } catch (error) {
       console.error(error);
@@ -260,6 +264,176 @@ async function buildOpinions(env) {
   };
 }
 
+async function sendEmailReport(request, env) {
+  const data = await request.json();
+  const email = clean(data.email).toLowerCase();
+
+  if (!isValidEmail(email)) {
+    const error = new Error('Correo electronico invalido');
+    error.status = 400;
+    throw error;
+  }
+
+  if (data.consentAccepted !== true) {
+    const error = new Error('Consentimiento requerido');
+    error.status = 400;
+    throw error;
+  }
+
+  if (!env.RESEND_API_KEY || !env.REPORT_EMAIL_FROM) {
+    const error = new Error('Servicio de correo no configurado');
+    error.status = 500;
+    throw error;
+  }
+
+  const report = normalizeEmailReport(data);
+  const subject = `Informe IAG etica pedagogica - ${report.likertLevel || 'resultado'}`;
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${env.RESEND_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: env.REPORT_EMAIL_FROM,
+      to: [email],
+      reply_to: env.REPORT_EMAIL_REPLY_TO || undefined,
+      subject,
+      text: buildReportText(report),
+      html: buildReportHtml(report),
+    }),
+  });
+
+  if (!response.ok) {
+    const details = await response.text();
+    console.error('Resend error', response.status, details);
+    const error = new Error('No se pudo enviar el correo');
+    error.status = 502;
+    throw error;
+  }
+
+  return { ok: true };
+}
+
+function normalizeEmailReport(data) {
+  return {
+    participantName: clean(data.participantName).slice(0, 120) || 'No indicado',
+    profile: clean(data.profile).slice(0, 160),
+    evidence: numberOrNull(data.evidence),
+    likertLevel: clean(data.likertLevel).slice(0, 120),
+    levelDescription: clean(data.levelDescription).slice(0, 900),
+    synthesis: clean(data.synthesis).slice(0, 2200),
+    improvements: normalizeReportItems(data.improvements, 8),
+    includeAnswers: data.includeAnswers === true,
+    answers: data.includeAnswers === true ? normalizeReportItems(data.answers, 20) : [],
+    references: normalizeStringList(data.references, 8),
+  };
+}
+
+function normalizeReportItems(items, limit) {
+  if (!Array.isArray(items)) return [];
+  return items.slice(0, limit).map(item => ({
+    number: numberOrNull(item.number),
+    title: clean(item.title || item.question).slice(0, 300),
+    question: clean(item.question || item.title).slice(0, 300),
+    answer: clean(item.answer).slice(0, 20),
+    feedback: clean(item.feedback).slice(0, 700),
+    recommendation: clean(item.recommendation).slice(0, 1300),
+  })).filter(item => item.title || item.question || item.feedback || item.recommendation);
+}
+
+function normalizeStringList(items, limit) {
+  if (!Array.isArray(items)) return [];
+  return items.slice(0, limit).map(item => clean(item).slice(0, 300)).filter(Boolean);
+}
+
+function buildReportText(report) {
+  const lines = [
+    'IAG en clave de etica pedagogica',
+    'Informe de reflexion y mejoras propuestas',
+    '',
+    `Participante: ${report.participantName}`,
+    `Perfil: ${report.profile || 'No indicado'}`,
+    `Puntaje: ${report.evidence ?? 'No indicado'}`,
+    `Nivel: ${report.likertLevel || 'No indicado'}`,
+    '',
+    'Descripcion del nivel:',
+    report.levelDescription,
+    '',
+    'Lectura desde marcos de referencia:',
+    report.synthesis,
+    '',
+    'Mejoras propuestas:',
+    ...report.improvements.flatMap((item, index) => [
+      `${index + 1}. ${item.title || item.question}`,
+      item.feedback ? `   ${item.feedback}` : '',
+      item.recommendation ? `   ${item.recommendation}` : '',
+    ]),
+  ];
+
+  if (report.includeAnswers && report.answers.length) {
+    lines.push('', 'Respuestas incluidas por consentimiento:');
+    report.answers.forEach((item, index) => {
+      lines.push(`${index + 1}. ${item.question || item.title}`);
+      lines.push(`   Respuesta: ${item.answer || 'No indicada'}`);
+      if (item.feedback) lines.push(`   Retroalimentacion: ${item.feedback}`);
+    });
+  }
+
+  if (report.references.length) {
+    lines.push('', 'Referencias:', ...report.references.map(ref => `- ${ref}`));
+  }
+
+  lines.push('', 'Confidencialidad: este correo fue enviado a solicitud de la persona usuaria. La direccion de correo no se guarda en la base de datos de la herramienta.');
+  return lines.filter(line => line !== '').join('\n');
+}
+
+function buildReportHtml(report) {
+  const improvements = report.improvements.map((item, index) => `
+    <li>
+      <strong>${index + 1}. ${escapeHtml(item.title || item.question)}</strong>
+      ${item.feedback ? `<p>${escapeHtml(item.feedback)}</p>` : ''}
+      ${item.recommendation ? `<p>${escapeHtml(item.recommendation)}</p>` : ''}
+    </li>
+  `).join('');
+
+  const answers = report.includeAnswers && report.answers.length ? `
+    <h2>Respuestas incluidas por consentimiento</h2>
+    <ol>
+      ${report.answers.map((item, index) => `
+        <li>
+          <strong>${index + 1}. ${escapeHtml(item.question || item.title)}</strong>
+          <p>Respuesta: ${escapeHtml(item.answer || 'No indicada')}</p>
+          ${item.feedback ? `<p>${escapeHtml(item.feedback)}</p>` : ''}
+        </li>
+      `).join('')}
+    </ol>
+  ` : '';
+
+  return `<!doctype html>
+  <html lang="es">
+    <body style="margin:0;padding:24px;background:#fff7ed;color:#1f2937;font-family:Arial,sans-serif;">
+      <main style="max-width:720px;margin:0 auto;background:#ffffff;border:1px solid #fed7aa;border-radius:12px;padding:24px;">
+        <p style="margin:0 0 8px;color:#c2410c;font-weight:700;text-transform:uppercase;letter-spacing:.04em;">IAG en clave de etica pedagogica</p>
+        <h1 style="margin:0 0 16px;color:#111827;font-size:24px;">Informe de reflexión y mejoras propuestas</h1>
+        <p><strong>Participante:</strong> ${escapeHtml(report.participantName)}</p>
+        <p><strong>Perfil:</strong> ${escapeHtml(report.profile || 'No indicado')}</p>
+        <p><strong>Puntaje:</strong> ${escapeHtml(report.evidence ?? 'No indicado')}</p>
+        <p><strong>Nivel:</strong> ${escapeHtml(report.likertLevel || 'No indicado')}</p>
+        <h2 style="color:#9a3412;font-size:18px;">Descripción del nivel</h2>
+        <p>${escapeHtml(report.levelDescription)}</p>
+        <h2 style="color:#9a3412;font-size:18px;">Lectura desde marcos de referencia</h2>
+        <p>${escapeHtml(report.synthesis)}</p>
+        <h2 style="color:#9a3412;font-size:18px;">Mejoras propuestas</h2>
+        <ol>${improvements}</ol>
+        ${answers}
+        ${report.references.length ? `<h2 style="color:#9a3412;font-size:18px;">Referencias</h2><ul>${report.references.map(ref => `<li>${escapeHtml(ref)}</li>`).join('')}</ul>` : ''}
+        <p style="margin-top:24px;color:#6b7280;font-size:13px;">Confidencialidad: este correo fue enviado a solicitud de la persona usuaria. La dirección de correo no se guarda en la base de datos de la herramienta.</p>
+      </main>
+    </body>
+  </html>`;
+}
+
 async function buildAdminSummary(env) {
   const stats = await buildStats(env);
 
@@ -418,6 +592,19 @@ function normalizeAnswer(answer) {
 
 function clean(value) {
   return String(value ?? '').trim();
+}
+
+function escapeHtml(value) {
+  return clean(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value) && value.length <= 254;
 }
 
 function numberOrNull(value) {

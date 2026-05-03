@@ -2705,6 +2705,17 @@ img, video {
   font-size: 1rem;
 }
 
+.stats-card--improvement {
+  border-color: rgba(234, 88, 12, 0.28);
+  background:
+    linear-gradient(135deg, rgba(255, 247, 237, 0.82), rgba(255, 255, 255, 0.45)),
+    var(--bg-main);
+}
+
+.stats-card--improvement h3 {
+  color: #9a3412;
+}
+
 .stats-bars {
   display: grid;
   gap: 0.75rem;
@@ -2735,6 +2746,82 @@ img, video {
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+}
+
+.stats-card--improvement .stats-bar-track {
+  background: rgba(251, 146, 60, 0.18);
+}
+
+.stats-card--improvement .stats-bar-fill {
+  background: linear-gradient(90deg, #fb923c 0%, #ea580c 100%);
+}
+
+.btn-email-report {
+  border-color: rgba(234, 88, 12, 0.28);
+  color: #c2410c;
+}
+
+.btn-email-report:hover {
+  border-color: #ea580c;
+  color: #9a3412;
+  box-shadow: 0 8px 22px rgba(234, 88, 12, 0.18);
+}
+
+.email-report-form {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.email-report-copy {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.email-report-field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.email-report-field label,
+.email-report-check {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.email-report-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  line-height: 1.4;
+}
+
+.email-report-check input {
+  margin-top: 0.15rem;
+  accent-color: #ea580c;
+}
+
+.email-report-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.email-report-status {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.email-report-status.is-warning {
+  color: var(--warning);
+}
+
+.email-report-status.is-success {
+  color: var(--success);
 }
 
 .stats-empty {
