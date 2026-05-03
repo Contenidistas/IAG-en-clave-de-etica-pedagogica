@@ -188,6 +188,64 @@ body {
   border-color: var(--primary);
 }
 
+.btn-diagnostic-start {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 72px;
+  border: 1px solid rgba(234, 88, 12, 0.35);
+  background:
+    linear-gradient(135deg, rgba(255, 247, 237, 0.98) 0%, rgba(255, 255, 255, 0.98) 100%);
+  color: #9a3412;
+  box-shadow: 0 10px 24px rgba(234, 88, 12, 0.16);
+}
+
+.btn-diagnostic-start::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(120deg, rgba(249, 115, 22, 0.18), rgba(251, 146, 60, 0.08), transparent);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.btn-diagnostic-start .btn-academic-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: #fed7aa;
+  color: #c2410c;
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+
+.btn-diagnostic-start .btn-academic-label {
+  color: #9a3412;
+  opacity: 0.8;
+}
+
+.btn-diagnostic-start .btn-academic-title {
+  color: #ea580c;
+  font-size: 1rem;
+}
+
+.btn-diagnostic-start:hover {
+  border-color: rgba(234, 88, 12, 0.72);
+  box-shadow: 0 14px 30px rgba(234, 88, 12, 0.22);
+}
+
+.btn-diagnostic-start:hover::before {
+  opacity: 1;
+}
+
+.btn-diagnostic-start:hover .btn-academic-icon {
+  background: #fb923c;
+  color: #fff;
+  transform: translateY(2px);
+}
+
 .theme-toggle {
   background: rgba(255, 255, 255, 0.2);
   border: none;
@@ -2821,19 +2879,52 @@ img, video {
   display: flex !important;
   align-items: center;
   justify-content: center;
-  min-height: 48px;
+  min-height: 58px;
+  flex: 0 1 280px;
 }
 
 .carousel #startBtn {
-  min-height: 46px;
+  min-height: 52px;
   margin: 0 !important;
-  padding: 0.85rem 1.25rem;
-  line-height: 1.1;
+  padding: 0.9rem 1.55rem !important;
+  line-height: 1.15;
+  white-space: normal;
+  text-align: center;
+  max-width: 100%;
 }
 
 .carousel #startBtn:not(.hidden) {
   position: static !important;
   z-index: 1 !important;
+}
+
+.carousel #prevSlide {
+  display: none;
+}
+
+.carousel #startBtn.enabled {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 52%, #c2410c 100%) !important;
+  border-left-color: rgba(154, 52, 18, 0.45) !important;
+  box-shadow: 0 10px 24px rgba(234, 88, 12, 0.28) !important;
+}
+
+.carousel #startBtn.enabled:hover:not(:disabled) {
+  box-shadow: 0 12px 30px rgba(234, 88, 12, 0.34) !important;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .btn-diagnostic-start {
+    animation: diagnosticPulse 4s ease-in-out infinite;
+  }
+}
+
+@keyframes diagnosticPulse {
+  0%, 100% {
+    box-shadow: 0 10px 24px rgba(234, 88, 12, 0.16);
+  }
+  50% {
+    box-shadow: 0 14px 32px rgba(234, 88, 12, 0.24);
+  }
 }
 
 .feedback-survey {
