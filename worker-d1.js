@@ -5,8 +5,6 @@ const CORS_HEADERS = {
   'Access-Control-Max-Age': '86400',
 };
 
-const DEFAULT_ADMIN_KEY = 'SH-DD-2026-SH-DD';
-
 export default {
   async fetch(request, env) {
     if (request.method === 'OPTIONS') {
@@ -190,12 +188,18 @@ async function buildStats(env) {
 }
 
 function requireAdmin(request, env) {
-  const expected = clean(env.ADMIN_KEY || DEFAULT_ADMIN_KEY);
+  const expected = clean(env.ADMIN_KEY);
   const headerKey = clean(request.headers.get('X-Admin-Key'));
   const auth = clean(request.headers.get('Authorization'));
   const bearerKey = auth.toLowerCase().startsWith('bearer ') ? auth.slice(7).trim() : '';
 
-  if (!expected || (headerKey !== expected && bearerKey !== expected)) {
+  if (!expected) {
+    const error = new Error('ADMIN_KEY no configurada');
+    error.status = 500;
+    throw error;
+  }
+
+  if (headerKey !== expected && bearerKey !== expected) {
     const error = new Error('No autorizado');
     error.status = 401;
     throw error;

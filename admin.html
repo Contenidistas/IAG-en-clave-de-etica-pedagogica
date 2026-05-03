@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin - IAG etica pedagogica</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#2563eb">
+  <title>Admin - IAG ética pedagógica</title>
   <style>
     :root {
       --bg: #f6f7f9;
@@ -357,6 +359,18 @@
       display: none !important;
     }
 
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
     @media (max-width: 1080px) {
       .summary {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -396,13 +410,14 @@
 </head>
 <body>
   <div id="login" class="login">
-    <section class="login-card">
-      <h1>Panel administrativo</h1>
-      <p>Acceso privado a los registros anonimos de uso, recorridos completados y valoraciones de la herramienta.</p>
+    <section class="login-card" aria-labelledby="loginTitle">
+      <h1 id="loginTitle">Panel administrativo</h1>
+      <p>Acceso privado a los registros anónimos de uso, recorridos completados y valoraciones de la herramienta.</p>
       <form id="loginForm">
-        <input id="adminKey" class="input" type="password" autocomplete="current-password" placeholder="Contrasena" required>
+        <label class="sr-only" for="adminKey">Contraseña administrativa</label>
+        <input id="adminKey" class="input" type="password" autocomplete="current-password" placeholder="Contraseña" required>
         <button class="btn primary" type="submit">Ingresar</button>
-        <div id="loginStatus" class="muted"></div>
+        <div id="loginStatus" class="muted" aria-live="polite"></div>
       </form>
     </section>
   </div>
@@ -410,19 +425,19 @@
   <main class="shell">
     <header class="topbar">
       <div class="brand">
-        <strong>IAG etica pedagogica</strong>
-        <span>Administracion de datos D1</span>
+        <strong>IAG ética pedagógica</strong>
+        <span>Administración de datos D1</span>
       </div>
       <div class="actions">
         <button id="refreshBtn" class="btn" type="button">Actualizar</button>
-        <button id="logoutBtn" class="btn danger" type="button">Cerrar sesion</button>
+        <button id="logoutBtn" class="btn danger" type="button">Cerrar sesión</button>
       </div>
     </header>
 
     <div class="layout">
       <section class="summary" aria-label="Resumen">
         <article class="metric">
-          <span>Visitas unicas</span>
+          <span>Visitas únicas</span>
           <strong id="metricVisits">0</strong>
         </article>
         <article class="metric">
@@ -438,7 +453,7 @@
           <strong id="metricFeedback">0</strong>
         </article>
         <article class="metric">
-          <span>Promedio valoracion</span>
+          <span>Promedio valoración</span>
           <strong id="metricRating">0</strong>
         </article>
       </section>
@@ -451,13 +466,16 @@
 
         <div class="toolbar">
           <div class="tabs" role="tablist" aria-label="Vistas">
-            <button class="tab active" type="button" data-tab="completions">Recorridos</button>
-            <button class="tab" type="button" data-tab="feedback">Valoraciones</button>
+            <button class="tab active" type="button" role="tab" aria-selected="true" data-tab="completions">Recorridos</button>
+            <button class="tab" type="button" role="tab" aria-selected="false" data-tab="feedback">Valoraciones</button>
           </div>
+          <label class="sr-only" for="searchInput">Buscar en registros</label>
           <input id="searchInput" class="input" type="search" placeholder="Buscar...">
+          <label class="sr-only" for="profileFilter">Filtrar por perfil</label>
           <select id="profileFilter" class="select">
             <option value="">Todos los perfiles</option>
           </select>
+          <label class="sr-only" for="levelFilter">Filtrar por nivel</label>
           <select id="levelFilter" class="select">
             <option value="">Todos los niveles</option>
           </select>
@@ -466,7 +484,7 @@
           <button id="exportAnswersBtn" class="btn" type="button">CSV respuestas</button>
         </div>
 
-        <div id="status" class="status">Esperando datos...</div>
+        <div id="status" class="status" aria-live="polite">Esperando datos...</div>
 
         <div id="completionsView" class="split hidden">
           <div class="table-wrap">
@@ -477,7 +495,7 @@
                   <th>Perfil</th>
                   <th>Nivel educativo</th>
                   <th>Puntaje</th>
-                  <th>Devolucion</th>
+                  <th>Devolución</th>
                   <th>Respuestas</th>
                   <th></th>
                 </tr>
@@ -501,7 +519,7 @@
             <thead>
               <tr>
                 <th>Fecha</th>
-                <th>Valoracion</th>
+                <th>Valoración</th>
                 <th>Comentario</th>
                 <th>Perfil</th>
                 <th>Nivel educativo</th>
@@ -562,7 +580,7 @@
     async function api(path) {
       const response = await fetch(`${API_BASE}${path}`, { headers: headers() });
       if (response.status === 401) {
-        throw new Error('Contrasena incorrecta o sesion vencida.');
+        throw new Error('Contraseña incorrecta o sesión vencida.');
       }
       if (!response.ok) {
         throw new Error(`Error HTTP ${response.status}`);
@@ -717,7 +735,11 @@
       els.completionsView.classList.toggle('hidden', !showingCompletions);
       els.feedbackView.classList.toggle('hidden', showingCompletions);
       els.levelFilter.classList.toggle('hidden', !showingCompletions);
-      els.tabs.forEach(tab => tab.classList.toggle('active', tab.dataset.tab === state.tab));
+      els.tabs.forEach(tab => {
+        const active = tab.dataset.tab === state.tab;
+        tab.classList.toggle('active', active);
+        tab.setAttribute('aria-selected', String(active));
+      });
 
       if (showingCompletions) renderCompletions();
       else renderFeedback();
