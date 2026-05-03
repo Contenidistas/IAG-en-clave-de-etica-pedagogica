@@ -36,7 +36,6 @@ La persistencia principal usa Cloudflare Workers + D1. La app envia eventos anon
 Endpoints:
 
 - `POST /events`: recibe visitas, cuestionarios y valoraciones.
-- `POST /email-report`: envia por correo un informe solicitado por la persona usuaria, sin guardar el email en D1.
 - `GET /stats`: devuelve estadisticas agregadas anonimas.
 - `GET /opinions`: devuelve opiniones anonimas destacadas para el carrusel de inicio.
 
@@ -55,12 +54,8 @@ Tablas:
 5. Pegar el `database_id` que devuelve Cloudflare.
 6. Crear tablas: `wrangler d1 execute iag-etica-db --file=database/schema.sql`.
 7. Configurar la clave privada del panel admin: `wrangler secret put ADMIN_KEY`.
-8. Si se usara el envio de informes por correo, configurar Resend:
-   - `wrangler secret put RESEND_API_KEY`
-   - `wrangler secret put REPORT_EMAIL_FROM`
-   - opcional: `wrangler secret put REPORT_EMAIL_REPLY_TO`
-9. Desplegar API: `wrangler deploy`.
-10. Copiar la URL del Worker en `configuracion-ia.js`, propiedad `apiBaseUrl`.
+8. Desplegar API: `wrangler deploy`.
+9. Copiar la URL del Worker en `configuracion-ia.js`, propiedad `apiBaseUrl`.
 
 ## Backend legado en Google Sheets
 
@@ -110,7 +105,6 @@ Los resultados de cuestionarios se calculan desde eventos `completion` y sus res
 - La API usa Cloudflare Worker como capa de escritura y lectura.
 - La base D1 separa eventos, respuestas y valoraciones.
 - El panel administrativo exige una clave privada configurada como secreto `ADMIN_KEY` en Cloudflare.
-- El envio de informes por correo usa secretos del Worker y no persiste direcciones de email en D1.
 - Los envios usan JSON con CORS normal, por lo que la app puede detectar errores reales de escritura.
 - Las opiniones publicas se filtran: solo se muestran comentarios con valoracion 4 o 5.
 - Las visitas se deduplican por sesion.

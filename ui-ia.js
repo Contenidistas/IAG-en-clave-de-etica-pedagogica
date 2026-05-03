@@ -57,7 +57,6 @@ const elements = {
   toolsList: document.getElementById('toolsList'),
   finalTimeline: document.getElementById('finalTimeline'),
   downloadBtn: document.getElementById('downloadBtn'),
-  emailReportBtn: document.getElementById('emailReportBtn'),
   copyBtn: document.getElementById('copyBtn'),
   restartBtn: document.getElementById('restartBtn'),
 
