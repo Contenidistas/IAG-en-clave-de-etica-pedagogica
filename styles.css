@@ -2603,6 +2603,57 @@ img, video {
   color: var(--text-primary) !important;
 }
 
+[data-theme="dark"] .carousel-slide:nth-child(2) {
+  background: linear-gradient(135deg, #0b1220 0%, #111827 100%) !important;
+}
+
+[data-theme="dark"] .carousel-slide:nth-child(2) .intro-slide {
+  background: var(--bg-card) !important;
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.36) !important;
+}
+
+[data-theme="dark"] .carousel-slide:nth-child(2) .intro-slide h2,
+[data-theme="dark"] .carousel-slide:nth-child(2) .intro-slide > div:has(.chips-container) h3 {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .carousel-slide:nth-child(2) .intro-slide > p {
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .carousel-slide:nth-child(2) .intro-slide > div:has(.chips-container),
+[data-theme="dark"] #nivelEducativoWrapper,
+[data-theme="dark"] .carousel-slide:nth-child(2) .intro-slide > div:has(#playerName),
+[data-theme="dark"] .carousel-slide:nth-child(2) .intro-slide > div:has(#countrySelect),
+[data-theme="dark"] .carousel-slide:nth-child(2) .intro-slide > div:has(#familiaridadInicial),
+[data-theme="dark"] .carousel-slide:nth-child(2) .intro-slide > div:has([name="recursosSimilares"]) {
+  background: rgba(15, 23, 42, 0.72) !important;
+  border-color: var(--border) !important;
+}
+
+[data-theme="dark"] .carousel-slide:nth-child(2) .chips-container .chip,
+[data-theme="dark"] .carousel-slide:nth-child(2) .input {
+  background: #111827 !important;
+  border-color: var(--border) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .carousel-slide:nth-child(2) .chips-container .chip:hover {
+  background: rgba(99, 102, 241, 0.18) !important;
+}
+
+[data-theme="dark"] .carousel-slide:nth-child(2) .chips-container .chip.active,
+[data-theme="dark"] .carousel-slide:nth-child(2) .chips-container .chip.selected {
+  background: linear-gradient(135deg, #2563eb 0%, #ea580c 100%) !important;
+  color: #fff !important;
+}
+
+[data-theme="dark"] .carousel-slide:nth-child(2) .framework-read-more {
+  background: rgba(15, 23, 42, 0.92) !important;
+  color: #f8fafc !important;
+  border-color: rgba(255, 255, 255, 0.22) !important;
+}
+
 @media (max-width: 768px) {
   .intro-action-grid,
   .intro-feature-grid {
