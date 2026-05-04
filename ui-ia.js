@@ -790,8 +790,11 @@ if (homeBtn) {
     }
   });
 }
-document.getElementById('btnVerAutores').addEventListener('click', function() {
+const btnVerAutores = document.getElementById('btnVerAutores');
+if (btnVerAutores) btnVerAutores.addEventListener('click', function() {
     const info = document.getElementById('infoAutores');
+    if (!info) return;
+
     const title = this.querySelector('.btn-academic-title');
     const icon = this.querySelector('.btn-academic-icon');
     const isHidden = info.style.display === 'none';
@@ -800,6 +803,9 @@ document.getElementById('btnVerAutores').addEventListener('click', function() {
 
     if (title) title.textContent = isHidden ? 'Cerrar información' : '¿Quiénes somos?';
     if (icon) icon.textContent = isHidden ? '↑' : '👥';
+    if (isHidden) {
+      info.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
     setTimeout(updateCarousel, 0);
 });
 

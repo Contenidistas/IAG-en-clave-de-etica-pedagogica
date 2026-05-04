@@ -192,7 +192,7 @@ body {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  min-height: 72px;
+  min-height: 88px;
   border: 1px solid rgba(234, 88, 12, 0.35);
   background:
     linear-gradient(135deg, rgba(255, 247, 237, 0.98) 0%, rgba(255, 255, 255, 0.98) 100%);
@@ -213,11 +213,12 @@ body {
 .btn-diagnostic-start .btn-academic-icon {
   display: inline-grid;
   place-items: center;
-  width: 34px;
-  height: 34px;
+  width: 42px;
+  height: 42px;
   border-radius: 999px;
   background: #fed7aa;
   color: #c2410c;
+  font-size: 1.3rem;
   transition: transform 0.25s ease, background 0.25s ease;
 }
 
@@ -228,7 +229,7 @@ body {
 
 .btn-diagnostic-start .btn-academic-title {
   color: #ea580c;
-  font-size: 1rem;
+  font-size: 1.2rem;
 }
 
 .btn-diagnostic-start:hover {
@@ -959,6 +960,26 @@ body {
   line-height: 1.25;
 }
 
+.framework-articles {
+  margin: 0 1.25rem 1.25rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-main);
+}
+
+.framework-articles h4 {
+  margin: 0 0 0.75rem;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.framework-article-links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
 .resource-content h4 { 
   margin-bottom: 0.25rem;
   font-weight: 600;
@@ -1334,24 +1355,6 @@ body {
   font-weight: 600;
 }
 
-.footer-article-links {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.75rem;
-  margin-top: 1rem;
-}
-
-.footer-article-links .btn-academic {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  box-shadow: 0 2px 8px var(--shadow);
-}
-
-.footer-article-links .btn-academic:hover {
-  border-color: var(--primary);
-}
-
 .foundation-page {
   max-width: 980px;
   margin: 2rem auto;
@@ -1366,6 +1369,12 @@ body {
   margin-bottom: 0.6rem;
   color: var(--primary);
   font-size: 1.05rem;
+}
+
+.foundation-articles {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
 }
 
 .foundation-page p {
@@ -1516,7 +1525,9 @@ body {
   .framework-links { grid-template-columns: 1fr; }
   .framework-hero { padding: 1rem; }
   .framework-context,
-  .framework-links { margin-left: 1rem; margin-right: 1rem; }
+  .framework-links,
+  .framework-articles { margin-left: 1rem; margin-right: 1rem; }
+  .framework-article-links { grid-template-columns: 1fr; }
   .framework-link { min-height: auto; }
   .foundation-grid,
   .foundation-actions { grid-template-columns: 1fr; }
@@ -2482,7 +2493,7 @@ img, video {
 
 .intro-action-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(180px, 0.75fr) minmax(260px, 1.25fr);
   gap: 0.75rem;
 }
 
