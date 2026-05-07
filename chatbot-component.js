@@ -324,6 +324,24 @@
       line-height: 1.4;
     }
 
+    .chatbot-tooltip-action {
+      margin-top: 0.85rem;
+      border: 0;
+      border-radius: 999px;
+      background: #ffffff;
+      color: #92400e;
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 800;
+      padding: 0.55rem 0.8rem;
+      box-shadow: 0 4px 12px rgba(146, 64, 14, 0.22);
+    }
+
+    .chatbot-tooltip-action:hover {
+      background: #fffbeb;
+    }
+
     .chatbot-tooltip-close {
       position: absolute;
       top: 0.5rem;
@@ -400,6 +418,7 @@
         <button class="chatbot-tooltip-close" id="chatbotTooltipClose" aria-label="Cerrar" type="button">Cerrar</button>
         <div class="chatbot-tooltip-title">Oportunidad de profundización</div>
         <p>Consultá al Asistente Pedagógico para resolver dudas sobre el uso crítico de IA.</p>
+        <button class="chatbot-tooltip-action" id="chatbotTooltipAction" type="button" style="display: none;">Ver sugerencias de mejora</button>
       </div>
       <span class="chatbot-floating-label">Asistente Pedagógico</span>
       <button class="chatbot-toggle" id="chatbotToggle" aria-label="Abrir asistente pedagógico">💬</button>
@@ -450,9 +469,10 @@
     send: document.getElementById('chatbotSend'),
     tooltip: document.getElementById('chatbotTooltip'),
     tooltipClose: document.getElementById('chatbotTooltipClose'),
+    tooltipAction: document.getElementById('chatbotTooltipAction'),
   };
 
-  let isOpen = false, isTyping = false;
+  let isOpen = false, isTyping = false, pendingTooltipAction = null;
 
   // ========== FUNCIONES ==========
   const scrollToBottom = () => {
@@ -519,9 +539,22 @@ const addMessage = (content, type = 'bot', save = true) => {
             referencia: node.anepRef
           }))
       : [];
+    const nivelFinal = appConfig.likert
+      ? appConfig.likert.find(l => (appState.evidence || 0) >= l.min && l.max >= (appState.evidence || 0))
+      : null;
+    const respuestasDelRecorrido = Array.isArray(appState.path)
+      ? appState.path.map((step, index) => ({
+          orden: index + 1,
+          id: step.id,
+          pregunta: step.question,
+          respuesta: step.answer ? 'Sí' : 'No',
+          feedback: step.feedback
+        }))
+      : [];
+    const areasDeMejora = respuestasDelRecorrido.filter(step => step.respuesta === 'No');
 
     return {
-      instruccionPrioritaria: 'Si la consulta del usuario menciona "esto", "acá", "esta pregunta", "la pregunta" o pide qué significa algo del sitio, respondé sobre la preguntaActual del recorrido. No comiences hablando del puntaje ni evalúes el resultado salvo que el usuario lo pida explícitamente.',
+      instruccionPrioritaria: 'Si la consulta del usuario menciona "esto", "acá", "esta pregunta", "la pregunta" o pide qué significa algo del sitio, respondé sobre la preguntaActual del recorrido. Si pregunta por "mejora", "sugerencias", "recomendaciones" o "áreas", usá resultadoFinal y areasDeMejora del recorrido. No inventes respuestas fuera del contexto disponible.',
       perfil: appState.profileBase || appState.profile || null,
       perfilRecorrido: profileKey || null,
       nivelEducativo: appState.nivelEducativo || null,
@@ -532,6 +565,11 @@ const addMessage = (content, type = 'bot', save = true) => {
         preguntaNumero: appState.currentQuestion || null,
         totalPreguntas: appState.totalQuestions || null
       },
+      resultadoFinal: nivelFinal ? {
+        nivel: nivelFinal.id,
+        descripcion: nivelFinal.desc,
+        evidencia: appState.evidence || 0
+      } : null,
       preguntaActual: currentNode ? {
         id: appState.currentId,
         pregunta: currentNode.title,
@@ -539,15 +577,8 @@ const addMessage = (content, type = 'bot', save = true) => {
         contexto: currentNode.context,
         referencia: currentNode.anepRef
       } : null,
-      respuestasDelRecorrido: Array.isArray(appState.path)
-        ? appState.path.map((step, index) => ({
-            orden: index + 1,
-            id: step.id,
-            pregunta: step.question,
-            respuesta: step.answer ? 'Sí' : 'No',
-            feedback: step.feedback
-          }))
-        : [],
+      respuestasDelRecorrido,
+      areasDeMejora,
       preguntasDelPerfil: questions
     };
   };
@@ -627,6 +658,24 @@ const addMessage = (content, type = 'bot', save = true) => {
 
   window.sendMessage = sendMessage;
 
+  const openChatbot = () => {
+    if (isOpen) return;
+    isOpen = true;
+    el.window.classList.add('active');
+    el.toggle.classList.add('active');
+    el.toggle.textContent = '✕';
+    el.tooltip.classList.add('hidden');
+  };
+
+  const askForImprovementSuggestions = (message) => {
+    openChatbot();
+    const prompt = message || window.chatbotImprovementPrompt || 'Mostrame sugerencias de mejora basadas en mi recorrido.';
+    window.setTimeout(() => sendMessage(prompt), 250);
+  };
+
+  window.openChatbot = openChatbot;
+  window.askChatbotForImprovementSuggestions = askForImprovementSuggestions;
+
   const dismissTooltip = () => {
     el.tooltip.classList.add('hidden');
     localStorage.setItem(TOOLTIP_DISMISSED_KEY, 'true');
@@ -639,6 +688,11 @@ const addMessage = (content, type = 'bot', save = true) => {
 
     if (titleEl) titleEl.textContent = title;
     if (textEl) textEl.textContent = text;
+    pendingTooltipAction = typeof options.onAction === 'function' ? options.onAction : null;
+    if (el.tooltipAction) {
+      el.tooltipAction.textContent = options.actionLabel || 'Ver sugerencias de mejora';
+      el.tooltipAction.style.display = pendingTooltipAction ? 'inline-flex' : 'none';
+    }
     el.tooltip.classList.remove('hidden');
 
     if (options.autoHideMs) {
@@ -656,11 +710,23 @@ const addMessage = (content, type = 'bot', save = true) => {
     showTooltip(
       'Asistente Pedagógico',
       'Uso IA generativa para explicar preguntas, interpretar respuestas y sugerir mejoras. Conviene verificar mis orientaciones con criterio pedagógico.',
-      { autoHideMs: 12000 }
+      { autoHideMs: 12000, onAction: null }
     );
   };
 
   window.showChatbotQuizIntro = showQuizIntroTooltip;
+
+  window.showChatbotImprovementPrompt = (message) => {
+    window.chatbotImprovementPrompt = message;
+    showTooltip(
+      'Oportunidad de profundización',
+      'Analicé tus respuestas del recorrido y puedo ayudarte a priorizar mejoras.',
+      {
+        actionLabel: 'Ver sugerencias de mejora',
+        onAction: () => askForImprovementSuggestions(message)
+      }
+    );
+  };
 
   // ========== EVENTOS ==========
   el.toggle.addEventListener('click', () => {
@@ -690,6 +756,14 @@ const addMessage = (content, type = 'bot', save = true) => {
     e.stopPropagation();
     dismissTooltip();
   });
+
+  if (el.tooltipAction) {
+    el.tooltipAction.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (pendingTooltipAction) pendingTooltipAction();
+    });
+  }
 
   // También permitir cerrar haciendo click en el tooltip completo
   el.tooltip.addEventListener('click', (e) => {

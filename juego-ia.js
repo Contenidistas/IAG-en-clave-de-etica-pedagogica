@@ -554,35 +554,44 @@ function mostrarResultados() {
     console.log('ℹ️ Usuario no dio consentimiento, no se envían datos');
   }
 
-  // 🤖 Dispara chatbot automáticamente con consejos
-  triggearChatbotConConsejosAutomaticos();
+  // Mostrar una acción clara para pedir sugerencias al Asistente Pedagógico.
+  prepararSugerenciasDeMejoraEnChatbot();
 }
 
 /**
- * Abre el chatbot automáticamente y envía un mensaje para generar consejos
+ * Prepara el mensaje contextual para que el chatbot pueda generar consejos
+ * cuando el usuario elija ver las sugerencias.
  */
-function triggearChatbotConConsejosAutomaticos() {
+function prepararSugerenciasDeMejoraEnChatbot() {
   try {
-    // Pequeño delay para que se haya renderizado todo
+    const mensajeAutomatico = generarMensajeAutomaticoDeConsejos();
+    if (!mensajeAutomatico) return;
+
+    window.chatbotImprovementPrompt = mensajeAutomatico;
+    const sugerenciasBtn = document.getElementById('improvementSuggestionsBtn');
+    if (sugerenciasBtn) {
+      sugerenciasBtn.onclick = () => {
+        if (typeof window.askChatbotForImprovementSuggestions === 'function') {
+          window.askChatbotForImprovementSuggestions(mensajeAutomatico);
+        } else if (typeof window.sendMessage === 'function') {
+          window.sendMessage(mensajeAutomatico);
+        }
+      };
+    }
+
     setTimeout(() => {
-      const chatbotToggle = document.getElementById('chatbotToggle');
-      if (chatbotToggle) {
-        // Simular clic para abrir el chatbot
-        chatbotToggle.click();
-        
-        // Esperar a que se abra y luego enviar el mensaje automático
-        setTimeout(() => {
-          generarMensajeAutomaticoDeConsejos();
-        }, 500);
+      if (typeof window.showChatbotImprovementPrompt === 'function') {
+        window.showChatbotImprovementPrompt(mensajeAutomatico);
       }
-    }, 300);
+    }, 400);
   } catch (err) {
-    console.error('❌ Error abriendo chatbot:', err);
+    console.error('❌ Error preparando sugerencias del chatbot:', err);
   }
 }
 
 /**
- * Genera un mensaje automático para obtener consejos personalizados
+ * Genera un mensaje automático para obtener consejos personalizados.
+ * Devuelve el texto para que el chatbot lo use cuando el usuario lo pida.
  */
 function generarMensajeAutomaticoDeConsejos() {
   try {
@@ -590,17 +599,18 @@ function generarMensajeAutomaticoDeConsejos() {
       l => state.evidence >= l.min && l.max >= state.evidence
     );
     
-    const perfil = CONFIG.perfiles[state.profileKey];
     const respuestasNo = state.path.filter(p => !p.answer);
+    const areas = respuestasNo.length
+      ? respuestasNo.map((p, index) => `${index + 1}. ${p.question} (${p.feedback})`).join('\n')
+      : 'No hay respuestas marcadas como "No"; sugerí formas de consolidar y profundizar las prácticas ya alineadas.';
     
-    const mensajeAutomatico = `Acabo de completar el recorrido y obtuve nivel "${nivel.id}". Tengo ${respuestasNo.length} áreas donde respondí "No". Con base en los marcos UNESCO, ANEP y FING, ¿cuáles serían los 3 principales consejos de mejora que me recomendarías para mi práctica pedagógica con IA?`;
-    
-    // Llamar a sendMessage que está en el chatbot-component.js
-    if (window.sendMessage) {
-      window.sendMessage(mensajeAutomatico);
-    }
+    return `Acabo de completar el recorrido y obtuve nivel "${nivel.id}" con ${state.evidence} puntos. Estas son mis áreas de mejora detectadas:
+${areas}
+
+Con base en los marcos UNESCO, ANEP y FING, mostrame 3 sugerencias de mejora priorizadas, concretas y aplicables para mi perfil (${state.profileBase || state.profile}, ${state.nivelEducativo || 'nivel no indicado'}).`;
   } catch (err) {
     console.error('❌ Error generando mensaje automático:', err);
+    return '';
   }
 }
 
