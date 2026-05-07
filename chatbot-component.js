@@ -434,7 +434,7 @@
 
   // ========== CONFIG ==========
   const CONFIG = {
-    WORKER_URL: 'https://dawn-math-0c97.suscripcionessh.workers.dev',
+    WORKER_URL: 'https://iag-etica-api.suscripcionessh.workers.dev/chat',
   };
 
   const TOOLTIP_DISMISSED_KEY = 'chatbot_tooltip_dismissed';

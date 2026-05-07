@@ -6,3 +6,6 @@ compatibility_date = "2026-05-02"
 binding = "DB"
 database_name = "iag-etica-db"
 database_id = "9b4f5ad2-9e9d-421b-a712-71803b883e23"
+
+[env.production]
+vars = { ADMIN_KEY = "tu-clave-admin-segura", GEMINI_API_KEY = "tu-clave-gemini-aqui" }

@@ -18,6 +18,14 @@ export default {
         return json(await handleEvent(request, env));
       }
 
+      if (request.method === 'POST' && url.pathname === '/email-report') {
+        return json(await sendEmailReport(request, env));
+      }
+
+      if (request.method === 'POST' && url.pathname === '/chat') {
+        return json(await handleChat(request, env));
+      }
+
       if (request.method === 'GET' && url.pathname === '/stats') {
         return json(await buildStats(env));
       }
@@ -25,7 +33,9 @@ export default {
       if (request.method === 'GET' && url.pathname === '/opinions') {
         return json(await buildOpinions(env));
       }
-
+      if (request.method === 'POST' && url.pathname === '/chat') {
+        return json(await handleChat(request, env));
+      }
       if (request.method === 'GET' && url.pathname === '/admin/summary') {
         requireAdmin(request, env);
         return json(await buildAdminSummary(env));
@@ -185,6 +195,106 @@ async function buildStats(env) {
     indicators,
     updatedAt: new Date().toISOString(),
   };
+}
+
+async function handleChat(request, env) {
+  const data = await request.json();
+  const message = clean(data.message);
+  const context = data.context || {};
+
+  if (!message) {
+    throw new Error('Mensaje vacío');
+  }
+
+  const apiKey = env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error('API key de Gemini no configurada');
+  }
+
+  const systemPrompt = `Eres un Asistente Pedagógico experto en educación y uso crítico de inteligencia artificial generativa. 
+Trabaja en un contexto educativo donde los usuarios están evaluando su práctica docente con respecto al uso de IA.
+
+Principios:
+- Ofrece respuestas breves, claras y contextualizadas (máximo 3-4 párrafos)
+- Si el usuario pregunta por la pregunta actual del recorrido, explicá qué está preguntando y cómo pensarla
+- Enfatizá la reflexión crítica sobre IA en educación
+- Sé respetuoso con el contexto del usuario (nivel educativo, familiaridad con IA, etc.)
+- No evalúes respuestas salvo que se te pida explícitamente
+- Sugiere recursos o marcos de referencia cuando sea relevante`;
+
+  const userMessage = `Contexto del usuario:
+${JSON.stringify(context, null, 2)}
+
+Consulta: ${message}`;
+
+  try {
+    const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              {
+                text: userMessage,
+              },
+            ],
+          },
+        ],
+        systemInstruction: {
+          parts: [
+            {
+              text: systemPrompt,
+            },
+          ],
+        },
+        generationConfig: {
+          temperature: 0.7,
+          topP: 0.95,
+          topK: 64,
+          maxOutputTokens: 1024,
+        },
+        safetySettings: [
+          {
+            category: 'HARM_CATEGORY_HARASSMENT',
+            threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+          },
+          {
+            category: 'HARM_CATEGORY_HATE_SPEECH',
+            threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+          },
+          {
+            category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+            threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+          },
+          {
+            category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+            threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+          },
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('Gemini API error:', error);
+      throw new Error(`Error en Gemini API: ${response.status}`);
+    }
+
+    const result = await response.json();
+    const reply = result.candidates?.[0]?.content?.parts?.[0]?.text || 'No pude generar una respuesta.';
+
+    return {
+      ok: true,
+      reply: reply.trim(),
+      timestamp: new Date().toISOString(),
+    };
+  } catch (error) {
+    console.error('Chat handler error:', error);
+    throw error;
+  }
 }
 
 function requireAdmin(request, env) {
