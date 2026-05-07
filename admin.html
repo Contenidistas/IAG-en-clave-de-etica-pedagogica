@@ -217,6 +217,12 @@
       color: var(--bad);
     }
 
+    .btn.danger.solid {
+      border-color: var(--bad);
+      background: var(--bad);
+      color: #fff;
+    }
+
     .table-wrap {
       width: 100%;
       overflow: auto;
@@ -430,6 +436,7 @@
       </div>
       <div class="actions">
         <button id="refreshBtn" class="btn" type="button">Actualizar</button>
+        <button id="resetDataBtn" class="btn danger solid" type="button">Limpiar datos</button>
         <button id="logoutBtn" class="btn danger" type="button">Cerrar sesión</button>
       </div>
     </header>
@@ -475,13 +482,29 @@
           <select id="profileFilter" class="select">
             <option value="">Todos los perfiles</option>
           </select>
-          <label class="sr-only" for="levelFilter">Filtrar por nivel</label>
-          <select id="levelFilter" class="select">
-            <option value="">Todos los niveles</option>
+          <label class="sr-only" for="educationFilter">Filtrar por formación</label>
+          <select id="educationFilter" class="select">
+            <option value="">Toda formación</option>
           </select>
-          <button id="exportCompletionsBtn" class="btn" type="button">CSV recorridos</button>
-          <button id="exportFeedbackBtn" class="btn" type="button">CSV valoraciones</button>
-          <button id="exportAnswersBtn" class="btn" type="button">CSV respuestas</button>
+          <label class="sr-only" for="familiarityFilter">Filtrar por experiencia</label>
+          <select id="familiarityFilter" class="select">
+            <option value="">Toda experiencia</option>
+          </select>
+          <label class="sr-only" for="resourcesFilter">Filtrar por recursos similares</label>
+          <select id="resourcesFilter" class="select">
+            <option value="">Todos los recursos</option>
+          </select>
+          <label class="sr-only" for="countryFilter">Filtrar por país</label>
+          <select id="countryFilter" class="select">
+            <option value="">Todos los países</option>
+          </select>
+          <label class="sr-only" for="levelFilter">Filtrar por resultado</label>
+          <select id="levelFilter" class="select">
+            <option value="">Todos los resultados</option>
+          </select>
+          <button id="exportCompletionsBtn" class="btn" type="button">CSV recorridos filtrados</button>
+          <button id="exportFeedbackBtn" class="btn" type="button">CSV valoraciones filtradas</button>
+          <button id="exportAnswersBtn" class="btn" type="button">CSV respuestas filtradas</button>
         </div>
 
         <div id="status" class="status" aria-live="polite">Esperando datos...</div>
@@ -552,6 +575,7 @@
       loginStatus: document.getElementById('loginStatus'),
       refreshBtn: document.getElementById('refreshBtn'),
       logoutBtn: document.getElementById('logoutBtn'),
+      resetDataBtn: document.getElementById('resetDataBtn'),
       status: document.getElementById('status'),
       updatedAt: document.getElementById('updatedAt'),
       completionsView: document.getElementById('completionsView'),
@@ -561,6 +585,10 @@
       answersPanel: document.getElementById('answersPanel'),
       searchInput: document.getElementById('searchInput'),
       profileFilter: document.getElementById('profileFilter'),
+      educationFilter: document.getElementById('educationFilter'),
+      familiarityFilter: document.getElementById('familiarityFilter'),
+      resourcesFilter: document.getElementById('resourcesFilter'),
+      countryFilter: document.getElementById('countryFilter'),
       levelFilter: document.getElementById('levelFilter'),
       tabs: document.querySelectorAll('.tab'),
       metricVisits: document.getElementById('metricVisits'),
@@ -584,6 +612,25 @@
       }
       if (!response.ok) {
         throw new Error(`Error HTTP ${response.status}`);
+      }
+      return response.json();
+    }
+
+    async function apiPost(path, body) {
+      const response = await fetch(`${API_BASE}${path}`, {
+        method: 'POST',
+        headers: {
+          ...headers(),
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body || {}),
+      });
+      if (response.status === 401) {
+        throw new Error('Contraseña incorrecta o sesión vencida.');
+      }
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.error || `Error HTTP ${response.status}`);
       }
       return response.json();
     }
@@ -626,11 +673,19 @@
     function rowMatches(row) {
       const query = normalizeText(els.searchInput.value);
       const profile = els.profileFilter.value;
+      const education = els.educationFilter.value;
+      const familiarity = els.familiarityFilter.value;
+      const resources = els.resourcesFilter.value;
+      const country = els.countryFilter.value;
       const level = els.levelFilter.value;
       const haystack = normalizeText(Object.values(row).join(' '));
 
       if (query && !haystack.includes(query)) return false;
       if (profile && row.profileKey !== profile && row.profile !== profile) return false;
+      if (education && row.nivelEducativo !== education) return false;
+      if (familiarity && row.familiaridadInicial !== familiarity) return false;
+      if (resources && row.recursosSimilares !== resources) return false;
+      if (country && row.country !== country) return false;
       if (level && row.likertLevel !== level) return false;
       return true;
     }
@@ -653,30 +708,79 @@
 
     function fillFilters() {
       const currentProfile = els.profileFilter.value;
+      const currentEducation = els.educationFilter.value;
+      const currentFamiliarity = els.familiarityFilter.value;
+      const currentResources = els.resourcesFilter.value;
+      const currentCountry = els.countryFilter.value;
       const currentLevel = els.levelFilter.value;
       const profiles = new Set();
+      const educationLevels = new Set();
+      const familiarityLevels = new Set();
+      const resourcesValues = new Set();
+      const countries = new Set();
       const levels = new Set();
 
       state.completions.forEach(row => {
         if (row.profileKey || row.profile) profiles.add(row.profileKey || row.profile);
+        if (row.nivelEducativo) educationLevels.add(row.nivelEducativo);
+        if (row.familiaridadInicial) familiarityLevels.add(row.familiaridadInicial);
+        if (row.recursosSimilares) resourcesValues.add(row.recursosSimilares);
+        if (row.country) countries.add(row.country);
         if (row.likertLevel) levels.add(row.likertLevel);
       });
       state.feedback.forEach(row => {
         if (row.profileKey || row.profile) profiles.add(row.profileKey || row.profile);
+        if (row.nivelEducativo) educationLevels.add(row.nivelEducativo);
+        if (row.country) countries.add(row.country);
       });
 
       els.profileFilter.innerHTML = '<option value="">Todos los perfiles</option>' +
         Array.from(profiles).sort().map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join('');
 
-      els.levelFilter.innerHTML = '<option value="">Todos los niveles</option>' +
+      els.educationFilter.innerHTML = '<option value="">Toda formación</option>' +
+        Array.from(educationLevels).sort().map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join('');
+
+      els.familiarityFilter.innerHTML = '<option value="">Toda experiencia</option>' +
+        Array.from(familiarityLevels).sort().map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join('');
+
+      els.resourcesFilter.innerHTML = '<option value="">Todos los recursos</option>' +
+        Array.from(resourcesValues).sort().map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join('');
+
+      els.countryFilter.innerHTML = '<option value="">Todos los países</option>' +
+        Array.from(countries).sort().map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join('');
+
+      els.levelFilter.innerHTML = '<option value="">Todos los resultados</option>' +
         Array.from(levels).sort().map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join('');
 
       els.profileFilter.value = currentProfile;
+      els.educationFilter.value = currentEducation;
+      els.familiarityFilter.value = currentFamiliarity;
+      els.resourcesFilter.value = currentResources;
+      els.countryFilter.value = currentCountry;
       els.levelFilter.value = currentLevel;
     }
 
+    function filteredCompletions() {
+      return state.completions.filter(rowMatches);
+    }
+
+    function filteredFeedback() {
+      return state.feedback.filter(row => {
+        const query = normalizeText(els.searchInput.value);
+        const profile = els.profileFilter.value;
+        const education = els.educationFilter.value;
+        const country = els.countryFilter.value;
+        const haystack = normalizeText(Object.values(row).join(' '));
+        if (query && !haystack.includes(query)) return false;
+        if (profile && row.profileKey !== profile && row.profile !== profile) return false;
+        if (education && row.nivelEducativo !== education) return false;
+        if (country && row.country !== country) return false;
+        return true;
+      });
+    }
+
     function renderCompletions() {
-      const rows = state.completions.filter(rowMatches);
+      const rows = filteredCompletions();
 
       if (!rows.length) {
         els.completionsBody.innerHTML = '<tr><td colspan="7" class="empty">No hay recorridos para mostrar.</td></tr>';
@@ -704,14 +808,7 @@
     }
 
     function renderFeedback() {
-      const rows = state.feedback.filter(row => {
-        const query = normalizeText(els.searchInput.value);
-        const profile = els.profileFilter.value;
-        const haystack = normalizeText(Object.values(row).join(' '));
-        if (query && !haystack.includes(query)) return false;
-        if (profile && row.profileKey !== profile && row.profile !== profile) return false;
-        return true;
-      });
+      const rows = filteredFeedback();
 
       if (!rows.length) {
         els.feedbackBody.innerHTML = '<tr><td colspan="6" class="empty">No hay valoraciones para mostrar.</td></tr>';
@@ -735,6 +832,8 @@
       els.completionsView.classList.toggle('hidden', !showingCompletions);
       els.feedbackView.classList.toggle('hidden', showingCompletions);
       els.levelFilter.classList.toggle('hidden', !showingCompletions);
+      els.familiarityFilter.classList.toggle('hidden', !showingCompletions);
+      els.resourcesFilter.classList.toggle('hidden', !showingCompletions);
       els.tabs.forEach(tab => {
         const active = tab.dataset.tab === state.tab;
         tab.classList.toggle('active', active);
@@ -795,6 +894,50 @@
       }
     }
 
+    function csvCell(value) {
+      return `"${String(value ?? '').replace(/"/g, '""')}"`;
+    }
+
+    function downloadRowsCsv(filename, rows, columns) {
+      const header = columns.join(',');
+      const lines = rows.map(row => columns.map(column => csvCell(row[column])).join(','));
+      const blob = new Blob([[header, ...lines].join('\r\n')], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    async function downloadFilteredCsv(type) {
+      if (type === 'completions') {
+        downloadRowsCsv('recorridos-filtrados.csv', filteredCompletions(), [
+          'id', 'timestamp', 'sessionId', 'userName', 'profile', 'profileKey', 'country',
+          'nivelEducativo', 'familiaridadInicial', 'recursosSimilares', 'evidence',
+          'likertLevel', 'answersCount'
+        ]);
+        return;
+      }
+
+      if (type === 'feedback') {
+        downloadRowsCsv('valoraciones-filtradas.csv', filteredFeedback(), [
+          'id', 'eventId', 'timestamp', 'sessionId', 'rating', 'suggestion',
+          'profile', 'profileKey', 'country', 'nivelEducativo'
+        ]);
+        return;
+      }
+
+      const eventIds = new Set(filteredCompletions().map(row => Number(row.id)));
+      const data = await api('/admin/answers');
+      const answers = (data.answers || []).filter(row => eventIds.has(Number(row.eventId)));
+      downloadRowsCsv('respuestas-filtradas.csv', answers, [
+        'id', 'eventId', 'questionId', 'question', 'answer', 'createdAt'
+      ]);
+    }
+
     async function downloadCsv(type) {
       try {
         const response = await fetch(`${API_BASE}/admin/export.csv?type=${encodeURIComponent(type)}`, {
@@ -815,6 +958,23 @@
       }
     }
 
+    async function resetData() {
+      const confirmation = window.prompt('Esta acción borra todos los registros de prueba: visitas, recorridos, respuestas y valoraciones. Escribí BORRAR DATOS para confirmar.');
+      if (confirmation !== 'BORRAR DATOS') return;
+
+      try {
+        els.resetDataBtn.disabled = true;
+        setStatus('Limpiando datos...');
+        const result = await apiPost('/admin/reset-data', { confirmation });
+        setStatus(`Datos eliminados: ${fmtNumber(result.deleted.events)} eventos, ${fmtNumber(result.deleted.answers)} respuestas y ${fmtNumber(result.deleted.feedback)} valoraciones.`);
+        await loadAll();
+      } catch (error) {
+        setStatus(`No se pudieron limpiar los datos: ${error.message}`);
+      } finally {
+        els.resetDataBtn.disabled = false;
+      }
+    }
+
     els.loginForm.addEventListener('submit', event => {
       event.preventDefault();
       state.key = els.adminKey.value.trim();
@@ -831,12 +991,17 @@
     });
 
     els.refreshBtn.addEventListener('click', loadAll);
+    els.resetDataBtn.addEventListener('click', resetData);
     els.searchInput.addEventListener('input', renderCurrentTab);
     els.profileFilter.addEventListener('change', renderCurrentTab);
+    els.educationFilter.addEventListener('change', renderCurrentTab);
+    els.familiarityFilter.addEventListener('change', renderCurrentTab);
+    els.resourcesFilter.addEventListener('change', renderCurrentTab);
+    els.countryFilter.addEventListener('change', renderCurrentTab);
     els.levelFilter.addEventListener('change', renderCurrentTab);
-    els.exportCompletionsBtn.addEventListener('click', () => downloadCsv('completions'));
-    els.exportFeedbackBtn.addEventListener('click', () => downloadCsv('feedback'));
-    els.exportAnswersBtn.addEventListener('click', () => downloadCsv('answers'));
+    els.exportCompletionsBtn.addEventListener('click', () => downloadFilteredCsv('completions'));
+    els.exportFeedbackBtn.addEventListener('click', () => downloadFilteredCsv('feedback'));
+    els.exportAnswersBtn.addEventListener('click', () => downloadFilteredCsv('answers'));
 
     els.tabs.forEach(tab => {
       tab.addEventListener('click', () => {

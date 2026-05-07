@@ -61,6 +61,11 @@ export default {
         return csv(await buildCsvExport(env, url.searchParams.get('type')));
       }
 
+      if (request.method === 'POST' && url.pathname === '/admin/reset-data') {
+        requireAdmin(request, env);
+        return json(await resetAdminData(request, env));
+      }
+
       return json({
         ok: true,
         message: 'Backend D1 activo. Use POST /events, GET /stats, GET /opinions o rutas /admin protegidas.',
@@ -419,7 +424,7 @@ async function listCompletions(env) {
     WHERE e.event_type = 'completion'
     GROUP BY e.id
     ORDER BY e.timestamp DESC
-    LIMIT 500
+    LIMIT 5000
   `).all();
 
   return { completions: result.results || [], updatedAt: new Date().toISOString() };
@@ -440,10 +445,44 @@ async function listFeedback(env) {
       nivel_educativo AS nivelEducativo
     FROM feedback
     ORDER BY timestamp DESC
-    LIMIT 500
+    LIMIT 5000
   `).all();
 
   return { feedback: result.results || [], updatedAt: new Date().toISOString() };
+}
+
+async function resetAdminData(request, env) {
+  const data = await request.json().catch(() => ({}));
+  const confirmation = clean(data.confirmation);
+
+  if (confirmation !== 'BORRAR DATOS') {
+    const error = new Error('Confirmación inválida');
+    error.status = 400;
+    throw error;
+  }
+
+  const before = await env.DB.prepare(`
+    SELECT
+      (SELECT COUNT(*) FROM events) AS events,
+      (SELECT COUNT(*) FROM answers) AS answers,
+      (SELECT COUNT(*) FROM feedback) AS feedback
+  `).first();
+
+  await env.DB.batch([
+    env.DB.prepare('DELETE FROM feedback'),
+    env.DB.prepare('DELETE FROM answers'),
+    env.DB.prepare('DELETE FROM events'),
+  ]);
+
+  return {
+    ok: true,
+    deleted: {
+      events: Number(before?.events || 0),
+      answers: Number(before?.answers || 0),
+      feedback: Number(before?.feedback || 0),
+    },
+    updatedAt: new Date().toISOString(),
+  };
 }
 
 async function listAnswers(env, eventId) {
@@ -459,7 +498,7 @@ async function listAnswers(env, eventId) {
         SELECT id, event_id AS eventId, question_id AS questionId, question, answer, created_at AS createdAt
         FROM answers
         ORDER BY created_at DESC
-        LIMIT 500
+        LIMIT 5000
       `);
 
   const result = await statement.all();
@@ -497,7 +536,7 @@ async function buildCsvExport(env, type) {
         created_at AS createdAt
       FROM events
       ORDER BY timestamp DESC
-      LIMIT 1000
+      LIMIT 10000
     `).all();
 
     return {
