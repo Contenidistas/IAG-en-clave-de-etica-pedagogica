@@ -502,6 +502,11 @@
           <select id="levelFilter" class="select">
             <option value="">Todos los resultados</option>
           </select>
+          <label class="sr-only" for="dateFromFilter">Fecha desde</label>
+          <input id="dateFromFilter" class="input" type="date" aria-label="Fecha desde">
+          <label class="sr-only" for="dateToFilter">Fecha hasta</label>
+          <input id="dateToFilter" class="input" type="date" aria-label="Fecha hasta">
+          <button id="exportCutZipBtn" class="btn primary" type="button">ZIP corte datos</button>
           <button id="exportCompletionsBtn" class="btn" type="button">CSV recorridos filtrados</button>
           <button id="exportFeedbackBtn" class="btn" type="button">CSV valoraciones filtradas</button>
           <button id="exportAnswersBtn" class="btn" type="button">CSV respuestas filtradas</button>
@@ -590,6 +595,8 @@
       resourcesFilter: document.getElementById('resourcesFilter'),
       countryFilter: document.getElementById('countryFilter'),
       levelFilter: document.getElementById('levelFilter'),
+      dateFromFilter: document.getElementById('dateFromFilter'),
+      dateToFilter: document.getElementById('dateToFilter'),
       tabs: document.querySelectorAll('.tab'),
       metricVisits: document.getElementById('metricVisits'),
       metricCompleted: document.getElementById('metricCompleted'),
@@ -599,6 +606,7 @@
       exportCompletionsBtn: document.getElementById('exportCompletionsBtn'),
       exportFeedbackBtn: document.getElementById('exportFeedbackBtn'),
       exportAnswersBtn: document.getElementById('exportAnswersBtn'),
+      exportCutZipBtn: document.getElementById('exportCutZipBtn'),
     };
 
     function headers() {
@@ -687,6 +695,25 @@
       if (resources && row.recursosSimilares !== resources) return false;
       if (country && row.country !== country) return false;
       if (level && row.likertLevel !== level) return false;
+      if (!dateInRange(row.timestamp)) return false;
+      return true;
+    }
+
+    function dateInRange(value) {
+      if (!value) return true;
+      const time = new Date(value).getTime();
+      if (Number.isNaN(time)) return true;
+
+      const from = els.dateFromFilter.value;
+      const to = els.dateToFilter.value;
+      if (from) {
+        const fromTime = new Date(`${from}T00:00:00`).getTime();
+        if (time < fromTime) return false;
+      }
+      if (to) {
+        const toTime = new Date(`${to}T23:59:59.999`).getTime();
+        if (time > toTime) return false;
+      }
       return true;
     }
 
@@ -867,9 +894,10 @@
       }
     }
 
-    async function loadAll() {
+    async function loadAll(options = {}) {
       if (!state.key) return;
-      setStatus('Cargando datos...');
+      const silent = options.silent === true;
+      if (!silent) setStatus('Cargando datos...');
 
       try {
         const [summary, completions, feedback] = await Promise.all([
@@ -883,7 +911,7 @@
         renderSummary(summary);
         fillFilters();
         renderCurrentTab();
-        setStatus('', false);
+        if (!silent) setStatus('', false);
         els.login.classList.add('hidden');
       } catch (error) {
         setStatus(error.message);
@@ -958,16 +986,61 @@
       }
     }
 
+    async function downloadCutZip() {
+      const params = new URLSearchParams();
+      if (els.dateFromFilter.value) params.set('from', els.dateFromFilter.value);
+      if (els.dateToFilter.value) params.set('to', els.dateToFilter.value);
+
+      try {
+        els.exportCutZipBtn.disabled = true;
+        setStatus('Preparando corte de datos...');
+        const query = params.toString();
+        const response = await fetch(`${API_BASE}/admin/export.zip${query ? `?${query}` : ''}`, {
+          headers: headers(),
+        });
+        if (response.status === 401) throw new Error('Contraseña incorrecta o sesión vencida.');
+        if (!response.ok) {
+          const error = await response.json().catch(() => ({}));
+          throw new Error(error.error || `Error HTTP ${response.status}`);
+        }
+
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        const from = els.dateFromFilter.value || 'inicio';
+        const to = els.dateToFilter.value || 'hoy';
+        link.href = url;
+        link.download = `corte-datos-${from}-${to}.zip`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+        setStatus(`Corte de datos descargado (${from} a ${to}).`);
+      } catch (error) {
+        setStatus(`No se pudo descargar el corte: ${error.message}`);
+      } finally {
+        els.exportCutZipBtn.disabled = false;
+      }
+    }
+
     async function resetData() {
-      const confirmation = window.prompt('Esta acción borra todos los registros de prueba: visitas, recorridos, respuestas y valoraciones. Escribí BORRAR DATOS para confirmar.');
-      if (confirmation !== 'BORRAR DATOS') return;
+      const confirmation = window.prompt('Antes de borrar, conviene descargar un ZIP de corte de datos. Esta acción borra visitas, recorridos, respuestas y valoraciones. Escribí BORRAR DATOS para confirmar.');
+      if (confirmation === null) {
+        setStatus('Limpieza cancelada.');
+        return;
+      }
+
+      if (confirmation.trim().toUpperCase() !== 'BORRAR DATOS') {
+        setStatus('No se limpiaron datos: la confirmación debe ser BORRAR DATOS.');
+        return;
+      }
 
       try {
         els.resetDataBtn.disabled = true;
         setStatus('Limpiando datos...');
-        const result = await apiPost('/admin/reset-data', { confirmation });
+        const result = await apiPost('/admin/reset-data', { confirmation: confirmation.trim() });
+        await loadAll({ silent: true });
         setStatus(`Datos eliminados: ${fmtNumber(result.deleted.events)} eventos, ${fmtNumber(result.deleted.answers)} respuestas y ${fmtNumber(result.deleted.feedback)} valoraciones.`);
-        await loadAll();
       } catch (error) {
         setStatus(`No se pudieron limpiar los datos: ${error.message}`);
       } finally {
@@ -999,6 +1072,9 @@
     els.resourcesFilter.addEventListener('change', renderCurrentTab);
     els.countryFilter.addEventListener('change', renderCurrentTab);
     els.levelFilter.addEventListener('change', renderCurrentTab);
+    els.dateFromFilter.addEventListener('change', renderCurrentTab);
+    els.dateToFilter.addEventListener('change', renderCurrentTab);
+    els.exportCutZipBtn.addEventListener('click', downloadCutZip);
     els.exportCompletionsBtn.addEventListener('click', () => downloadFilteredCsv('completions'));
     els.exportFeedbackBtn.addEventListener('click', () => downloadFilteredCsv('feedback'));
     els.exportAnswersBtn.addEventListener('click', () => downloadFilteredCsv('answers'));

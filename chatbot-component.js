@@ -481,14 +481,48 @@
     }, 100);
   };
 
+  const escapeHTML = (value) => String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
+  const safeLink = (url) => {
+    const trimmed = String(url || '').trim();
+    return /^(https?:|mailto:)/i.test(trimmed) ? trimmed : '#';
+  };
+
+  const getHistory = () => {
+    try {
+      const parsed = JSON.parse(sessionStorage.getItem('chatbot_history') || '[]');
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      console.warn('Historial del chatbot inválido. Se reinicia.', error);
+      sessionStorage.removeItem('chatbot_history');
+      return [];
+    }
+  };
+
+  const saveHistory = (history) => {
+    try {
+      sessionStorage.setItem('chatbot_history', JSON.stringify(history.slice(-20)));
+    } catch (error) {
+      console.warn('No se pudo guardar el historial del chatbot.', error);
+    }
+  };
+
   const markdownToHTML = (text) => {
-    return text
+    return escapeHTML(text)
       .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
       .replace(/\*(.*?)\*/g, "<em>$1</em>")
       .replace(/`([^`]+)`/g, "<code>$1</code>")
       .replace(/\n/g, "<br>")
       .replace(/^- (.*)/gm, "<ul><li>$1</li></ul>")
-      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_match, label, url) => {
+        const href = escapeHTML(safeLink(url));
+        return `<a href="${href}" target="_blank" rel="noopener noreferrer">${label}</a>`;
+      });
   };
 
 const addMessage = (content, type = 'bot', save = true) => {
@@ -512,9 +546,9 @@ const addMessage = (content, type = 'bot', save = true) => {
 
     // Guardar en sesión para persistencia (solo mensajes reales)
     if (save && content !== 'TYPING_INDICATOR') {
-      const history = JSON.parse(sessionStorage.getItem('chatbot_history') || '[]');
+      const history = getHistory();
       history.push({ content, type });
-      sessionStorage.setItem('chatbot_history', JSON.stringify(history));
+      saveHistory(history);
     }
 
     return msg;
@@ -608,9 +642,10 @@ const addMessage = (content, type = 'bot', save = true) => {
   };
 
  const sendMessage = async (message) => {
-    if (!message || isTyping) return;
+    const cleanMessage = String(message || '').trim();
+    if (!cleanMessage || isTyping) return;
 
-    addMessage(message, 'user');
+    addMessage(cleanMessage, 'user');
     el.input.value = '';
     el.send.disabled = true;
     el.input.disabled = true;
@@ -618,9 +653,13 @@ const addMessage = (content, type = 'bot', save = true) => {
 
     const typingMessage = addMessage('TYPING_INDICATOR', 'bot', false); // Indicador visual sin guardar
 
+    let timeoutId;
+
    try {
   const userContext = buildQuestionContext();
-  const workerMessage = buildWorkerMessage(message, userContext);
+  const workerMessage = buildWorkerMessage(cleanMessage, userContext);
+  const controller = new AbortController();
+  timeoutId = window.setTimeout(() => controller.abort(), 25000);
 
   const response = await fetch(CONFIG.WORKER_URL, {
     method: 'POST',
@@ -630,15 +669,21 @@ const addMessage = (content, type = 'bot', save = true) => {
     body: JSON.stringify({
       message: workerMessage,
       context: userContext
-    })
+    }),
+    signal: controller.signal
   });
+  window.clearTimeout(timeoutId);
 
   if (!response.ok) {
-    throw new Error(`Error HTTP: ${response.status}`);
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || `Error HTTP: ${response.status}`);
   }
 
   const data = await response.json();
   console.log("Respuesta IA:", data);
+  if (!data.ok) {
+    throw new Error(data.error || 'Respuesta inválida del asistente');
+  }
 
   // 👇 MOSTRAR RESPUESTA
   if (typingMessage && typingMessage.parentNode) typingMessage.remove();
@@ -647,8 +692,12 @@ const addMessage = (content, type = 'bot', save = true) => {
 } catch (error) {
   console.error("Error en chatbot:", error);
   if (typingMessage && typingMessage.parentNode) typingMessage.remove();
-  addMessage("⚠️ Hubo un problema al conectar con la IA.", 'bot');
+  const offlineMessage = error.name === 'AbortError'
+    ? 'La respuesta está demorando más de lo esperado. Probá de nuevo en unos segundos.'
+    : 'Hubo un problema al conectar con la IA. Podés intentar nuevamente en unos segundos.';
+  addMessage(offlineMessage, 'bot');
 } finally {
+      if (timeoutId) window.clearTimeout(timeoutId);
       el.send.disabled = false;
       el.input.disabled = false;
       el.input.focus();
@@ -785,11 +834,7 @@ const addMessage = (content, type = 'bot', save = true) => {
   // ========== INICIALIZACIÓN ==========
   
   // Cargar historial previo de la sesión
-  const savedHistory = sessionStorage.getItem('chatbot_history');
-  if (savedHistory) {
-    const history = JSON.parse(savedHistory);
-    history.forEach(msg => addMessage(msg.content, msg.type, false));
-  }
+  getHistory().forEach(msg => addMessage(msg.content, msg.type, false));
 
   if (localStorage.getItem(TOOLTIP_DISMISSED_KEY) === 'true') {
     el.tooltip.classList.add('hidden');

@@ -33,9 +33,6 @@ export default {
       if (request.method === 'GET' && url.pathname === '/opinions') {
         return json(await buildOpinions(env));
       }
-      if (request.method === 'POST' && url.pathname === '/chat') {
-        return json(await handleChat(request, env));
-      }
       if (request.method === 'GET' && url.pathname === '/admin/summary') {
         requireAdmin(request, env);
         return json(await buildAdminSummary(env));
@@ -59,6 +56,11 @@ export default {
       if (request.method === 'GET' && url.pathname === '/admin/export.csv') {
         requireAdmin(request, env);
         return csv(await buildCsvExport(env, url.searchParams.get('type')));
+      }
+
+      if (request.method === 'GET' && url.pathname === '/admin/export.zip') {
+        requireAdmin(request, env);
+        return zip(await buildZipExport(env, url.searchParams));
       }
 
       if (request.method === 'POST' && url.pathname === '/admin/reset-data') {
@@ -203,17 +205,29 @@ async function buildStats(env) {
 }
 
 async function handleChat(request, env) {
-  const data = await request.json();
+  let data;
+  try {
+    data = await request.json();
+  } catch {
+    const error = new Error('Solicitud inválida');
+    error.status = 400;
+    throw error;
+  }
+
   const message = clean(data.message);
   const context = data.context || {};
 
   if (!message) {
-    throw new Error('Mensaje vacío');
+    const error = new Error('Mensaje vacío');
+    error.status = 400;
+    throw error;
   }
 
   const apiKey = env.GEMINI_API_KEY;
   if (!apiKey) {
-    throw new Error('API key de Gemini no configurada');
+    const error = new Error('API key de Gemini no configurada');
+    error.status = 500;
+    throw error;
   }
 
   const systemPrompt = `Eres un Asistente Pedagógico experto en educación y uso crítico de inteligencia artificial generativa. 
@@ -227,8 +241,9 @@ Principios:
 - No evalúes respuestas salvo que se te pida explícitamente
 - Sugiere recursos o marcos de referencia cuando sea relevante`;
 
+  const contextText = limitText(JSON.stringify(context, null, 2), 12000);
   const userMessage = `Contexto del usuario:
-${JSON.stringify(context, null, 2)}
+${contextText}
 
 Consulta: ${message}`;
 
@@ -237,6 +252,7 @@ Consulta: ${message}`;
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'x-goog-api-key': apiKey,
       },
       body: JSON.stringify({
         contents: [
@@ -285,21 +301,46 @@ Consulta: ${message}`;
     if (!response.ok) {
       const error = await response.text();
       console.error('Gemini API error:', error);
-      throw new Error(`Error en Gemini API: ${response.status}`);
+      const geminiError = new Error('El asistente no está disponible en este momento');
+      geminiError.status = response.status >= 500 ? 502 : 500;
+      throw geminiError;
     }
 
     const result = await response.json();
-    const reply = result.candidates?.[0]?.content?.parts?.[0]?.text || 'No pude generar una respuesta.';
+    const candidate = result.candidates?.[0];
+    const reply = candidate?.content?.parts
+      ?.map(part => part.text || '')
+      .join('')
+      .trim();
+
+    if (!reply) {
+      console.warn('Gemini response without text:', JSON.stringify({
+        finishReason: candidate?.finishReason,
+        promptFeedback: result.promptFeedback,
+      }));
+
+      return {
+        ok: true,
+        reply: 'No pude generar una respuesta útil para esa consulta. Probá reformularla o hacerla más concreta.',
+        timestamp: new Date().toISOString(),
+      };
+    }
 
     return {
       ok: true,
-      reply: reply.trim(),
+      reply,
       timestamp: new Date().toISOString(),
     };
   } catch (error) {
     console.error('Chat handler error:', error);
     throw error;
   }
+}
+
+function limitText(value, maxLength) {
+  const text = String(value || '');
+  if (text.length <= maxLength) return text;
+  return `${text.slice(0, maxLength)}\n[Contexto recortado por longitud]`;
 }
 
 function requireAdmin(request, env) {
@@ -455,7 +496,7 @@ async function resetAdminData(request, env) {
   const data = await request.json().catch(() => ({}));
   const confirmation = clean(data.confirmation);
 
-  if (confirmation !== 'BORRAR DATOS') {
+  if (confirmation.toUpperCase() !== 'BORRAR DATOS') {
     const error = new Error('Confirmación inválida');
     error.status = 400;
     throw error;
@@ -473,6 +514,12 @@ async function resetAdminData(request, env) {
     env.DB.prepare('DELETE FROM answers'),
     env.DB.prepare('DELETE FROM events'),
   ]);
+
+  try {
+    await env.DB.prepare("DELETE FROM sqlite_sequence WHERE name IN ('events', 'answers', 'feedback')").run();
+  } catch (error) {
+    console.warn('No se pudo reiniciar sqlite_sequence:', error.message);
+  }
 
   return {
     ok: true,
@@ -554,6 +601,200 @@ async function buildCsvExport(env, type) {
   };
 }
 
+async function buildZipExport(env, searchParams) {
+  const range = dateRangeFromParams(searchParams);
+  const events = await listEventsForRange(env, range);
+  const completions = await listCompletionsForRange(env, range);
+  const feedback = await listFeedbackForRange(env, range);
+  const answers = await listAnswersForRange(env, range);
+  const createdAt = new Date().toISOString();
+
+  const manifest = {
+    createdAt,
+    range: {
+      from: range.fromDate || null,
+      to: range.toDate || null,
+      fromTimestamp: range.from || null,
+      toTimestamp: range.to || null,
+    },
+    counts: {
+      events: events.length,
+      completions: completions.length,
+      feedback: feedback.length,
+      answers: answers.length,
+    },
+    files: [
+      'events.csv',
+      'recorridos.csv',
+      'valoraciones.csv',
+      'respuestas.csv',
+      'manifest.json',
+    ],
+  };
+
+  const files = [
+    {
+      name: 'events.csv',
+      content: toCsv(events, ['id', 'timestamp', 'eventType', 'sessionId', 'page', 'profile', 'profileKey', 'userName', 'country', 'nivelEducativo', 'familiaridadInicial', 'recursosSimilares', 'evidence', 'likertLevel', 'createdAt']),
+    },
+    {
+      name: 'recorridos.csv',
+      content: toCsv(completions, ['id', 'timestamp', 'sessionId', 'userName', 'profile', 'profileKey', 'country', 'nivelEducativo', 'familiaridadInicial', 'recursosSimilares', 'evidence', 'likertLevel', 'answersCount']),
+    },
+    {
+      name: 'valoraciones.csv',
+      content: toCsv(feedback, ['id', 'eventId', 'timestamp', 'sessionId', 'rating', 'suggestion', 'profile', 'profileKey', 'country', 'nivelEducativo']),
+    },
+    {
+      name: 'respuestas.csv',
+      content: toCsv(answers, ['id', 'eventId', 'eventTimestamp', 'questionId', 'question', 'answer', 'createdAt']),
+    },
+    {
+      name: 'manifest.json',
+      content: JSON.stringify(manifest, null, 2),
+    },
+  ];
+
+  const suffix = `${range.fromDate || 'inicio'}_${range.toDate || 'hoy'}`;
+  return {
+    filename: `corte-datos-${suffix}.zip`,
+    body: createZip(files),
+  };
+}
+
+function dateRangeFromParams(searchParams) {
+  const fromDate = normalizeDateParam(searchParams.get('from'));
+  const toDate = normalizeDateParam(searchParams.get('to'));
+
+  return {
+    fromDate,
+    toDate,
+    from: fromDate ? `${fromDate}T00:00:00.000Z` : '',
+    to: toDate ? `${toDate}T23:59:59.999Z` : '',
+  };
+}
+
+function normalizeDateParam(value) {
+  const text = clean(value);
+  return /^\d{4}-\d{2}-\d{2}$/.test(text) ? text : '';
+}
+
+function rangeWhere(range, column = 'timestamp') {
+  const clauses = [];
+  const values = [];
+  if (range.from) {
+    clauses.push(`datetime(${column}) >= datetime(?)`);
+    values.push(range.from);
+  }
+  if (range.to) {
+    clauses.push(`datetime(${column}) <= datetime(?)`);
+    values.push(range.to);
+  }
+
+  return {
+    sql: clauses.length ? `WHERE ${clauses.join(' AND ')}` : '',
+    values,
+  };
+}
+
+async function listEventsForRange(env, range) {
+  const where = rangeWhere(range, 'timestamp');
+  const result = await runAll(env.DB.prepare(`
+    SELECT
+      id, timestamp, event_type AS eventType, session_id AS sessionId, page,
+      profile, profile_key AS profileKey, user_name AS userName, country,
+      nivel_educativo AS nivelEducativo, familiaridad_inicial AS familiaridadInicial,
+      recursos_similares AS recursosSimilares, evidence, likert_level AS likertLevel,
+      created_at AS createdAt
+    FROM events
+    ${where.sql}
+    ORDER BY timestamp DESC
+    LIMIT 20000
+  `), where.values);
+
+  return result.results || [];
+}
+
+async function listCompletionsForRange(env, range) {
+  const where = rangeWhere(range, 'e.timestamp');
+  const whereSql = where.sql
+    ? `${where.sql} AND e.event_type = 'completion'`
+    : "WHERE e.event_type = 'completion'";
+
+  const result = await runAll(env.DB.prepare(`
+    SELECT
+      e.id,
+      e.timestamp,
+      e.session_id AS sessionId,
+      e.user_name AS userName,
+      e.profile,
+      e.profile_key AS profileKey,
+      e.country,
+      e.nivel_educativo AS nivelEducativo,
+      e.familiaridad_inicial AS familiaridadInicial,
+      e.recursos_similares AS recursosSimilares,
+      e.evidence,
+      e.likert_level AS likertLevel,
+      COUNT(a.id) AS answersCount
+    FROM events e
+    LEFT JOIN answers a ON a.event_id = e.id
+    ${whereSql}
+    GROUP BY e.id
+    ORDER BY e.timestamp DESC
+    LIMIT 10000
+  `), where.values);
+
+  return result.results || [];
+}
+
+async function listFeedbackForRange(env, range) {
+  const where = rangeWhere(range, 'timestamp');
+  const result = await runAll(env.DB.prepare(`
+    SELECT
+      id,
+      event_id AS eventId,
+      timestamp,
+      session_id AS sessionId,
+      rating,
+      suggestion,
+      profile,
+      profile_key AS profileKey,
+      country,
+      nivel_educativo AS nivelEducativo
+    FROM feedback
+    ${where.sql}
+    ORDER BY timestamp DESC
+    LIMIT 10000
+  `), where.values);
+
+  return result.results || [];
+}
+
+async function listAnswersForRange(env, range) {
+  const where = rangeWhere(range, 'e.timestamp');
+  const result = await runAll(env.DB.prepare(`
+    SELECT
+      a.id,
+      a.event_id AS eventId,
+      e.timestamp AS eventTimestamp,
+      a.question_id AS questionId,
+      a.question,
+      a.answer,
+      a.created_at AS createdAt
+    FROM answers a
+    INNER JOIN events e ON e.id = a.event_id
+    ${where.sql}
+    ORDER BY e.timestamp DESC, a.id
+    LIMIT 50000
+  `), where.values);
+
+  return result.results || [];
+}
+
+function runAll(statement, values) {
+  return values.length ? statement.bind(...values).all() : statement.all();
+}
+
 function normalizeEventType(value) {
   const eventType = clean(value || 'completion');
   return ['visit', 'completion', 'feedback'].includes(eventType) ? eventType : '';
@@ -612,6 +853,18 @@ function csv(exportData) {
   });
 }
 
+function zip(exportData) {
+  return new Response(exportData.body, {
+    status: 200,
+    headers: {
+      ...CORS_HEADERS,
+      'Content-Type': 'application/zip',
+      'Content-Disposition': `attachment; filename="${exportData.filename}"`,
+      'Cache-Control': 'no-store',
+    },
+  });
+}
+
 function toCsv(rows, columns) {
   const header = columns.join(',');
   const lines = (rows || []).map(row => (
@@ -625,3 +878,113 @@ function csvCell(value) {
   const text = String(value ?? '');
   return `"${text.replace(/"/g, '""')}"`;
 }
+
+function createZip(files) {
+  const encoder = new TextEncoder();
+  const localParts = [];
+  const centralParts = [];
+  let offset = 0;
+
+  for (const file of files) {
+    const nameBytes = encoder.encode(file.name);
+    const data = encoder.encode(String(file.content ?? ''));
+    const crc = crc32(data);
+    const localHeader = zipLocalHeader(nameBytes, data, crc);
+    const centralHeader = zipCentralHeader(nameBytes, data, crc, offset);
+
+    localParts.push(localHeader, data);
+    centralParts.push(centralHeader);
+    offset += localHeader.length + data.length;
+  }
+
+  const centralSize = centralParts.reduce((sum, part) => sum + part.length, 0);
+  const end = zipEndRecord(files.length, centralSize, offset);
+  return concatUint8Arrays([...localParts, ...centralParts, end]);
+}
+
+function zipLocalHeader(nameBytes, data, crc) {
+  const header = new Uint8Array(30 + nameBytes.length);
+  const view = new DataView(header.buffer);
+  view.setUint32(0, 0x04034b50, true);
+  view.setUint16(4, 20, true);
+  view.setUint16(6, 0, true);
+  view.setUint16(8, 0, true);
+  view.setUint16(10, 0, true);
+  view.setUint16(12, 0, true);
+  view.setUint32(14, crc, true);
+  view.setUint32(18, data.length, true);
+  view.setUint32(22, data.length, true);
+  view.setUint16(26, nameBytes.length, true);
+  view.setUint16(28, 0, true);
+  header.set(nameBytes, 30);
+  return header;
+}
+
+function zipCentralHeader(nameBytes, data, crc, offset) {
+  const header = new Uint8Array(46 + nameBytes.length);
+  const view = new DataView(header.buffer);
+  view.setUint32(0, 0x02014b50, true);
+  view.setUint16(4, 20, true);
+  view.setUint16(6, 20, true);
+  view.setUint16(8, 0, true);
+  view.setUint16(10, 0, true);
+  view.setUint16(12, 0, true);
+  view.setUint16(14, 0, true);
+  view.setUint32(16, crc, true);
+  view.setUint32(20, data.length, true);
+  view.setUint32(24, data.length, true);
+  view.setUint16(28, nameBytes.length, true);
+  view.setUint16(30, 0, true);
+  view.setUint16(32, 0, true);
+  view.setUint16(34, 0, true);
+  view.setUint16(36, 0, true);
+  view.setUint32(38, 0, true);
+  view.setUint32(42, offset, true);
+  header.set(nameBytes, 46);
+  return header;
+}
+
+function zipEndRecord(fileCount, centralSize, centralOffset) {
+  const end = new Uint8Array(22);
+  const view = new DataView(end.buffer);
+  view.setUint32(0, 0x06054b50, true);
+  view.setUint16(4, 0, true);
+  view.setUint16(6, 0, true);
+  view.setUint16(8, fileCount, true);
+  view.setUint16(10, fileCount, true);
+  view.setUint32(12, centralSize, true);
+  view.setUint32(16, centralOffset, true);
+  view.setUint16(20, 0, true);
+  return end;
+}
+
+function concatUint8Arrays(parts) {
+  const total = parts.reduce((sum, part) => sum + part.length, 0);
+  const output = new Uint8Array(total);
+  let offset = 0;
+  for (const part of parts) {
+    output.set(part, offset);
+    offset += part.length;
+  }
+  return output;
+}
+
+function crc32(data) {
+  let crc = 0xffffffff;
+  for (let index = 0; index < data.length; index++) {
+    crc = CRC32_TABLE[(crc ^ data[index]) & 0xff] ^ (crc >>> 8);
+  }
+  return (crc ^ 0xffffffff) >>> 0;
+}
+
+const CRC32_TABLE = (() => {
+  const table = new Uint32Array(256);
+  for (let index = 0; index < 256; index++) {
+    let value = index;
+    for (let bit = 0; bit < 8; bit++) {
+      value = value & 1 ? 0xedb88320 ^ (value >>> 1) : value >>> 1;
+    }
+    table[index] = value >>> 0;
+  }
+  return table;
+})();
