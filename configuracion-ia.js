@@ -592,7 +592,7 @@ const state = {
   nivelEducativo: '',
   familiaridadInicial: '',
   recursosSimilares: '',
-  consentTracking: true
+  consentTracking: false
 };
 
 window.state = state;

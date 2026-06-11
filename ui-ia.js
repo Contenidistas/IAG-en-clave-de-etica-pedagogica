@@ -416,13 +416,16 @@ if (elements.nivelEducativo) {
    CONSENTIMIENTO DE REGISTRO
    ======================================== */
 if (elements.consentTracking) {
-  elements.consentTracking.addEventListener('change', () => {
+  const syncConsentTracking = () => {
     if (window.state) {
       window.state.consentTracking = elements.consentTracking.checked;
     }
     // 🔧 AGREGADO: Validar botón cuando cambia el consentimiento
     updateStartButtonState();
-  });
+  };
+
+  elements.consentTracking.addEventListener('change', syncConsentTracking);
+  elements.consentTracking.addEventListener('input', syncConsentTracking);
 
   if (window.state) {
     window.state.consentTracking = elements.consentTracking.checked;
@@ -471,6 +474,7 @@ if (elements.prevSlide) {
     if (state.currentSlide > 0) { 
       state.currentSlide--; 
       updateCarousel(); 
+      updateStartButtonState();
     }
   });
 }
@@ -480,6 +484,7 @@ if (elements.nextSlide) {
     if (state.currentSlide < 1) { 
       state.currentSlide++; 
       updateCarousel(); 
+      updateStartButtonState();
     }
   });
 }
@@ -488,6 +493,7 @@ if (elements.carouselDots && elements.carouselDots.length) {
     dot.addEventListener('click', () => { 
       state.currentSlide = index; 
       updateCarousel(); 
+      updateStartButtonState();
     })
   );
 }
@@ -498,6 +504,7 @@ if (goToDiagnosticBtn) {
     event.preventDefault();
     state.currentSlide = 1;
     updateCarousel();
+    updateStartButtonState();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 }
@@ -514,6 +521,10 @@ function updateStartButtonState() {
   console.log('=== 🔍 DEBUG: Validando formulario ===');
 
   // 1) Perfil elegido
+  const activeProfile = document.querySelector('.chip.active');
+  if (activeProfile && window.state) {
+    window.state.profile = activeProfile.dataset.profile || window.state.profile;
+  }
   const perfilOk = !!state.profile;
   console.log('✓ Perfil OK:', perfilOk, '| Valor:', state.profile);
 
@@ -545,6 +556,9 @@ function updateStartButtonState() {
   // 5) Consentimiento (OBLIGATORIO)
   let consentOk = true;
   if (elements.consentTracking) {
+    if (window.state) {
+      window.state.consentTracking = elements.consentTracking.checked;
+    }
     consentOk = elements.consentTracking.checked;
     console.log('✓ Consentimiento OK:', consentOk);
   }
@@ -752,7 +766,7 @@ if (homeBtn) {
             state.nivelEducativo = '';
             state.familiaridadInicial = '';
             state.recursosSimilares = '';
-            state.consentTracking = true;
+            state.consentTracking = false;
 
             // Reset UI
             if (elements.chips && elements.chips.length) {
@@ -772,7 +786,7 @@ if (homeBtn) {
             if (elements.recursosSimilaresRadios && elements.recursosSimilaresRadios.length) {
               elements.recursosSimilaresRadios.forEach(r => { r.checked = false; });
             }
-            if (elements.consentTracking) elements.consentTracking.checked = true;
+            if (elements.consentTracking) elements.consentTracking.checked = false;
 
             updateStartButtonState();
             updateCarousel();
