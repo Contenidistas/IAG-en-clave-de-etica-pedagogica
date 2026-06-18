@@ -9,6 +9,7 @@
 
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; connect-src 'self' https://iag-etica-api.suscripcionessh.workers.dev; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
   <meta name="theme-color" content="#6366f1">
   <title>IA Educativa ANEP - Uso Crítico y Reflexivo</title>
   <link rel="stylesheet" href="styles.css">
@@ -21,7 +22,7 @@
   <header class="app-header">
     <h1 id="homeBtn" class="home-btn" style="cursor:pointer; display:flex; align-items:center; gap:0.5rem;">
       <div class="logo">AI</div>
-      <span>🏠 IAG en clave de ética pedagógica</span>
+      <span>IAG en clave de ética pedagógica</span>
     </h1>
 
     <div class="header-actions">
@@ -77,13 +78,13 @@
                     </span>
                   </a>
 
-                  <a href="#diagnosticoInicio" class="btn-academic btn-authors btn-diagnostic-start" id="goToDiagnosticBtn">
+                  <button type="button" class="btn-academic btn-authors btn-diagnostic-start" id="goToDiagnosticBtn">
                     <span class="btn-academic-icon">↓</span>
                     <span class="btn-academic-text">
                       <span class="btn-academic-label">Diagnóstico</span>
                       <span class="btn-academic-title">Iniciar cuestionario</span>
                     </span>
-                  </a>
+                  </button>
                 </div>
 
                 <div class="intro-feature-grid" aria-label="Ejes principales de la herramienta">
@@ -95,12 +96,12 @@
                   <article class="intro-feature-card">
                     <span>02</span>
                     <h3>Marcos de referencia</h3>
-                    <p>Articula aportes de UNESCO, ANEP y FING para orientar decisiones pedagógicas.</p>
+                    <p>Articula aportes de UNESCO, ANEP, FING, Udelar y Ceibal para orientar decisiones pedagógicas.</p>
                   </article>
                   <article class="intro-feature-card">
                     <span>03</span>
-                    <h3>Reporte final</h3>
-                    <p>Genera una devolución con criterios éticos, críticos y reflexivos sobre el uso de IAG.</p>
+                    <h3>Acuerdo accionable</h3>
+                    <p>Genera una devolución y un borrador editable de acuerdo didáctico sobre el uso de IAG.</p>
                   </article>
                 </div>
 
@@ -141,7 +142,7 @@
                  SLIDE 2: FORMULARIO DE CARACTERIZACIÓN
                  ========================================== -->
             <div class="carousel-slide">
-              <div class="intro-slide">
+              <div class="intro-slide onboarding-flow">
                 <div id="diagnosticoInicio" class="diagnostic-heading">
                   <p class="section-kicker">Diagnóstico guiado</p>
                   <h2>Comenzar el proceso de reflexión crítica de mis prácticas</h2>
@@ -150,22 +151,69 @@
                   Este cuestionario interactivo te ayudará a evaluar tu práctica y recibir recomendaciones personalizadas.
                 </p>
 
-                <!-- Principios clave UNESCO/ANEP/FING -->
-                <div class="card framework-card">
+                <div class="onboarding-progress-card" id="onboardingProgress">
+                  <div class="onboarding-progress-copy">
+                    <span id="onboardingStepCounter">Paso 1 de 5</span>
+                    <strong id="onboardingStepTitle">Punto de partida</strong>
+                  </div>
+                  <div class="onboarding-progress-dots" id="onboardingDots" aria-label="Progreso del inicio guiado"></div>
+                </div>
+
+                <!-- Selección de perfil (define la densidad del recorrido) -->
+                <div class="profile-selector-panel onboarding-step" id="profileSelectorPanel" data-onboarding-step="profile">
+                  <p class="section-kicker">Punto de partida</p>
+                  <h3>¿Desde qué lugar querés hacer el recorrido?</h3>
+                  <div class="chips-container profile-choice-grid">
+                    <div class="chip profile-choice" data-profile="estudiante">
+                      <span>Estudiante</span>
+                      <small>Uso de IA en estudio, tareas y producción académica.</small>
+                    </div>
+                    <div class="chip profile-choice" data-profile="docente">
+                      <span>Docente</span>
+                      <small>Consignas, evaluación, acompañamiento y acuerdos de aula.</small>
+                    </div>
+                    <div class="chip profile-choice" data-profile="especializado">
+                      <span>Docente/investigador/a</span>
+                      <small>Marcos, formación, investigación y criterios compartidos.</small>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Campo de nivel educativo (aparece dinámicamente según perfil) -->
+                <div id="nivelEducativoWrapper" class="onboarding-step" data-onboarding-step="nivel" style="max-width: 500px; margin: 1.5rem auto; display: none;">
+                  <label for="nivelEducativo" style="display:block; margin-bottom:0.5rem; font-weight:600;">
+                    <span id="nivelEducativoLabel">En qué nivel trabajás</span>
+                  </label>
+                  <select id="nivelEducativo" class="input">
+                    <option value="">Seleccioná una opción</option>
+                    <!-- Opciones se cargan dinámicamente según perfil -->
+                  </select>
+                </div>
+
+                <!-- Principios clave UNESCO/ANEP/FING/Udelar/Ceibal -->
+                <div class="card framework-card audience-framework onboarding-reference">
                   <div class="framework-hero">
                     <p class="section-kicker">Fundamentación de la herramienta</p>
-                    <h3>Marcos de UNESCO, ANEP y FING</h3>
-                    <p>
-                      Una propuesta construida desde investigación, formación docente y experiencia de aula para pensar el uso ético, crítico y reflexivo de la IA.
+                    <h3 id="frameworkAudienceTitle">Marcos de UNESCO, ANEP, FING, Udelar y Ceibal</h3>
+                    <p id="frameworkAudienceIntro">
+                      Una propuesta construida desde investigación, formación docente, experiencia de aula y marcos uruguayos recientes para pensar el uso ético, crítico y reflexivo de la IA.
                     </p>
-                    <a href="fundamentacion.html" class="framework-read-more">Leer fundamentación completa</a>
+                    <div class="framework-hero-actions">
+                      <a href="fundamentacion.html" class="framework-read-more">Leer fundamentación completa</a>
+                      <button type="button" class="framework-read-more framework-toggle-btn" id="toggleFrameworkBtn">Ver marcos</button>
+                    </div>
                   </div>
 
                   <div class="framework-context">
                     <strong>Sentido de la propuesta</strong>
-                    <p>
-                      Como formadores de formadores, entendemos que estas herramientas requieren criterios compartidos, transparencia y espacios de reflexión pedagógica situada.
+                    <p id="frameworkContextText">
+                      Estas herramientas requieren criterios compartidos, transparencia y espacios de reflexión pedagógica situada.
                     </p>
+                  </div>
+
+                  <div class="framework-compact-summary" id="frameworkCompactSummary">
+                    <strong>En este recorrido vas a revisar:</strong>
+                    <span>transparencia, verificación, privacidad, sesgos y aporte humano.</span>
                   </div>
 
                   <div class="framework-links" aria-label="Accesos directos a marcos de referencia">
@@ -180,6 +228,14 @@
                     <a href="https://www.fing.edu.uy/sites/default/files/2026-02/guia-de-etica-fing_2026.pdf" target="_blank" rel="noopener noreferrer" class="framework-link">
                       <span class="framework-link-label">FING</span>
                       <span class="framework-link-title">Uso ético y crítico de IA</span>
+                    </a>
+                    <a href="https://fcea.udelar.edu.uy/institucional/novedades/9667-politica-institucional-de-inteligencia-artificial-de-la-universidad-de-la-republica.html" target="_blank" rel="noopener noreferrer" class="framework-link">
+                      <span class="framework-link-label">Udelar</span>
+                      <span class="framework-link-title">11 principios para uso de IAG</span>
+                    </a>
+                    <a href="https://ceibal.edu.uy/politicas/buenas-practicas-uso-ia-educacion/" target="_blank" rel="noopener noreferrer" class="framework-link">
+                      <span class="framework-link-label">Ceibal</span>
+                      <span class="framework-link-title">Guía ética de uso de IA</span>
                     </a>
                   </div>
 
@@ -197,7 +253,15 @@
                     </div>
                   </div>
 
-                  <h4 class="principles-title">Principios para orientar la reflexión</h4>
+                  <div class="framework-model-intro">
+                    <p class="section-kicker">Modelo ampliado</p>
+                    <h4>De principios operativos a criterios de decisión</h4>
+                    <p>
+                      La herramienta mantiene cuatro puertas de entrada simples para la navegación, pero las conecta con una matriz más potente: integridad académica, protección de datos, justicia, accesibilidad, explicabilidad, supervisión humana, pertinencia pedagógica y mejora continua.
+                    </p>
+                  </div>
+
+                  <h4 class="principles-title">Principios operativos para orientar la reflexión</h4>
                   <div class="grid grid-2">
                     
                     <div class="resource-card principle-card">
@@ -243,38 +307,75 @@
                   </div>
                   <div class="principles-transversal-note">
                     <strong>Criterios transversales de cuidado:</strong>
-                    protección de datos, privacidad, equidad, inclusión, accesibilidad, edad del estudiantado y acuerdos institucionales atraviesan todos los principios.
+                    protección de datos, privacidad, equidad, inclusión, accesibilidad, edad del estudiantado, soberanía pedagógica, trazabilidad del proceso y acuerdos institucionales atraviesan todos los principios.
                   </div>
-                </div>
 
-                <!-- Selección de perfil (Docente/Estudiante) -->
-                <div style="margin: 2rem auto; max-width: 600px;">
-                  <h3 style="margin-bottom: 1rem;">Seleccioná tu perfil</h3>
-                  <div class="chips-container" style="justify-content: center;">
-                    <div class="chip" data-profile="docente"><span>Docente</span></div>
-                    <div class="chip" data-profile="estudiante"><span>Estudiante</span></div>
+                  <div class="advanced-principles-grid" aria-label="Criterios avanzados del modelo ampliado">
+                    <article>
+                      <span>01</span>
+                      <strong>Integridad y autoría</strong>
+                      <p>Declarar uso, conservar evidencia del proceso y sostener producción humana reconocible.</p>
+                    </article>
+                    <article>
+                      <span>02</span>
+                      <strong>Datos y privacidad</strong>
+                      <p>Evitar información sensible y revisar condiciones de uso, edad, consentimiento y finalidad.</p>
+                    </article>
+                    <article>
+                      <span>03</span>
+                      <strong>Equidad y accesibilidad</strong>
+                      <p>Preguntar quién queda afuera, qué sesgos aparecen y qué apoyos necesita cada contexto.</p>
+                    </article>
+                    <article>
+                      <span>04</span>
+                      <strong>Supervisión humana</strong>
+                      <p>Usar IA como apoyo consultivo: la decisión pedagógica, ética y evaluativa sigue siendo humana.</p>
+                    </article>
                   </div>
-                </div>
 
-                <!-- Campo de nivel educativo (aparece dinámicamente según perfil) -->
-                <div id="nivelEducativoWrapper" style="max-width: 500px; margin: 1.5rem auto; display: none;">
-                  <label for="nivelEducativo" style="display:block; margin-bottom:0.5rem; font-weight:600;">
-                    <span id="nivelEducativoLabel">En qué nivel trabajás</span>
-                  </label>
-                  <select id="nivelEducativo" class="input">
-                    <option value="">Seleccioná una opción</option>
-                    <!-- Opciones se cargan dinámicamente según perfil -->
-                  </select>
+                  <div class="reference-principles-panel">
+                    <article>
+                      <h4>Udelar: 11 principios rectores</h4>
+                      <div class="principle-tags">
+                        <span>Interés general</span>
+                        <span>Equidad</span>
+                        <span>Transparencia</span>
+                        <span>Control humano</span>
+                        <span>Privacidad y autoría</span>
+                        <span>Ética</span>
+                        <span>Seguridad</span>
+                        <span>Soberanía</span>
+                        <span>Sostenibilidad</span>
+                        <span>Capacidades</span>
+                        <span>Participación</span>
+                      </div>
+                    </article>
+                    <article>
+                      <h4>Ceibal: uso ético de IA</h4>
+                      <div class="principle-tags">
+                        <span>Responsabilidad</span>
+                        <span>IA como apoyo</span>
+                        <span>Herramientas confiables</span>
+                        <span>Verificación</span>
+                        <span>Sesgos</span>
+                        <span>Adaptación al grupo</span>
+                        <span>Pensamiento crítico</span>
+                        <span>Transparencia</span>
+                        <span>Guía docente</span>
+                        <span>Protección de datos</span>
+                      </div>
+                    </article>
+                  </div>
                 </div>
 
                 <!-- Campo de nombre (opcional) -->
-                <div style="max-width: 400px; margin: 1.5rem auto 1rem auto;">
+                <div id="identityWrapper" class="onboarding-step" data-onboarding-step="contexto" style="max-width: 400px; margin: 1.5rem auto 1rem auto;">
                   <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Tu nombre (opcional)</label>
                   <input type="text" id="playerName" class="input" placeholder="Ingresá tu nombre o un seudónimo" />
                 </div>
 
                 <!-- Selector de país -->
-                <div style="max-width: 400px; margin: 1rem auto;">
+                <div id="countryWrapper" class="onboarding-step" data-onboarding-step="contexto" style="max-width: 400px; margin: 1rem auto;">
                   <label for="countrySelect" style="display:block; margin-bottom:0.5rem; font-weight:600;">País</label>
                   <select id="countrySelect" name="pais" class="input">
                     <option value="Uruguay" selected>Uruguay</option>
@@ -290,7 +391,7 @@
                 </div>
 
                 <!-- Campo "Otro país" (aparece si selecciona "Otro") -->
-                <div id="countryOtherWrapper" style="max-width: 400px; margin: 0 auto 1rem auto; display:none;">
+                <div id="countryOtherWrapper" class="onboarding-step" data-onboarding-step="contexto" style="max-width: 400px; margin: 0 auto 1rem auto; display:none;">
                   <label for="countryOther" style="display:block; margin-bottom:0.5rem; font-weight:600;">Especificá tu país</label>
                   <input type="text" id="countryOther" class="input" placeholder="Ingresá tu país" />
                 </div>
@@ -299,7 +400,7 @@
                 <input type="hidden" id="countryFinal" value="Uruguay" />
 
                 <!-- Nivel de familiaridad con el tema -->
-                <div style="max-width: 500px; margin: 1.5rem auto;">
+                <div id="familiaridadInicialWrapper" class="onboarding-step" data-onboarding-step="familiaridad" style="max-width: 500px; margin: 1.5rem auto;">
                   <label for="familiaridadInicial" style="display:block; margin-bottom:0.5rem; font-weight:600;">
                     Antes de comenzar, ¿qué nivel de familiaridad tenés con este tema?
                   </label>
@@ -314,7 +415,7 @@
                 </div>
 
                 <!-- Uso de recursos similares -->
-                <div style="max-width: 500px; margin: 1.5rem auto;">
+                <div id="recursosSimilaresWrapper" class="onboarding-step" data-onboarding-step="recursos" style="max-width: 500px; margin: 1.5rem auto;">
                   <p style="margin-bottom:0.5rem; font-weight:600;">
                           ¿Has usado recursos similares sobre este tema (guías, simuladores, cursos en línea)?
                   </p>
@@ -335,16 +436,30 @@
                 </div>
 
                 <!-- Checkbox de consentimiento -->
-                <div class="mt-2 consent-box" style="max-width: 700px; margin: 1.5rem auto 0 auto; display:flex; align-items:flex-start; gap:0.5rem; font-size:0.85rem; color:var(--text-secondary);">
-                  <input type="checkbox" id="consentTracking" style="margin-top:0.15rem; cursor:pointer;" />
-                  <div>
-                    <label for="consentTracking" style="cursor:pointer; line-height:1.4; font-weight:500;">
-                      Acepto que mis respuestas se registren de forma anónima con fines educativos y para mejorar esta herramienta.
-                    </label>
+                <div class="mt-2 consent-box onboarding-step" data-onboarding-step="cierre" style="max-width: 700px; margin: 1.5rem auto 0 auto; display:flex; align-items:flex-start; gap:0.5rem; font-size:0.85rem; color:var(--text-secondary);">
+                  <div class="consent-content">
                     <p class="consent-help" style="margin-top:0.25rem;">
-                      El nombre es opcional y podés usar un seudónimo. Se guarda únicamente: perfil, país, seudónimo, nivel de familiaridad, uso de recursos similares y registro del cuestionario. Si desmarcás esta opción, no se guardará nada.
+                      Podés iniciar el recorrido aunque no aceptes. Si marcás esta opción, se guarda únicamente: perfil, país, seudónimo opcional, nivel de familiaridad, uso de recursos similares y registro del cuestionario.
                     </p>
                   </div>
+                </div>
+
+                <div id="startGuidance" class="start-guidance" aria-live="polite">
+                  <div class="start-guidance-header">
+                    <span id="startGuidanceBadge">Paso a paso</span>
+                    <strong id="startGuidanceTitle">Completá lo necesario para iniciar</strong>
+                  </div>
+                  <div id="startGuidanceList" class="start-guidance-list"></div>
+                </div>
+
+                <div class="onboarding-controls" id="onboardingControls">
+                  <button type="button" class="btn btn-outline" id="onboardingBackBtn">Anterior</button>
+                  <label for="consentTracking" class="btn btn-primary consent-action-label" style="cursor:pointer; line-height:1.4; font-weight:500;">
+                    <input type="checkbox" id="consentTracking" style="margin-top:0.15rem; cursor:pointer;" />
+                    <span class="consent-unchecked">Acepto registro anónimo</span>
+                    <span class="consent-checked">Registro anónimo aceptado</span>
+                  </label>
+                  <button type="button" class="btn btn-primary" id="onboardingNextBtn">Siguiente</button>
                 </div>
 
               </div>
@@ -460,7 +575,7 @@
     <!-- FIN PANTALLA 1: INTRO + CARRUSEL -->
 
     <!-- ==========================================
-         TOOLTIP PRINCIPIOS UNESCO/ANEP
+         TOOLTIP PRINCIPIOS UNESCO/ANEP/UDELAR/CEIBAL
          ========================================== -->
     <div id="principleTooltip" class="principle-tooltip hidden" role="dialog" aria-modal="true">
       <div class="tooltip-header">
@@ -471,6 +586,8 @@
       <div class="tooltip-tabs">
         <button type="button" class="tooltip-tab active" data-source="unesco">UNESCO</button>
         <button type="button" class="tooltip-tab" data-source="anep">ANEP</button>
+        <button type="button" class="tooltip-tab" data-source="udelar">Udelar</button>
+        <button type="button" class="tooltip-tab" data-source="ceibal">Ceibal</button>
       </div>
 
       <div id="tooltipBody" class="tooltip-body"></div>
@@ -495,31 +612,45 @@
         <!-- Card de pregunta -->
         <div>
           <div class="card question-card">
+            <div class="question-context-strip">
+              <span id="activeCriterionBadge" class="active-criterion-badge">Criterio activo</span>
+              <span id="decisionReason" class="decision-reason">El recorrido adapta las preguntas según tus respuestas.</span>
+            </div>
             <div class="question-number" id="questionNumber">1</div>
             <h2 class="question-title" id="questionTitle">Pregunta</h2>
             <p class="question-help" id="questionHelp">Descripción de la pregunta</p>
 
-            <!-- Botones de respuesta Sí/No -->
+            <!-- Botones de respuesta -->
             <div class="answer-buttons">
               <button class="btn btn-success" id="yesBtn">Sí</button>
-              <button class="btn btn-danger" id="noBtn">No</button>
+              <button class="btn btn-secondary" id="sometimesBtn">A veces</button>
+              <button class="btn btn-secondary answer-no" id="noBtn">No</button>
+              <button class="btn btn-outline" id="notApplicableBtn">No aplica</button>
+            </div>
+
+            <!-- Controles de navegación del cuestionario -->
+            <div class="quiz-flow-controls">
+              <button class="btn btn-outline" id="backBtn" disabled>Anterior</button>
+              <button class="btn btn-primary quiz-next-hidden" id="nextBtn" disabled>Siguiente</button>
+              <button class="btn btn-outline" id="contextBtn">Marcos</button>
+            </div>
+
+            <div class="principle-live-graph question-principle-graph" aria-label="Grafo vivo de principios">
+              <div class="principle-live-graph-header">
+                <h4>Principios conectados</h4>
+                <span id="principleGraphStatus">Esperando decisión</span>
+              </div>
+              <div id="principleGraph" class="principle-graph"></div>
             </div>
 
             <!-- Box de feedback (oculto hasta responder) -->
             <div id="feedbackBox" class="hidden"></div>
-
-            <!-- Controles de navegación del cuestionario -->
-            <div class="flex flex-center gap-2 flex-wrap mt-3">
-              <button class="btn btn-outline" id="backBtn" disabled>Anterior</button>
-              <button class="btn btn-outline" id="contextBtn">Contexto ANEP</button>
-              <button class="btn btn-primary" id="nextBtn" disabled>Siguiente</button>
-            </div>
           </div>
         </div>
 
         <!-- Card de progreso y timeline -->
         <div>
-          <div class="card">
+          <div class="card progress-card">
             <h3 style="margin-bottom: 1rem;">Tu progreso</h3>
             
             <!-- Timeline de respuestas -->
@@ -538,6 +669,22 @@
                 <span>Alto</span>
               </div>
               <div class="likert-level" id="likertLevel">—</div>
+            </div>
+
+            <div class="decision-map mt-3">
+              <div class="decision-map-header">
+                <h4>Mapa del recorrido</h4>
+                <span id="decisionMapCount">0 criterios</span>
+              </div>
+              <div id="decisionMapAxes" class="decision-map-axes" aria-label="Mapa de criterios del árbol de decisión"></div>
+            </div>
+
+            <div class="decision-branch-map mt-3" aria-label="Ramal del recorrido de decisión">
+              <div class="decision-map-header">
+                <h4>Ramal de decisión</h4>
+                <span id="decisionBranchStatus">Inicio</span>
+              </div>
+              <div id="decisionBranchMap" class="decision-branch-track"></div>
             </div>
           </div>
         </div>
@@ -566,8 +713,87 @@
         </div>
       </div>
 
+      <div class="result-tabs" role="tablist" aria-label="Secciones del resultado">
+        <button type="button" class="result-tab active" data-result-tab="sintesis">Síntesis</button>
+        <button type="button" class="result-tab" data-result-tab="brujula">Brújula</button>
+        <button type="button" class="result-tab" data-result-tab="acuerdo">Acuerdo</button>
+        <button type="button" class="result-tab" data-result-tab="casos">Casos</button>
+        <button type="button" class="result-tab" data-result-tab="recursos">Recursos</button>
+        <button type="button" class="result-tab" data-result-tab="recorrido">Recorrido</button>
+      </div>
+
+      <div class="card result-insights-card mb-3 result-tab-panel active" data-result-panel="sintesis">
+        <p class="section-kicker">Devolución formativa</p>
+        <h3>Orientaciones para seguir avanzando</h3>
+        <p id="resultSummary">Revisá tu recorrido para identificar acuerdos, prácticas y criterios a fortalecer.</p>
+        <div class="result-insights-grid" id="resultInsights"></div>
+      </div>
+
+      <div class="card ethical-compass-card mb-3 result-tab-panel" data-result-panel="brujula">
+        <div class="ethical-compass-header">
+          <div>
+            <p class="section-kicker">Brújula ética</p>
+            <h3>Mapa de criterios para decidir</h3>
+          </div>
+          <span id="ethicalCompassLevel" class="ethical-compass-level">—</span>
+        </div>
+        <div class="ethical-compass-layout">
+          <div class="ethical-compass-summary">
+            <strong id="ethicalCompassFocus">Criterio prioritario</strong>
+            <p id="ethicalCompassCopy">El mapa se construye a partir de tus respuestas y orienta el acuerdo didáctico generado.</p>
+          </div>
+          <div class="ethical-compass-bars" id="ethicalCompassBars" aria-label="Mapa de criterios éticos"></div>
+        </div>
+        <div class="principle-result-graph">
+          <div class="principle-live-graph-header">
+            <h4>Conexiones de tu recorrido</h4>
+            <span id="principleResultGraphStatus">Principios activados</span>
+          </div>
+          <div id="principleResultGraph" class="principle-graph principle-graph-result"></div>
+        </div>
+      </div>
+
+      <div class="card agreement-builder-card mb-3 result-tab-panel" data-result-panel="acuerdo">
+        <div class="agreement-builder-header">
+          <div>
+            <p class="section-kicker">Constructor de acuerdos</p>
+            <h3>Acuerdo didáctico de uso de IA</h3>
+          </div>
+          <span class="agreement-builder-badge">Editable</span>
+        </div>
+        <p class="agreement-builder-copy">
+          Borrador generado a partir de tu recorrido. Podés ajustarlo para una tarea, unidad, curso o conversación institucional.
+        </p>
+        <div class="agreement-format-switch" aria-label="Formato del acuerdo">
+          <button type="button" class="agreement-format-btn active" data-agreement-format="aula">Aula</button>
+          <button type="button" class="agreement-format-btn" data-agreement-format="estudiante">Estudiante</button>
+          <button type="button" class="agreement-format-btn" data-agreement-format="institucional">Institucional</button>
+          <button type="button" class="agreement-format-btn" data-agreement-format="virtual">Aula virtual</button>
+        </div>
+        <textarea id="agreementBuilderText" class="input agreement-builder-textarea" rows="12" aria-label="Acuerdo didáctico generado"></textarea>
+        <div class="agreement-builder-actions">
+          <button class="btn btn-primary" id="copyAgreementBtn" type="button">Copiar acuerdo</button>
+          <button class="btn btn-outline" id="regenerateAgreementBtn" type="button">Regenerar</button>
+          <p id="agreementBuilderStatus" class="agreement-builder-status" aria-live="polite"></p>
+        </div>
+      </div>
+
+      <div class="card situated-cases-card mb-3 result-tab-panel" data-result-panel="casos">
+        <div class="situated-cases-header">
+          <div>
+            <p class="section-kicker">Casos situados</p>
+            <h3>Dilemas para debatir y decidir</h3>
+          </div>
+          <span class="agreement-builder-badge">Aplicable</span>
+        </div>
+        <p class="agreement-builder-copy">
+          Elegí un caso para abrir una conversación de aula, sala docente o equipo institucional. Cada caso conecta una decisión concreta con los principios activados en tu recorrido.
+        </p>
+        <div id="situatedCases" class="situated-cases-grid"></div>
+      </div>
+
       <!-- Grid de recomendaciones -->
-      <div class="grid grid-2">
+      <div class="grid grid-2 result-tab-panel" data-result-panel="recursos">
         <!-- Acuerdos didácticos ANEP -->
         <div class="card">
           <h3 style="margin-bottom: 1rem;">Acuerdos didácticos ANEP</h3>
@@ -578,7 +804,7 @@
         <div class="card">
           <h3 style="margin-bottom: 1rem;">Herramientas recomendadas</h3>
           <div class="grid" style="gap: 1rem;">
-            <div class="resource-card" onclick="mostrarHerramientas('educativo')" style="cursor: pointer;">
+            <div class="resource-card tool-resource-card" data-tool-type="educativo" role="button" tabindex="0">
               <div class="resource-content">
                 <h4>Asistentes con modo educativo</h4>
                 <p>Interfaces que promueven verificación, citas y transparencia</p>
@@ -586,7 +812,7 @@
               </div>
             </div>
 
-            <div class="resource-card" onclick="mostrarHerramientas('citador')" style="cursor: pointer;">
+            <div class="resource-card tool-resource-card" data-tool-type="citador" role="button" tabindex="0">
               <div class="resource-content">
                 <h4>Búsqueda académica y citación</h4>
                 <p>Recursos para localizar, organizar y citar fuentes verificables</p>
@@ -594,7 +820,7 @@
               </div>
             </div>
 
-            <div class="resource-card" onclick="mostrarHerramientas('sesgos')" style="cursor: pointer;">
+            <div class="resource-card tool-resource-card" data-tool-type="sesgos" role="button" tabindex="0">
               <div class="resource-content">
                 <h4>Revisión crítica de sesgos</h4>
                 <p>Apoyos para detectar señales de sesgo, toxicidad o problemas de equidad</p>
@@ -602,7 +828,7 @@
               </div>
             </div>
 
-            <div class="resource-card" onclick="mostrarHerramientas('prompts')" style="cursor: pointer;">
+            <div class="resource-card tool-resource-card" data-tool-type="prompts" role="button" tabindex="0">
               <div class="resource-content">
                 <h4>Plataformas de prompts éticos</h4>
                 <p>Enseñan a formular consultas que promuevan pensamiento crítico</p>
@@ -614,23 +840,23 @@
       </div>
 
       <!-- Timeline completo del recorrido -->
-      <div class="card mt-3">
+      <div class="card mt-3 result-tab-panel" data-result-panel="recorrido">
         <h3 style="margin-bottom: 1rem;">Tu recorrido completo</h3>
         <div class="timeline" id="finalTimeline"></div>
       </div>
 
       <!-- Recursos educativos adicionales -->
-      <div class="card mt-3">
-        <h3 style="margin-bottom: 1rem;">Recursos educativos ANEP - UNESCO - FING - CEIBAL</h3>
+      <div class="card mt-3 result-tab-panel" data-result-panel="recursos">
+        <h3 style="margin-bottom: 1rem;">Recursos educativos ANEP - UNESCO - FING - Udelar - CEIBAL</h3>
         <div class="grid">
-          <a href="https://www.anep.edu.uy/sites/default/files/images/2024/noticias/julio/240709/Documento%20IA.pdf" target="_blank" class="resource-card" style="text-decoration: none; color: inherit;">
+          <a href="https://www.anep.edu.uy/sites/default/files/images/2024/noticias/julio/240709/Documento%20IA.pdf" target="_blank" rel="noopener noreferrer" class="resource-card" style="text-decoration: none; color: inherit;">
             <div class="resource-content">
               <h4>Documento IA ANEP 2024</h4>
               <p>Marco referencial completo sobre uso de IA en educación</p>
             </div>
           </a>
 
-          <a href="https://unesdoc.unesco.org/ark:/48223/pf0000389227" target="_blank" class="resource-card" style="text-decoration: none; color: inherit;">
+          <a href="https://unesdoc.unesco.org/ark:/48223/pf0000389227" target="_blank" rel="noopener noreferrer" class="resource-card" style="text-decoration: none; color: inherit;">
             <div class="resource-content">
               <h4>Guía para el uso de IA - UNESCO</h4>
               <p>Guía para el uso de IA generativa en educación e investigación</p>
@@ -644,10 +870,17 @@
             </div>
           </a>
 
-          <a href="https://documentos.ceibal.edu.uy/portal/2024/06/Construyendo-Inteligencia-Artificial-para-la-educacion.pdf" target="_blank" class="resource-card" style="text-decoration: none; color: inherit;">
+          <a href="https://fcea.udelar.edu.uy/institucional/novedades/9667-politica-institucional-de-inteligencia-artificial-de-la-universidad-de-la-republica.html" target="_blank" rel="noopener noreferrer" class="resource-card" style="text-decoration: none; color: inherit;">
             <div class="resource-content">
-              <h4>CEIBAL</h4>
-              <p>Construyendo Inteligencia Artificial para la educación</p>
+              <h4>Udelar - 11 principios</h4>
+              <p>Principios rectores para orientar el desarrollo y uso responsable de IA en la universidad.</p>
+            </div>
+          </a>
+
+          <a href="https://ceibal.edu.uy/politicas/buenas-practicas-uso-ia-educacion/" target="_blank" rel="noopener noreferrer" class="resource-card" style="text-decoration: none; color: inherit;">
+            <div class="resource-content">
+              <h4>Ceibal - Guía ética de IA</h4>
+              <p>Lineamientos para uso crítico, reflexivo, seguro y responsable de IA en prácticas educativas.</p>
             </div>
           </a>
         </div>
@@ -724,12 +957,17 @@
       Creado por <strong>Prof. Esp. Santiago Hernández</strong> y <strong>Prof. Diego Daluz</strong><br>
       Basado en marcos de
       <a href="https://www.anep.edu.uy/sites/default/files/images/2024/noticias/julio/240709/Documento%20IA.pdf" target="_blank" rel="noopener noreferrer">ANEP</a>,
-      <a href="https://unesdoc.unesco.org/ark:/48223/pf0000389227" target="_blank" rel="noopener noreferrer">UNESCO</a> y
-      <a href="https://www.fing.edu.uy/sites/default/files/2026-02/guia-de-etica-fing_2026.pdf" target="_blank" rel="noopener noreferrer">FING</a>
+      <a href="https://unesdoc.unesco.org/ark:/48223/pf0000389227" target="_blank" rel="noopener noreferrer">UNESCO</a>,
+      <a href="https://www.fing.edu.uy/sites/default/files/2026-02/guia-de-etica-fing_2026.pdf" target="_blank" rel="noopener noreferrer">FING</a>,
+      <a href="https://fcea.udelar.edu.uy/institucional/novedades/9667-politica-institucional-de-inteligencia-artificial-de-la-universidad-de-la-republica.html" target="_blank" rel="noopener noreferrer">Udelar</a> y
+      <a href="https://ceibal.edu.uy/politicas/buenas-practicas-uso-ia-educacion/" target="_blank" rel="noopener noreferrer">Ceibal</a>
     </p>
     <p style="margin-top: 0.75rem; font-size: 0.85rem; opacity: 0.8;">
       🔄 Sitio en constante actualización con nuevas funcionalidades y mejoras
     </p>
+    <button type="button" class="ai-use-disclosure-btn" id="aiUseDisclosureBtn">
+      Declaración de uso de IA
+    </button>
   </footer>
 
   <!-- ==========================================

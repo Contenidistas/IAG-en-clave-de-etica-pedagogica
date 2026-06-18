@@ -16,9 +16,16 @@ const elements = {
   
   // Bienvenida
   chips: document.querySelectorAll('.chip'),
+  profileSelectorPanel: document.getElementById('profileSelectorPanel'),
   playerName: document.getElementById('playerName'),
   startBtn: document.getElementById('startBtn'),
   infoBtn: document.getElementById('infoBtn'),
+  frameworkCard: document.querySelector('.audience-framework'),
+  frameworkAudienceTitle: document.getElementById('frameworkAudienceTitle'),
+  frameworkAudienceIntro: document.getElementById('frameworkAudienceIntro'),
+  frameworkContextText: document.getElementById('frameworkContextText'),
+  toggleFrameworkBtn: document.getElementById('toggleFrameworkBtn'),
+  aiUseDisclosureBtn: document.getElementById('aiUseDisclosureBtn'),
 
   // 🆕 Nivel educativo
   nivelEducativoWrapper: document.getElementById('nivelEducativoWrapper'),
@@ -31,16 +38,33 @@ const elements = {
   countryOtherInput: document.getElementById('countryOther'),
   countryFinalInput: document.getElementById('countryFinal'),
   familiaridadInicial: document.getElementById('familiaridadInicial'),
+  familiaridadInicialWrapper: document.getElementById('familiaridadInicialWrapper'),
   recursosSimilaresRadios: document.querySelectorAll('input[name="recursosSimilares"]'),
+  recursosSimilaresWrapper: document.getElementById('recursosSimilaresWrapper'),
+  startGuidance: document.getElementById('startGuidance'),
+  startGuidanceBadge: document.getElementById('startGuidanceBadge'),
+  startGuidanceTitle: document.getElementById('startGuidanceTitle'),
+  startGuidanceList: document.getElementById('startGuidanceList'),
+  onboardingSteps: document.querySelectorAll('.onboarding-step'),
+  onboardingStepCounter: document.getElementById('onboardingStepCounter'),
+  onboardingStepTitle: document.getElementById('onboardingStepTitle'),
+  onboardingDots: document.getElementById('onboardingDots'),
+  onboardingControls: document.getElementById('onboardingControls'),
+  onboardingBackBtn: document.getElementById('onboardingBackBtn'),
+  onboardingNextBtn: document.getElementById('onboardingNextBtn'),
   
   // Juego
   progressFill: document.getElementById('progressFill'),
   progressText: document.getElementById('progressText'),
   questionNumber: document.getElementById('questionNumber'),
+  activeCriterionBadge: document.getElementById('activeCriterionBadge'),
+  decisionReason: document.getElementById('decisionReason'),
   questionTitle: document.getElementById('questionTitle'),
   questionHelp: document.getElementById('questionHelp'),
   yesBtn: document.getElementById('yesBtn'),
+  sometimesBtn: document.getElementById('sometimesBtn'),
   noBtn: document.getElementById('noBtn'),
+  notApplicableBtn: document.getElementById('notApplicableBtn'),
   contextBtn: document.getElementById('contextBtn'),
   feedbackBox: document.getElementById('feedbackBox'),
   nextBtn: document.getElementById('nextBtn'),
@@ -48,11 +72,33 @@ const elements = {
   timeline: document.getElementById('timeline'),
   likertMarker: document.getElementById('likertMarker'),
   likertLevel: document.getElementById('likertLevel'),
+  decisionMapCount: document.getElementById('decisionMapCount'),
+  decisionMapAxes: document.getElementById('decisionMapAxes'),
+  decisionBranchStatus: document.getElementById('decisionBranchStatus'),
+  decisionBranchMap: document.getElementById('decisionBranchMap'),
+  principleGraphStatus: document.getElementById('principleGraphStatus'),
+  principleGraph: document.getElementById('principleGraph'),
   
   // Resultado
   resultTitle: document.getElementById('resultTitle'),
   resultDesc: document.getElementById('resultDesc'),
   resultLevel: document.getElementById('resultLevel'),
+  resultSummary: document.getElementById('resultSummary'),
+  resultInsights: document.getElementById('resultInsights'),
+  ethicalCompassLevel: document.getElementById('ethicalCompassLevel'),
+  ethicalCompassFocus: document.getElementById('ethicalCompassFocus'),
+  ethicalCompassCopy: document.getElementById('ethicalCompassCopy'),
+  ethicalCompassBars: document.getElementById('ethicalCompassBars'),
+  principleResultGraphStatus: document.getElementById('principleResultGraphStatus'),
+  principleResultGraph: document.getElementById('principleResultGraph'),
+  resultTabs: document.querySelectorAll('.result-tab'),
+  resultTabPanels: document.querySelectorAll('.result-tab-panel'),
+  agreementBuilderText: document.getElementById('agreementBuilderText'),
+  copyAgreementBtn: document.getElementById('copyAgreementBtn'),
+  regenerateAgreementBtn: document.getElementById('regenerateAgreementBtn'),
+  agreementBuilderStatus: document.getElementById('agreementBuilderStatus'),
+  agreementFormatBtns: document.querySelectorAll('.agreement-format-btn'),
+  situatedCases: document.getElementById('situatedCases'),
   didacticaList: document.getElementById('didacticaList'),
   toolsList: document.getElementById('toolsList'),
   finalTimeline: document.getElementById('finalTimeline'),
@@ -149,6 +195,12 @@ const modal = {
     document.body.style.overflow = '';
   }
 };
+
+function debugLog(...args) {
+  if (window.CONFIG && window.CONFIG.debug) {
+    console.log(...args);
+  }
+}
 
 const QUICK_GUIDE_KEY = 'iag_quick_guide_seen';
 
@@ -255,16 +307,18 @@ function showPrincipleTooltip(principleId, source = 'unesco') {
   if (!elements.principleTooltip || !PRINCIPLES_CONTENT[principleId]) return;
 
   currentPrincipleId = principleId;
-  currentSource = source;
 
   const data = PRINCIPLES_CONTENT[principleId];
+  currentSource = data[source] ? source : 'unesco';
   elements.tooltipTitle.textContent = data.title;
 
   elements.tooltipTabs.forEach(tab => {
-    tab.classList.toggle('active', tab.dataset.source === source);
+    const hasContent = Boolean(data[tab.dataset.source]);
+    tab.hidden = !hasContent;
+    tab.classList.toggle('active', tab.dataset.source === currentSource);
   });
 
-  elements.tooltipBody.innerHTML = data[source];
+  elements.tooltipBody.innerHTML = data[currentSource] || '';
   elements.principleTooltip.classList.remove('hidden');
 }
 
@@ -420,6 +474,9 @@ if (elements.consentTracking) {
     if (window.state) {
       window.state.consentTracking = elements.consentTracking.checked;
     }
+    if (elements.consentTracking.checked && typeof sendVisitToServer === 'function') {
+      sendVisitToServer().finally(cargarEstadisticasAnonimas);
+    }
     // 🔧 AGREGADO: Validar botón cuando cambia el consentimiento
     updateStartButtonState();
   };
@@ -442,6 +499,12 @@ function updateCarousel() {
   elements.carouselTrack.style.transform = `translateX(${offset}%)`;
 
   const activeSlide = elements.carouselTrack.children[state.currentSlide];
+  Array.from(elements.carouselTrack.children).forEach((slide, index) => {
+    slide.classList.toggle('is-active', index === state.currentSlide);
+    slide.classList.toggle('is-before', index < state.currentSlide);
+    slide.classList.toggle('is-after', index > state.currentSlide);
+  });
+
   if (activeSlide) {
     elements.carouselTrack.style.height = `${activeSlide.offsetHeight}px`;
   }
@@ -459,9 +522,10 @@ function updateCarousel() {
   if (!elements.nextSlide || !elements.startBtn) return;
 
   // ✅ CORREGIDO: Ahora verifica Slide 2 (índice 1) en lugar de Slide 3 (índice 2)
+  const hasOnboardingFlow = elements.onboardingNextBtn && elements.onboardingSteps && elements.onboardingSteps.length;
   if (state.currentSlide === 1) {
     elements.nextSlide.classList.add('hidden');
-    elements.startBtn.classList.remove('hidden');
+    elements.startBtn.classList.toggle('hidden', !!hasOnboardingFlow);
   } else {
     elements.nextSlide.classList.remove('hidden');
     elements.startBtn.classList.add('hidden');
@@ -478,6 +542,75 @@ if (elements.prevSlide) {
     }
   });
 }
+
+if (elements.toggleFrameworkBtn) {
+  elements.toggleFrameworkBtn.addEventListener('click', () => {
+    if (!elements.frameworkCard) return;
+    const expanded = elements.frameworkCard.classList.toggle('framework-expanded');
+    elements.toggleFrameworkBtn.textContent = expanded ? 'Ocultar marcos' : 'Ver marcos';
+  });
+}
+
+if (elements.aiUseDisclosureBtn) {
+  elements.aiUseDisclosureBtn.addEventListener('click', () => {
+    modal.show('Declaración de uso de IA', `
+      <div class="ai-disclosure-modal">
+        <p>
+          Esta herramienta fue construida con asistencia de inteligencia artificial generativa en tareas de ideación, redacción, revisión de interfaz, organización de código y mejora progresiva de la experiencia de usuario.
+        </p>
+        <p>
+          El uso de IA se realizó bajo criterios de transparencia, supervisión humana, protección de datos, verificación, pertinencia pedagógica y mejora continua, coherentes con los marcos de ANEP, UNESCO, FING, Udelar y Ceibal integrados en la propia herramienta.
+        </p>
+        <ul>
+          <li><strong>Responsabilidad humana:</strong> las decisiones pedagógicas, conceptuales y de diseño fueron revisadas y validadas por los autores.</li>
+          <li><strong>Trazabilidad:</strong> los cambios se aplicaron de forma incremental, revisando funcionamiento, accesibilidad, legibilidad y coherencia ética.</li>
+          <li><strong>Límites:</strong> la IA no sustituye el juicio profesional ni garantiza ausencia de errores; por eso se mantiene revisión humana y actualización permanente.</li>
+          <li><strong>Coherencia ética:</strong> declarar este uso forma parte del mismo principio de transparencia que la herramienta propone para prácticas educativas con IAG.</li>
+        </ul>
+      </div>
+    `);
+  });
+}
+
+const FRAMEWORK_AUDIENCE_COPY = {
+  estudiante: {
+    title: 'Criterios para usar IA en tareas y estudio',
+    intro: 'Un recorrido breve para revisar transparencia, verificación, privacidad y aporte propio sin cargar la pantalla con toda la fundamentación.',
+    context: 'La fundamentación queda disponible como apoyo: podés consultarla si querés profundizar, pero el recorrido prioriza decisiones concretas para estudiar y producir con responsabilidad.',
+    button: 'Ver marcos'
+  },
+  docente: {
+    title: 'Criterios para orientar prácticas de aula',
+    intro: 'Una guía para pensar consignas, evaluación, acompañamiento y acuerdos de uso de IA con estudiantes.',
+    context: 'Como docentes, necesitamos criterios claros para definir cuándo se permite la IA, cómo se declara, qué se verifica y cómo se evalúa el aporte humano.',
+    button: 'Ver marcos'
+  },
+  especializado: {
+    title: 'Marcos para formación, investigación y criterios compartidos',
+    intro: 'Una lectura ampliada para quienes investigan, forman o acompañan procesos sobre IA educativa.',
+    context: 'Desde la formación, la investigación y la experiencia situada, estos marcos permiten construir criterios compartidos, transparentes y pedagógicamente defendibles.',
+    button: 'Ocultar marcos'
+  }
+};
+
+function updateFrameworkAudience(perfil) {
+  if (!elements.frameworkCard) return;
+  const audience = perfil || 'none';
+  const copy = FRAMEWORK_AUDIENCE_COPY[audience] || {
+    title: 'Marcos de UNESCO, ANEP, FING, Udelar y Ceibal',
+    intro: 'Elegí un perfil para adaptar la profundidad de la fundamentación y hacer el recorrido más liviano.',
+    context: 'La herramienta adapta la densidad de los marcos según el lugar desde el que se realiza el recorrido.',
+    button: 'Ver marcos'
+  };
+
+  elements.frameworkCard.dataset.audience = audience;
+  elements.frameworkCard.classList.toggle('framework-expanded', audience === 'especializado');
+
+  if (elements.frameworkAudienceTitle) elements.frameworkAudienceTitle.textContent = copy.title;
+  if (elements.frameworkAudienceIntro) elements.frameworkAudienceIntro.textContent = copy.intro;
+  if (elements.frameworkContextText) elements.frameworkContextText.textContent = copy.context;
+  if (elements.toggleFrameworkBtn) elements.toggleFrameworkBtn.textContent = copy.button;
+}
 if (elements.nextSlide) {
   elements.nextSlide.addEventListener('click', () => { 
     // ✅ CORREGIDO: Máximo slide es 1 (antes era 2)
@@ -485,6 +618,9 @@ if (elements.nextSlide) {
       state.currentSlide++; 
       updateCarousel(); 
       updateStartButtonState();
+      if (state.currentSlide === 1) {
+        scrollToDiagnosticStart();
+      }
     }
   });
 }
@@ -499,13 +635,268 @@ if (elements.carouselDots && elements.carouselDots.length) {
 }
 
 const goToDiagnosticBtn = document.getElementById('goToDiagnosticBtn');
+function scrollToDiagnosticStart() {
+  const target = document.getElementById('diagnosticoInicio');
+  if (!target) {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
+
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+
+  window.setTimeout(() => {
+    updateCarousel();
+    const headerOffset = 88;
+    const top = target.getBoundingClientRect().top + window.scrollY - headerOffset;
+    window.scrollTo({ top: Math.max(0, top), behavior: 'auto' });
+  }, 120);
+}
+
+function focusInitialField(targetKey) {
+  const targetMap = {
+    profile: elements.profileSelectorPanel,
+    nivel: elements.nivelEducativoWrapper,
+    contexto: elements.playerName || elements.countrySelect,
+    familiaridad: elements.familiaridadInicialWrapper,
+    recursos: elements.recursosSimilaresWrapper,
+    start: elements.startBtn
+  };
+  const focusMap = {
+    nivel: elements.nivelEducativo,
+    contexto: elements.playerName || elements.countrySelect,
+    familiaridad: elements.familiaridadInicial,
+    recursos: elements.recursosSimilaresRadios && elements.recursosSimilaresRadios[0],
+    start: elements.startBtn
+  };
+  const target = targetMap[targetKey];
+  if (!target) return;
+
+  target.classList.add('field-guidance-highlight');
+  target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  window.setTimeout(() => {
+    const focusTarget = focusMap[targetKey];
+    if (focusTarget && typeof focusTarget.focus === 'function') {
+      focusTarget.focus({ preventScroll: true });
+    }
+  }, 350);
+  window.setTimeout(() => target.classList.remove('field-guidance-highlight'), 1800);
+}
+
+function renderStartGuidance(missingItems, ready) {
+  if (!elements.startGuidance || !elements.startGuidanceList) return;
+
+  elements.startGuidance.classList.toggle('is-ready', ready);
+  if (elements.startGuidanceBadge) {
+    elements.startGuidanceBadge.textContent = ready ? 'Listo' : `${missingItems.length} pendiente(s)`;
+  }
+  if (elements.startGuidanceTitle) {
+    elements.startGuidanceTitle.textContent = ready
+      ? 'Listo, ya podés iniciar el recorrido'
+      : 'Completá estos pasos para iniciar';
+  }
+
+  if (ready) {
+    elements.startGuidanceList.innerHTML = `
+      <button type="button" class="start-guidance-item is-complete" data-guide-target="start">
+        <span>✓</span>
+        <strong>Todo preparado</strong>
+        <small>El botón Iniciar cuestionario ya está disponible.</small>
+      </button>
+    `;
+    return;
+  }
+
+  elements.startGuidanceList.innerHTML = missingItems.map((item, index) => `
+    <button type="button" class="start-guidance-item" data-guide-target="${item.target}">
+      <span>${index + 1}</span>
+      <strong>${item.title}</strong>
+      <small>${item.help}</small>
+    </button>
+  `).join('');
+}
+
+const ONBOARDING_STEP_META = {
+  profile: {
+    title: 'Punto de partida',
+    target: 'profile',
+    isValid: () => !!state.profile
+  },
+  nivel: {
+    title: 'Contexto educativo',
+    target: 'nivel',
+    isValid: () => !(state.profile === 'docente' || state.profile === 'estudiante')
+      || (elements.nivelEducativo && elements.nivelEducativo.value.trim() !== '')
+  },
+  contexto: {
+    title: 'Datos de contexto',
+    target: 'contexto',
+    isValid: () => true
+  },
+  familiaridad: {
+    title: 'Experiencia previa',
+    target: 'familiaridad',
+    isValid: () => elements.familiaridadInicial && elements.familiaridadInicial.value.trim() !== ''
+  },
+  recursos: {
+    title: 'Recursos similares',
+    target: 'recursos',
+    isValid: () => elements.recursosSimilaresRadios
+      && Array.from(elements.recursosSimilaresRadios).some(r => r.checked)
+  },
+  cierre: {
+    title: 'Privacidad y cierre',
+    target: 'start',
+    isValid: () => true
+  }
+};
+
+function getOnboardingStepKeys() {
+  const keys = ['profile'];
+  if (state.profile === 'docente' || state.profile === 'estudiante') {
+    keys.push('nivel');
+  }
+  keys.push('contexto', 'familiaridad', 'recursos', 'cierre');
+  return keys;
+}
+
+function syncOnboardingStepBounds() {
+  const keys = getOnboardingStepKeys();
+  if (!Number.isInteger(state.onboardingStep)) state.onboardingStep = 0;
+  state.onboardingStep = Math.max(0, Math.min(state.onboardingStep, keys.length - 1));
+  return keys;
+}
+
+function isCountryOtherVisible() {
+  return elements.countrySelect && elements.countrySelect.value === 'Otro';
+}
+
+function updateOnboardingUI() {
+  if (!elements.onboardingSteps || !elements.onboardingSteps.length) return;
+  const keys = syncOnboardingStepBounds();
+  const activeKey = keys[state.onboardingStep] || keys[0];
+
+  elements.onboardingSteps.forEach(step => {
+    const key = step.dataset.onboardingStep;
+    const isActive = key === activeKey;
+    const isCountryOther = step.id === 'countryOtherWrapper';
+    step.classList.toggle('active', isActive && (!isCountryOther || isCountryOtherVisible()));
+  });
+
+  if (elements.onboardingStepCounter) {
+    elements.onboardingStepCounter.textContent = `Paso ${state.onboardingStep + 1} de ${keys.length}`;
+  }
+  if (elements.onboardingStepTitle) {
+    elements.onboardingStepTitle.textContent = ONBOARDING_STEP_META[activeKey]?.title || 'Inicio guiado';
+  }
+  if (elements.onboardingDots) {
+    elements.onboardingDots.style.setProperty('--onboarding-steps', keys.length);
+    elements.onboardingDots.innerHTML = keys.map((key, index) => `
+      <button type="button" class="onboarding-dot${index === state.onboardingStep ? ' active' : ''}${ONBOARDING_STEP_META[key]?.isValid() ? ' done' : ''}" data-onboarding-index="${index}" aria-label="Ir al paso ${index + 1}"></button>
+    `).join('');
+  }
+  if (elements.onboardingBackBtn) {
+    elements.onboardingBackBtn.disabled = state.onboardingStep === 0;
+  }
+  if (elements.onboardingControls) {
+    elements.onboardingControls.classList.toggle('is-consent-step', activeKey === 'cierre');
+  }
+  if (elements.onboardingNextBtn) {
+    const isLast = state.onboardingStep === keys.length - 1;
+    elements.onboardingNextBtn.textContent = isLast ? 'Iniciar cuestionario' : 'Siguiente';
+  }
+
+  updateCarousel();
+}
+
+function currentOnboardingStepIsValid() {
+  const keys = syncOnboardingStepBounds();
+  const activeKey = keys[state.onboardingStep] || keys[0];
+  return ONBOARDING_STEP_META[activeKey]?.isValid() !== false;
+}
+
+function findFirstInvalidOnboardingIndex(keys = syncOnboardingStepBounds()) {
+  return keys.findIndex(key => ONBOARDING_STEP_META[key]?.isValid() === false);
+}
+
+function focusCurrentOnboardingStep() {
+  const keys = syncOnboardingStepBounds();
+  const activeKey = keys[state.onboardingStep] || keys[0];
+  const target = ONBOARDING_STEP_META[activeKey]?.target || activeKey;
+  focusInitialField(target);
+}
+
+function advanceOnboarding() {
+  const keys = syncOnboardingStepBounds();
+  if (!currentOnboardingStepIsValid()) {
+    focusCurrentOnboardingStep();
+    return;
+  }
+
+  if (state.onboardingStep >= keys.length - 1) {
+    updateStartButtonState();
+    if (!elements.startBtn.disabled) {
+      iniciarJuego();
+    } else {
+      const invalidIndex = findFirstInvalidOnboardingIndex(keys);
+      if (invalidIndex >= 0) {
+        state.onboardingStep = invalidIndex;
+        updateOnboardingUI();
+      }
+      window.setTimeout(focusCurrentOnboardingStep, 120);
+    }
+    return;
+  }
+
+  state.onboardingStep += 1;
+  updateOnboardingUI();
+}
+
+function retreatOnboarding() {
+  syncOnboardingStepBounds();
+  state.onboardingStep = Math.max(0, state.onboardingStep - 1);
+  updateOnboardingUI();
+}
+
 if (goToDiagnosticBtn) {
   goToDiagnosticBtn.addEventListener('click', (event) => {
     event.preventDefault();
     state.currentSlide = 1;
     updateCarousel();
     updateStartButtonState();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToDiagnosticStart();
+  });
+}
+
+if (elements.startGuidance) {
+  elements.startGuidance.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-guide-target]');
+    if (!button) return;
+    focusInitialField(button.dataset.guideTarget);
+  });
+}
+
+if (elements.onboardingNextBtn) {
+  elements.onboardingNextBtn.addEventListener('click', advanceOnboarding);
+}
+
+if (elements.onboardingBackBtn) {
+  elements.onboardingBackBtn.addEventListener('click', retreatOnboarding);
+}
+
+if (elements.onboardingDots) {
+  elements.onboardingDots.addEventListener('click', (event) => {
+    const dot = event.target.closest('[data-onboarding-index]');
+    if (!dot) return;
+    const requested = Number(dot.dataset.onboardingIndex);
+    if (!Number.isInteger(requested)) return;
+    const keys = syncOnboardingStepBounds();
+    const firstInvalid = findFirstInvalidOnboardingIndex(keys);
+    state.onboardingStep = firstInvalid >= 0 ? Math.min(requested, firstInvalid) : requested;
+    updateOnboardingUI();
+    if (firstInvalid >= 0 && requested > firstInvalid) {
+      window.setTimeout(focusCurrentOnboardingStep, 120);
+    }
   });
 }
 
@@ -518,7 +909,8 @@ if (goToDiagnosticBtn) {
 function updateStartButtonState() {
   if (!elements.startBtn) return;
 
-  console.log('=== 🔍 DEBUG: Validando formulario ===');
+  debugLog('Validando formulario');
+  const missingItems = [];
 
   // 1) Perfil elegido
   const activeProfile = document.querySelector('.chip.active');
@@ -526,68 +918,91 @@ function updateStartButtonState() {
     window.state.profile = activeProfile.dataset.profile || window.state.profile;
   }
   const perfilOk = !!state.profile;
-  console.log('✓ Perfil OK:', perfilOk, '| Valor:', state.profile);
+  if (!perfilOk) {
+    missingItems.push({
+      target: 'profile',
+      title: 'Elegí tu perfil',
+      help: 'Seleccioná Estudiante, Docente o Docente/investigador/a.'
+    });
+  }
+  debugLog('Perfil OK:', perfilOk, '| Valor:', state.profile);
 
-  // 2) Nivel educativo (OBLIGATORIO solo para docente/estudiante)
+  // 2) Nivel educativo (obligatorio para docente/estudiante; no para perfil especializado)
   let nivelOk = true;
   if (state.profile === 'docente' || state.profile === 'estudiante') {
     if (elements.nivelEducativo) {
       nivelOk = elements.nivelEducativo.value.trim() !== '';
-      console.log('✓ Nivel OK:', nivelOk, '| Valor:', elements.nivelEducativo.value);
+      if (!nivelOk) {
+        missingItems.push({
+          target: 'nivel',
+          title: 'Indicá el nivel educativo',
+          help: state.profile === 'docente' ? 'Elegí en qué nivel trabajás.' : 'Elegí en qué nivel estudiás.'
+        });
+      }
+      debugLog('Nivel OK:', nivelOk, '| Valor:', elements.nivelEducativo.value);
     }
   } else {
-    console.log('✓ Nivel OK: true (no requerido para este perfil)');
+    debugLog('Nivel OK: true (no requerido para este perfil)');
   }
 
   // 3) Familiaridad
   let famOk = true;
   if (elements.familiaridadInicial) {
     famOk = elements.familiaridadInicial.value.trim() !== '';
-    console.log('✓ Familiaridad OK:', famOk, '| Valor:', elements.familiaridadInicial.value);
+    if (!famOk) {
+      missingItems.push({
+        target: 'familiaridad',
+        title: 'Completá tu familiaridad inicial',
+        help: 'Esto ayuda a contextualizar la devolución final.'
+      });
+    }
+    debugLog('Familiaridad OK:', famOk, '| Valor:', elements.familiaridadInicial.value);
   }
 
   // 4) Recursos similares
   let recursosOk = true;
   if (elements.recursosSimilaresRadios && elements.recursosSimilaresRadios.length) {
     recursosOk = Array.from(elements.recursosSimilaresRadios).some(r => r.checked);
-    console.log('✓ Recursos OK:', recursosOk);
+    if (!recursosOk) {
+      missingItems.push({
+        target: 'recursos',
+        title: 'Marcá si usaste recursos similares',
+        help: 'Podés elegir Sí, No o No estoy seguro/a.'
+      });
+    }
+    debugLog('Recursos OK:', recursosOk);
   }
 
-  // 5) Consentimiento (OBLIGATORIO)
-  let consentOk = true;
+  // 5) Consentimiento opcional: habilita registro anónimo, no bloquea el uso.
   if (elements.consentTracking) {
     if (window.state) {
       window.state.consentTracking = elements.consentTracking.checked;
     }
-    consentOk = elements.consentTracking.checked;
-    console.log('✓ Consentimiento OK:', consentOk);
+    debugLog('Consentimiento de registro:', elements.consentTracking.checked);
   }
 
   // 🔑 Lógica de Habilitación y Visibilidad
-  const todasOk = perfilOk && nivelOk && famOk && recursosOk && consentOk;
+  const todasOk = perfilOk && nivelOk && famOk && recursosOk;
   const nextSlideBtn = document.getElementById('nextSlide');
+  const hasOnboardingFlow = elements.onboardingNextBtn && elements.onboardingSteps && elements.onboardingSteps.length;
 
-  console.log('━━━━━━━━━━━━━━━━━━━━━━');
-  console.log('📊 RESULTADO:', todasOk ? '✅ TODAS OK' : '❌ FALTAN CAMPOS');
+  debugLog('Resultado validación:', todasOk ? 'todas ok' : 'faltan campos');
+  renderStartGuidance(missingItems, todasOk);
+  updateOnboardingUI();
   
 if (todasOk) {
   elements.startBtn.disabled = false;
-  elements.startBtn.classList.remove('hidden');
+  elements.startBtn.classList.toggle('hidden', !!hasOnboardingFlow);
   elements.startBtn.classList.add('enabled');
 
   if (nextSlideBtn) nextSlideBtn.classList.add('hidden');
-
-  console.log('🎯 Botón Inicio: MOSTRADO, VERDE Y HABILITADO');
 } else {
   elements.startBtn.disabled = true;
   elements.startBtn.classList.add('hidden');
   elements.startBtn.classList.remove('enabled');
 
   if (nextSlideBtn) nextSlideBtn.classList.remove('hidden');
-
-  console.log('🎯 Botón Inicio: OCULTO Y DESHABILITADO');
 }
-  console.log('━━━━━━━━━━━━━━━━━━━━━━\n');
 }
 
 /* ========================================
@@ -595,7 +1010,7 @@ if (todasOk) {
    ======================================== */
 elements.chips.forEach(chip => {
   chip.addEventListener('click', () => {
-    console.log('🔵 Click en chip:', chip.dataset.profile);
+    debugLog('Click en chip:', chip.dataset.profile);
     
     elements.chips.forEach(c => c.classList.remove('active'));
     chip.classList.add('active');
@@ -605,10 +1020,12 @@ elements.chips.forEach(chip => {
     // ✅ Actualizar state
     if (window.state) {
       window.state.profile = perfil;
-      console.log('✅ State actualizado - Perfil:', window.state.profile);
+      debugLog('State actualizado - Perfil:', window.state.profile);
     } else {
       console.error('❌ window.state no existe!');
     }
+
+    updateFrameworkAudience(perfil);
 
     // Mostrar nivel educativo según perfil
     if (perfil === 'docente' || perfil === 'estudiante') {
@@ -624,10 +1041,10 @@ elements.chips.forEach(chip => {
 // Cambios en familiaridad inicial
 if (elements.familiaridadInicial) {
   elements.familiaridadInicial.addEventListener('change', (e) => {
-    console.log('🔵 Familiaridad cambió:', e.target.value);
+    debugLog('Familiaridad cambió:', e.target.value);
     if (window.state) {
       window.state.familiaridadInicial = e.target.value || '';
-      console.log('✅ State actualizado - Familiaridad:', window.state.familiaridadInicial);
+      debugLog('State actualizado - Familiaridad:', window.state.familiaridadInicial);
     }
     updateStartButtonState();
   });
@@ -637,10 +1054,10 @@ if (elements.familiaridadInicial) {
 if (elements.recursosSimilaresRadios && elements.recursosSimilaresRadios.length) {
   elements.recursosSimilaresRadios.forEach(radio => {
     radio.addEventListener('change', (e) => {
-      console.log('🔵 Recursos cambió:', e.target.value);
+      debugLog('Recursos cambió:', e.target.value);
       if (e.target.checked && window.state) {
         window.state.recursosSimilares = e.target.value;
-        console.log('✅ State actualizado - Recursos:', window.state.recursosSimilares);
+        debugLog('State actualizado - Recursos:', window.state.recursosSimilares);
       }
       updateStartButtonState();
     });
@@ -657,8 +1074,8 @@ updateCarousel();
    ======================================== */
 if (elements.infoBtn) {
   elements.infoBtn.addEventListener('click', () => {
-    modal.show('Marco ANEP sobre IA en Educación', `
-      <p>Este cuestionario está basado en documentos oficiales de UNESCO y ANEP sobre el uso de IAG contextualizado a la Educación.</p>
+    modal.show('Marcos sobre IA en Educación', `
+      <p>Este cuestionario está basado en documentos y orientaciones de UNESCO, ANEP, FING, Udelar y Ceibal sobre el uso de IAG contextualizado a la educación.</p>
       <h4>Principios clave:</h4>
       <ul>
         <li>Verificación de información con fuentes confiables</li>
@@ -676,6 +1093,9 @@ if (elements.infoBtn) {
    CAMBIO DE PANTALLAS
    ======================================== */
 function showScreen(screenName) {
+  document.body.classList.toggle('quiz-active', screenName === 'game');
+  document.body.classList.toggle('result-active', screenName === 'result');
+
   Object.values(screens).forEach(screen => {
     if (screen) screen.classList.add('hidden');
   });
@@ -686,6 +1106,7 @@ function showScreen(screenName) {
 
   // --- 🆕 LÓGICA DE ASISTENCIA PROACTIVA ---
   if (screenName === 'result') {
+    activateResultTab(state.activeResultTab || 'sintesis');
     // Si el puntaje es bajo (margen de mejora o proceso inicial)
     if (window.state && window.state.evidence <= 40) {
       setTimeout(() => {
@@ -822,6 +1243,35 @@ if (btnVerAutores) btnVerAutores.addEventListener('click', function() {
     }
     setTimeout(updateCarousel, 0);
 });
+
+updateFrameworkAudience(state.profile || null);
+
+function activateResultTab(tabName) {
+  const activeTab = tabName || 'sintesis';
+  state.activeResultTab = activeTab;
+
+  if (elements.resultTabs && elements.resultTabs.length) {
+    elements.resultTabs.forEach(tab => {
+      const isActive = tab.dataset.resultTab === activeTab;
+      tab.classList.toggle('active', isActive);
+      tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
+  }
+
+  if (elements.resultTabPanels && elements.resultTabPanels.length) {
+    elements.resultTabPanels.forEach(panel => {
+      panel.classList.toggle('active', panel.dataset.resultPanel === activeTab);
+    });
+  }
+}
+
+if (elements.resultTabs && elements.resultTabs.length) {
+  elements.resultTabs.forEach(tab => {
+    tab.addEventListener('click', () => activateResultTab(tab.dataset.resultTab));
+  });
+}
+
+window.activateResultTab = activateResultTab;
 
 
 /* ========================================
@@ -971,6 +1421,16 @@ function mostrarHerramientas(tipo) {
   modal.show(grupo.titulo, cuerpo);
 }
 
+document.querySelectorAll('[data-tool-type]').forEach(card => {
+  const openToolModal = () => mostrarHerramientas(card.dataset.toolType);
+  card.addEventListener('click', openToolModal);
+  card.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    openToolModal();
+  });
+});
+
 /* ========================================
    ESTADÍSTICAS ANÓNIMAS
    ======================================== */
@@ -1004,7 +1464,7 @@ function renderStatsBars(container, rows) {
     return `
       <div class="stats-bar-row">
         <div class="stats-bar-label">
-          <span>${row.label}</span>
+          <span>${escapeHtml(row.label)}</span>
           <span>${formatNumber(row.count)}</span>
         </div>
         <div class="stats-bar-track">
@@ -1149,7 +1609,8 @@ function buildToolFeedbackPayload() {
     profile: state.profileBase || state.profile || '',
     profileKey: state.profileKey || '',
     country: state.country || '',
-    nivelEducativo: state.nivelEducativo || ''
+    nivelEducativo: state.nivelEducativo || '',
+    consentTracking: !!state.consentTracking
   };
 }
 
@@ -1160,6 +1621,14 @@ function enviarValoracionHerramienta() {
   if (!rating) {
     if (elements.toolFeedbackStatus) {
       elements.toolFeedbackStatus.textContent = 'Seleccioná una valoración del 1 al 5 para enviar tu aporte.';
+      elements.toolFeedbackStatus.classList.add('is-warning');
+    }
+    return;
+  }
+
+  if (!state.consentTracking) {
+    if (elements.toolFeedbackStatus) {
+      elements.toolFeedbackStatus.textContent = 'Para guardar tu valoración, primero aceptá el registro anónimo de datos.';
       elements.toolFeedbackStatus.classList.add('is-warning');
     }
     return;
@@ -1209,25 +1678,30 @@ if (elements.sendToolFeedbackBtn) {
    ======================================== */
 // Ejecutar después de que todo se cargue
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🔄 Sincronizando estado inicial...');
+  debugLog('Sincronizando estado inicial...');
   
   // Sincronizar perfil si hay un chip activo
   const activeChip = document.querySelector('.chip.active');
   if (activeChip && window.state) {
     const perfil = activeChip.dataset.profile;
     window.state.profile = perfil;
-    console.log('✅ Perfil inicial sincronizado:', perfil);
+    debugLog('Perfil inicial sincronizado:', perfil);
     
     // Mostrar nivel educativo si corresponde
     if (perfil === 'docente' || perfil === 'estudiante') {
       updateNivelEducativo(perfil);
+    } else {
+      hideNivelEducativo();
     }
+    updateFrameworkAudience(perfil);
+  } else {
+    updateFrameworkAudience(null);
   }
   
   // Sincronizar familiaridad inicial
   if (elements.familiaridadInicial && window.state) {
     window.state.familiaridadInicial = elements.familiaridadInicial.value || '';
-    console.log('✅ Familiaridad inicial:', window.state.familiaridadInicial);
+    debugLog('Familiaridad inicial:', window.state.familiaridadInicial);
   }
   
   // Sincronizar recursos similares inicial
@@ -1235,27 +1709,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkedRadio = Array.from(elements.recursosSimilaresRadios).find(r => r.checked);
     if (checkedRadio) {
       window.state.recursosSimilares = checkedRadio.value;
-      console.log('✅ Recursos inicial:', window.state.recursosSimilares);
+      debugLog('Recursos inicial:', window.state.recursosSimilares);
     }
   }
   
   // Sincronizar consentimiento inicial
   if (elements.consentTracking && window.state) {
     window.state.consentTracking = elements.consentTracking.checked;
-    console.log('✅ Consentimiento inicial:', window.state.consentTracking);
+    debugLog('Consentimiento inicial:', window.state.consentTracking);
   }
   
   // Validar estado del botón
   setTimeout(() => {
-    console.log('🔍 Validando estado inicial del botón...');
+    debugLog('Validando estado inicial del botón...');
     updateStartButtonState();
   }, 100);
 
-  const afterVisit = typeof sendVisitToServer === 'function'
-    ? Promise.resolve(sendVisitToServer())
-    : Promise.resolve(false);
-
-  afterVisit.finally(cargarEstadisticasAnonimas);
+  cargarEstadisticasAnonimas();
   cargarOpinionesAnonimas();
 
   setTimeout(mostrarGuiaRapidaInicial, 450);

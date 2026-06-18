@@ -7,9 +7,14 @@
    CONFIGURACIÓN BASADA EN DOCUMENTO ANEP
    ======================================== */
 const CONFIG = {
+  debug: false,
+  schemaVersion: '2026-06-17.1',
   apiBaseUrl: 'https://iag-etica-api.suscripcionessh.workers.dev',
   get dataEndpoint() {
     return `${this.apiBaseUrl}/events`;
+  },
+  get chatEndpoint() {
+    return `${this.apiBaseUrl}/chat`;
   },
   get statsEndpoint() {
     return `${this.apiBaseUrl}/stats`;
@@ -25,33 +30,33 @@ likert: [
     min: 0, 
     max: 20, 
     desc: 'Las prácticas muestran un uso inicial y poco sistemático. Es un buen punto de partida para comenzar a incorporar verificaciones y criterios más consistentes.',
-    color: '#ef4444'
+    color: '#dbeafe'
   },
   { 
     id: 'En proceso inicial', 
     min: 21, 
     max: 40, 
     desc: 'Se reconocen algunas buenas prácticas, aunque todavía falta incorporarlas con regularidad. Hay espacio para reforzar revisión, contraste de información y decisiones más informadas.',
-    color: '#f59e0b'
+    color: '#bfdbfe'
   },
   { 
     id: 'Desarrollo progresivo', 
     min: 41, 
     max: 60, 
     desc: 'Se evidencia un avance claro: se combinan decisiones razonadas y uso cuidadoso. Aún queda margen para afinar criterios y fortalecer la autonomía en el proceso.',
-    color: '#eab308'
+    color: '#93c5fd'
   },
 { 
   id: 'Prácticas consolidadas', 
   min: 61, max: 80, 
-  desc: 'Se integra la herramienta con criterio. El trabajo muestra una lectura madura y, según los marcos de Fing/ANEP, se evidencia una validación activa de los resultados.',
-  color: '#84cc16'
+  desc: 'Se integra la herramienta con criterio. El trabajo muestra una lectura madura y, según los marcos de FING, ANEP, Udelar y Ceibal, se evidencia una validación activa de los resultados.',
+  color: '#60a5fa'
 },
 { 
   id: 'Nivel avanzado', 
   min: 81, max: 100, 
   desc: 'Uso sólido y crítico. Se aporta valor personal, se documenta el proceso (prompts/validaciones) y se mantiene la autoría humana como eje central.',
-  color: '#22c55e'
+  color: '#ffffff'
 }
 
 
@@ -478,12 +483,12 @@ likert: [
 };
 
 /* ========================================
-   CONTENIDO DE PRINCIPIOS UNESCO / ANEP
+   CONTENIDO DE PRINCIPIOS UNESCO / ANEP / Udelar / Ceibal
    ======================================== */
 
 
 /* ========================================
-   CONTENIDO DE PRINCIPIOS UNESCO / ANEP
+   CONTENIDO DE PRINCIPIOS UNESCO / ANEP / Udelar / Ceibal
    - Texto breve + citas textuales de ambos documentos
    - Usado por el tooltip de las cards
    ======================================== */
@@ -503,6 +508,16 @@ const PRINCIPLES_CONTENT = {
       <p>“Fomentar el pensamiento crítico […] se torna impostergable”.</p>
       <p><em>La inteligencia artificial en la educación, sección 6. Recomendaciones para el futuro.</em></p>
       <p>Por eso se espera que estudiantes y docentes verifiquen la información generada por IA antes de utilizarla en evaluaciones o producciones.</p>
+    `,
+    udelar: `
+      <p><strong>Udelar</strong></p>
+      <p>Entre los 11 principios rectores aprobados por Udelar aparecen transparencia y explicabilidad, seguridad y gestión de riesgos, ética e imparcialidad, formación de capacidades y participación.</p>
+      <p>En la herramienta, verificar significa conservar evidencia suficiente para explicar cómo se obtuvo, revisó y transformó una respuesta generada por IA.</p>
+    `,
+    ceibal: `
+      <p><strong>Ceibal</strong></p>
+      <p>La guía de uso ético de IA recomienda verificar siempre la información, porque los sistemas pueden cometer errores, inventar datos u ofrecer información incompleta.</p>
+      <p>También pide revisar y adaptar los contenidos generados al nivel, lenguaje, intereses y realidad concreta del grupo.</p>
     `
   },
   transparencia: {
@@ -518,6 +533,16 @@ const PRINCIPLES_CONTENT = {
       <p>“Fomentar una comprensión clara de la IA […] implica enseñar a los estudiantes a <strong>diferenciar</strong> entre la información generada por IA y la creada por humanos”.</p>
       <p><em>La inteligencia artificial en la educación, sección 6.</em></p>
       <p>En tareas y evaluaciones se espera declarar qué partes fueron asistidas por IAG y cuál es el aporte personal.</p>
+    `,
+    udelar: `
+      <p><strong>Udelar</strong></p>
+      <p>Udelar incluye transparencia y explicabilidad, autonomía académica y control humano, además de derechos de autor y protección de datos.</p>
+      <p>Esto implica declarar herramientas, finalidades, límites de uso, fuentes consultadas y decisiones humanas tomadas durante la producción.</p>
+    `,
+    ceibal: `
+      <p><strong>Ceibal</strong></p>
+      <p>Ceibal plantea ser transparente en el uso: aclarar cuándo y cómo se utiliza IA para generar materiales, actividades o propuestas pedagógicas fortalece la confianza.</p>
+      <p>La transparencia convierte el uso de IA en una práctica conversable y evaluable, no en una delegación invisible.</p>
     `
   },
   sesgos: {
@@ -533,6 +558,16 @@ const PRINCIPLES_CONTENT = {
       <p>“Los algoritmos de IA a veces emiten resultados que no se originan en los datos de entrenamiento y los interpretan de forma incorrecta […] generando resultados inesperados o erróneos”.</p>
       <p><em>La inteligencia artificial en la educación, sección 6.</em></p>
       <p>Detectar y discutir estos errores con el grupo es parte del trabajo sobre sesgos y ciudadanía digital crítica.</p>
+    `,
+    udelar: `
+      <p><strong>Udelar</strong></p>
+      <p>Los principios de equidad y no discriminación, ética e imparcialidad, participación y sostenibilidad permiten leer los sesgos como problema pedagógico e institucional.</p>
+      <p>Una práctica sólida pregunta a quién beneficia, a quién perjudica y qué supuestos quedan naturalizados en la respuesta generada.</p>
+    `,
+    ceibal: `
+      <p><strong>Ceibal</strong></p>
+      <p>Ceibal advierte que los modelos pueden reflejar prejuicios o miradas parciales. Por eso recomienda revisar los contenidos para asegurar un enfoque inclusivo, diverso y respetuoso.</p>
+      <p>La revisión de sesgos debe considerar también brechas de acceso, accesibilidad y condiciones reales del grupo.</p>
     `
   },
   valor_agregado: {
@@ -548,6 +583,16 @@ const PRINCIPLES_CONTENT = {
       <p>“Todos los matices entre lo generado por IA y lo creado por un ser humano pueden enriquecer los procesos de aprendizaje, pero ello no implica la eliminación del componente humano en el proceso”.</p>
       <p><em>La inteligencia artificial en la educación, sección 4.</em></p>
       <p>Las producciones deberían mostrar ejemplos, análisis y decisiones propias: la IA apoya, pero el valor educativo lo aporta la mirada pedagógica.</p>
+    `,
+    udelar: `
+      <p><strong>Udelar</strong></p>
+      <p>Udelar combina centralidad de la persona humana, control humano, autonomía académica, formación de capacidades y participación.</p>
+      <p>Desde esos principios, la IAG potencia el trabajo cuando amplía el pensamiento, no cuando sustituye la responsabilidad intelectual y pedagógica.</p>
+    `,
+    ceibal: `
+      <p><strong>Ceibal</strong></p>
+      <p>Ceibal propone usar la IA como apoyo y nunca sin revisión y análisis. La persona sigue siendo responsable de los contenidos que decide utilizar.</p>
+      <p>El valor agregado aparece cuando la IA sirve como punto de partida para analizar, comparar, debatir y reflexionar.</p>
     `
   },
 autoria: {
@@ -581,7 +626,7 @@ autoria: {
    ======================================== */
 
 const state = {
-  profile: null,        // docente | estudiante
+  profile: null,        // docente | estudiante | especializado
   profileKey: null,     // docente, estudiante_media, etc.
   name: '',
   currentId: null,      // ID de la pregunta actual
@@ -592,7 +637,9 @@ const state = {
   nivelEducativo: '',
   familiaridadInicial: '',
   recursosSimilares: '',
-  consentTracking: false
+  consentTracking: false,
+  activeResultTab: 'sintesis',
+  agreementFormat: 'aula'
 };
 
 window.state = state;

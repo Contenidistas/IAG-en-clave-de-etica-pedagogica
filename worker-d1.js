@@ -1,80 +1,92 @@
-const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*',
+const DEFAULT_ALLOWED_ORIGINS = [
+  'https://santiherben.github.io',
+  'http://localhost:8787',
+  'http://localhost:8000',
+  'http://127.0.0.1:8787',
+  'http://127.0.0.1:8000',
+];
+
+const BASE_CORS_HEADERS = {
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Admin-Key',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Admin-Key, X-API-Key',
   'Access-Control-Max-Age': '86400',
+};
+
+const SECURITY_HEADERS = {
+  'X-Content-Type-Options': 'nosniff',
+  'Referrer-Policy': 'no-referrer',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
 };
 
 export default {
   async fetch(request, env) {
     if (request.method === 'OPTIONS') {
-      return new Response(null, { status: 204, headers: CORS_HEADERS });
+      return new Response(null, { status: 204, headers: corsHeaders(request, env) });
     }
 
     const url = new URL(request.url);
 
     try {
-      if (request.method === 'POST' && url.pathname === '/events') {
-        return json(await handleEvent(request, env));
+      if (request.method === 'POST' && !isAllowedRequestOrigin(request, env)) {
+        return json({ ok: false, error: 'Origen no permitido' }, 403, request, env);
       }
 
-      if (request.method === 'POST' && url.pathname === '/email-report') {
-        return json(await sendEmailReport(request, env));
+      if (request.method === 'POST' && url.pathname === '/events') {
+        return json(await handleEvent(request, env), 200, request, env);
       }
 
       if (request.method === 'POST' && url.pathname === '/chat') {
-        return json(await handleChat(request, env));
+        return json(await handleChat(request, env), 200, request, env);
       }
 
       if (request.method === 'GET' && url.pathname === '/stats') {
-        return json(await buildStats(env));
+        return json(await buildStats(env), 200, request, env);
       }
 
       if (request.method === 'GET' && url.pathname === '/opinions') {
-        return json(await buildOpinions(env));
+        return json(await buildOpinions(env), 200, request, env);
       }
       if (request.method === 'GET' && url.pathname === '/admin/summary') {
         requireAdmin(request, env);
-        return json(await buildAdminSummary(env));
+        return json(await buildAdminSummary(env), 200, request, env);
       }
 
       if (request.method === 'GET' && url.pathname === '/admin/completions') {
         requireAdmin(request, env);
-        return json(await listCompletions(env));
+        return json(await listCompletions(env), 200, request, env);
       }
 
       if (request.method === 'GET' && url.pathname === '/admin/feedback') {
         requireAdmin(request, env);
-        return json(await listFeedback(env));
+        return json(await listFeedback(env), 200, request, env);
       }
 
       if (request.method === 'GET' && url.pathname === '/admin/answers') {
         requireAdmin(request, env);
-        return json(await listAnswers(env, url.searchParams.get('eventId')));
+        return json(await listAnswers(env, url.searchParams.get('eventId')), 200, request, env);
       }
 
       if (request.method === 'GET' && url.pathname === '/admin/export.csv') {
         requireAdmin(request, env);
-        return csv(await buildCsvExport(env, url.searchParams.get('type')));
+        return csv(await buildCsvExport(env, url.searchParams.get('type')), request, env);
       }
 
       if (request.method === 'GET' && url.pathname === '/admin/export.zip') {
         requireAdmin(request, env);
-        return zip(await buildZipExport(env, url.searchParams));
+        return zip(await buildZipExport(env, url.searchParams), request, env);
       }
 
       if (request.method === 'POST' && url.pathname === '/admin/reset-data') {
         requireAdmin(request, env);
-        return json(await resetAdminData(request, env));
+        return json(await resetAdminData(request, env), 200, request, env);
       }
 
-      return json({
-        ok: true,
-        message: 'Backend D1 activo. Use POST /events, GET /stats, GET /opinions o rutas /admin protegidas.',
-      });
+      return json({ ok: false, error: 'Not found' }, 404, request, env);
     } catch (error) {
       console.error(error);
-      return json({ ok: false, error: error.message || 'Error interno' }, error.status || 500);
+      const status = error.status || 500;
+      const message = status >= 500 ? 'Error interno' : error.message || 'Solicitud inválida';
+      return json({ ok: false, error: message }, status, request, env);
     }
   },
 };
@@ -82,12 +94,14 @@ export default {
 async function handleEvent(request, env) {
   const data = await request.json();
   const eventType = normalizeEventType(data.eventType);
-  const timestamp = data.timestamp || new Date().toISOString();
+  const timestamp = new Date().toISOString();
   const isCompletion = eventType === 'completion';
 
   if (!eventType) {
     throw new Error('eventType invalido');
   }
+
+  const payload = validateEventPayload(eventType, data);
 
   const eventResult = await env.DB.prepare(`
     INSERT INTO events (
@@ -99,30 +113,30 @@ async function handleEvent(request, env) {
   `).bind(
     timestamp,
     eventType,
-    clean(data.sessionId),
-    clean(data.page),
+    payload.sessionId,
+    payload.page,
     data.anonymous === false ? 0 : 1,
-    clean(data.profile),
-    clean(data.profileKey),
-    isCompletion ? clean(data.userName) : '',
-    clean(data.country),
-    clean(data.nivelEducativo),
-    clean(data.familiaridadInicial),
-    clean(data.recursosSimilares),
+    payload.profile,
+    payload.profileKey,
+    isCompletion ? payload.userName : '',
+    payload.country,
+    payload.nivelEducativo,
+    payload.familiaridadInicial,
+    payload.recursosSimilares,
     data.consentTracking ? 1 : 0,
-    isCompletion ? numberOrNull(data.evidence) : null,
-    isCompletion ? clean(data.likertLevel) : '',
-    isCompletion ? JSON.stringify(data.path || []) : ''
+    isCompletion ? payload.evidence : null,
+    isCompletion ? payload.likertLevel : '',
+    isCompletion ? JSON.stringify(payload.path) : ''
   ).run();
 
   const eventId = eventResult.meta.last_row_id;
 
   if (eventType === 'completion') {
-    await insertAnswers(env, eventId, data.path || []);
+    await insertAnswers(env, eventId, payload.path);
   }
 
   if (eventType === 'feedback') {
-    await insertFeedback(env, eventId, data, timestamp);
+    await insertFeedback(env, eventId, payload, timestamp);
   }
 
   return { ok: true, type: eventType, id: eventId };
@@ -147,11 +161,6 @@ async function insertAnswers(env, eventId, path) {
 }
 
 async function insertFeedback(env, eventId, data, timestamp) {
-  const rating = Number(data.rating || 0);
-  if (!rating || rating < 1 || rating > 5) {
-    throw new Error('rating invalido');
-  }
-
   await env.DB.prepare(`
     INSERT INTO feedback (
       event_id, timestamp, session_id, rating, suggestion, profile, profile_key,
@@ -161,16 +170,119 @@ async function insertFeedback(env, eventId, data, timestamp) {
   `).bind(
     eventId,
     timestamp,
-    clean(data.sessionId),
-    rating,
-    clean(data.suggestion).slice(0, 800),
-    clean(data.profile),
-    clean(data.profileKey),
-    clean(data.country),
-    clean(data.nivelEducativo),
+    data.sessionId,
+    data.rating,
+    data.suggestion,
+    data.profile,
+    data.profileKey,
+    data.country,
+    data.nivelEducativo,
     null,
     ''
   ).run();
+}
+
+function validateEventPayload(eventType, data) {
+  const payload = {
+    sessionId: boundedClean(data.sessionId, 120),
+    page: boundedClean(data.page, 80),
+    profile: normalizeProfile(data.profile),
+    profileKey: normalizeProfileKey(data.profileKey),
+    userName: boundedClean(data.userName, 120),
+    country: boundedClean(data.country, 80),
+    nivelEducativo: boundedClean(data.nivelEducativo, 120),
+    familiaridadInicial: boundedClean(data.familiaridadInicial, 80),
+    recursosSimilares: boundedClean(data.recursosSimilares, 80),
+    evidence: null,
+    likertLevel: '',
+    path: [],
+    rating: null,
+    suggestion: '',
+  };
+
+  if ((eventType === 'completion' || eventType === 'feedback') && data.consentTracking !== true) {
+    const error = new Error('Consentimiento requerido');
+    error.status = 400;
+    throw error;
+  }
+
+  if (eventType === 'completion') {
+    payload.evidence = normalizeScore(data.evidence);
+    payload.likertLevel = normalizeLikertLevel(data.likertLevel);
+    payload.path = normalizePath(data.path);
+
+    if (!payload.profile || !payload.profileKey || !payload.likertLevel || payload.evidence === null) {
+      const error = new Error('Payload de resultado invalido');
+      error.status = 400;
+      throw error;
+    }
+  }
+
+  if (eventType === 'feedback') {
+    payload.rating = normalizeRating(data.rating);
+    payload.suggestion = boundedClean(data.suggestion, 800);
+
+    if (payload.rating === null) {
+      const error = new Error('rating invalido');
+      error.status = 400;
+      throw error;
+    }
+  }
+
+  return payload;
+}
+
+function normalizeProfile(value) {
+  const profile = clean(value);
+  return ['docente', 'estudiante', 'especializado'].includes(profile) ? profile : '';
+}
+
+function normalizeProfileKey(value) {
+  const profileKey = clean(value);
+  const valid = [
+    'docente',
+    'estudiante',
+    'estudiante_media',
+    'estudiante_universitaria',
+    'estudiante_formacion',
+  ];
+  return valid.includes(profileKey) ? profileKey : '';
+}
+
+function normalizeLikertLevel(value) {
+  const level = clean(value);
+  const valid = [
+    'Amplio margen de mejora',
+    'En proceso inicial',
+    'Desarrollo progresivo',
+    'Prácticas consolidadas',
+    'Nivel avanzado',
+  ];
+  return valid.includes(level) ? level : '';
+}
+
+function normalizeScore(value) {
+  const number = Number(value);
+  if (!Number.isFinite(number) || number < 0 || number > 100) return null;
+  return Math.round(number);
+}
+
+function normalizeRating(value) {
+  const rating = Number(value);
+  if (!Number.isInteger(rating) || rating < 1 || rating > 5) return null;
+  return rating;
+}
+
+function normalizePath(path) {
+  if (!Array.isArray(path)) return [];
+
+  return path.slice(0, 30)
+    .filter(item => item && item.question)
+    .map(item => ({
+      id: boundedClean(item.id, 80),
+      question: boundedClean(item.question, 400),
+      answer: normalizeAnswer(item.answer),
+    }));
 }
 
 async function buildStats(env) {
@@ -214,12 +326,18 @@ async function handleChat(request, env) {
     throw error;
   }
 
-  const message = clean(data.message);
+  const message = boundedClean(data.message, 800);
   const context = data.context || {};
 
   if (!message) {
     const error = new Error('Mensaje vacío');
     error.status = 400;
+    throw error;
+  }
+
+  if (clean(data.message).length > 800) {
+    const error = new Error('Mensaje demasiado largo');
+    error.status = 413;
     throw error;
   }
 
@@ -234,12 +352,14 @@ async function handleChat(request, env) {
 Trabaja en un contexto educativo donde los usuarios están evaluando su práctica docente con respecto al uso de IA.
 
 Principios:
-- Ofrece respuestas breves, claras y contextualizadas (máximo 3-4 párrafos)
-- Si el usuario pregunta por la pregunta actual del recorrido, explicá qué está preguntando y cómo pensarla
+- Ofrece respuestas breves, claras y contextualizadas (máximo 2 párrafos o 4 viñetas)
+- Si la consulta es simple, respondé directo y sin rodeos
+- Usá palabras accesibles; si aparece un término técnico, explicalo en una frase corta
+- Si el usuario pregunta por la pregunta actual del recorrido, explicá qué está preguntando y cómo pensarla con un ejemplo concreto
 - Enfatizá la reflexión crítica sobre IA en educación
 - Sé respetuoso con el contexto del usuario (nivel educativo, familiaridad con IA, etc.)
 - No evalúes respuestas salvo que se te pida explícitamente
-- Sugiere recursos o marcos de referencia cuando sea relevante`;
+- Sugiere recursos o marcos de referencia solo cuando aporte valor a la consulta`;
 
   const contextText = limitText(JSON.stringify(context, null, 2), 12000);
   const userMessage = `Contexto del usuario:
@@ -381,7 +501,7 @@ async function weakIndicators(env) {
   const result = await env.DB.prepare(`
     SELECT question
     FROM answers
-    WHERE answer = 'No'
+    WHERE answer IN ('No', 'A veces')
   `).all();
 
   const counts = {};
@@ -803,11 +923,16 @@ function normalizeEventType(value) {
 function normalizeAnswer(answer) {
   if (answer === true) return 'Sí';
   if (answer === false) return 'No';
-  return clean(answer);
+  const normalized = clean(answer);
+  return ['Sí', 'A veces', 'No', 'No aplica'].includes(normalized) ? normalized : 'No';
 }
 
 function clean(value) {
   return String(value ?? '').trim();
+}
+
+function boundedClean(value, maxLength) {
+  return clean(value).slice(0, maxLength);
 }
 
 function numberOrNull(value) {
@@ -829,23 +954,47 @@ function classifyQuestion(question) {
   return 'Otros criterios de reflexión';
 }
 
-function json(payload, status = 200) {
+function allowedOrigins(env) {
+  const configured = clean(env?.ALLOWED_ORIGINS);
+  if (!configured) return DEFAULT_ALLOWED_ORIGINS;
+  return configured.split(',').map(origin => origin.trim()).filter(Boolean);
+}
+
+function corsHeaders(request, env) {
+  const headers = { ...BASE_CORS_HEADERS, Vary: 'Origin' };
+  const origin = request?.headers?.get('Origin') || '';
+
+  if (origin && allowedOrigins(env).includes(origin)) {
+    headers['Access-Control-Allow-Origin'] = origin;
+  }
+
+  return headers;
+}
+
+function isAllowedRequestOrigin(request, env) {
+  const origin = request?.headers?.get('Origin') || '';
+  return !origin || allowedOrigins(env).includes(origin);
+}
+
+function json(payload, status = 200, request, env) {
   return new Response(JSON.stringify(payload), {
     status,
     headers: {
-      ...CORS_HEADERS,
+      ...corsHeaders(request, env),
+      ...SECURITY_HEADERS,
       'Content-Type': 'application/json; charset=utf-8',
       'Cache-Control': 'no-store',
     },
   });
 }
 
-function csv(exportData) {
+function csv(exportData, request, env) {
   const body = toCsv(exportData.rows, exportData.columns);
   return new Response(body, {
     status: 200,
     headers: {
-      ...CORS_HEADERS,
+      ...corsHeaders(request, env),
+      ...SECURITY_HEADERS,
       'Content-Type': 'text/csv; charset=utf-8',
       'Content-Disposition': `attachment; filename="${exportData.filename}"`,
       'Cache-Control': 'no-store',
@@ -853,11 +1002,12 @@ function csv(exportData) {
   });
 }
 
-function zip(exportData) {
+function zip(exportData, request, env) {
   return new Response(exportData.body, {
     status: 200,
     headers: {
-      ...CORS_HEADERS,
+      ...corsHeaders(request, env),
+      ...SECURITY_HEADERS,
       'Content-Type': 'application/zip',
       'Content-Disposition': `attachment; filename="${exportData.filename}"`,
       'Cache-Control': 'no-store',
@@ -875,7 +1025,10 @@ function toCsv(rows, columns) {
 }
 
 function csvCell(value) {
-  const text = String(value ?? '');
+  let text = String(value ?? '');
+  if (/^[=+\-@\t\r]/.test(text)) {
+    text = `'${text}`;
+  }
   return `"${text.replace(/"/g, '""')}"`;
 }
 

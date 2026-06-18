@@ -88,6 +88,7 @@
       right: 20px;
       width: 380px;
       height: 550px;
+      max-height: calc(100dvh - 120px);
       background: #ffffff;
       border-radius: 16px;
       box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
@@ -113,6 +114,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      flex-shrink: 0;
     }
 
     .chatbot-header-title {
@@ -134,21 +136,32 @@
     }
 
     .chatbot-close {
-      background: transparent;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.14);
       border: none;
       color: white;
       font-size: 1.5rem;
       cursor: pointer;
-      opacity: 0.8;
-      transition: opacity 0.2s;
+      opacity: 0.95;
+      transition: background 0.2s, opacity 0.2s;
       padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
     }
 
-    .chatbot-close:hover { opacity: 1; }
+    .chatbot-close:hover {
+      background: rgba(255, 255, 255, 0.24);
+      opacity: 1;
+    }
 
     .chatbot-messages {
       flex: 1;
       overflow-y: auto;
+      overscroll-behavior: contain;
       padding: 1rem;
       display: flex;
       flex-direction: column;
@@ -375,9 +388,9 @@
     @media (max-width: 768px) {
       .chatbot-window {
         width: calc(100vw - 40px);
-        height: calc(100vh - 140px);
+        height: min(620px, calc(100dvh - 120px));
         right: 20px;
-        bottom: 90px;
+        bottom: calc(76px + env(safe-area-inset-bottom, 0px));
       }
 
       .chatbot-tooltip {
@@ -392,11 +405,32 @@
 
     @media (max-width: 480px) {
       .chatbot-window {
-        width: 100vw;
-        height: 100vh;
-        right: 0;
-        bottom: 0;
-        border-radius: 0;
+        width: calc(100vw - 24px);
+        height: min(560px, calc(100dvh - 112px));
+        right: 12px;
+        bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+        border-radius: 14px;
+      }
+
+      .chatbot-header {
+        padding: 0.8rem 0.9rem;
+      }
+
+      .chatbot-header-title h3 {
+        font-size: 0.95rem;
+      }
+
+      .chatbot-header-subtitle {
+        font-size: 0.7rem;
+      }
+
+      .chatbot-messages {
+        padding: 0.85rem;
+      }
+
+      .chatbot-input-area {
+        padding: 0.75rem;
+        padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
       }
 
       .chatbot-tooltip {
@@ -430,7 +464,7 @@
               <p class="chatbot-header-subtitle">Asistencia generada con IA</p>
             </div>
           </div>
-          <button class="chatbot-close" id="chatbotClose">×</button>
+          <button class="chatbot-close" id="chatbotClose" type="button" aria-label="Cerrar asistente">×</button>
         </div>
         <div class="chatbot-messages" id="chatbotMessages">
           <div class="chatbot-welcome">
@@ -452,8 +486,11 @@
   document.body.insertAdjacentHTML('beforeend', chatbotHTML);
 
   // ========== CONFIG ==========
-  const CONFIG = {
-    WORKER_URL: 'https://iag-etica-api.suscripcionessh.workers.dev/chat',
+  const CHAT_ENDPOINT = window.CONFIG?.chatEndpoint
+    || (window.CONFIG?.apiBaseUrl ? `${window.CONFIG.apiBaseUrl}/chat` : 'https://iag-etica-api.suscripcionessh.workers.dev/chat');
+
+  const debugLog = (...args) => {
+    if (window.CONFIG?.debug) console.log(...args);
   };
 
   const TOOLTIP_DISMISSED_KEY = 'chatbot_tooltip_dismissed';
@@ -581,11 +618,11 @@ const addMessage = (content, type = 'bot', save = true) => {
           orden: index + 1,
           id: step.id,
           pregunta: step.question,
-          respuesta: step.answer ? 'Sí' : 'No',
+          respuesta: step.answer || step.answerKey || '',
           feedback: step.feedback
         }))
       : [];
-    const areasDeMejora = respuestasDelRecorrido.filter(step => step.respuesta === 'No');
+    const areasDeMejora = respuestasDelRecorrido.filter(step => ['No', 'A veces'].includes(step.respuesta));
 
     return {
       instruccionPrioritaria: 'Si la consulta del usuario menciona "esto", "acá", "esta pregunta", "la pregunta" o pide qué significa algo del sitio, respondé sobre la preguntaActual del recorrido. Si pregunta por "mejora", "sugerencias", "recomendaciones" o "áreas", usá resultadoFinal y areasDeMejora del recorrido. No inventes respuestas fuera del contexto disponible.',
@@ -661,7 +698,7 @@ const addMessage = (content, type = 'bot', save = true) => {
   const controller = new AbortController();
   timeoutId = window.setTimeout(() => controller.abort(), 25000);
 
-  const response = await fetch(CONFIG.WORKER_URL, {
+  const response = await fetch(CHAT_ENDPOINT, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -680,7 +717,7 @@ const addMessage = (content, type = 'bot', save = true) => {
   }
 
   const data = await response.json();
-  console.log("Respuesta IA:", data);
+  debugLog("Respuesta IA:", data);
   if (!data.ok) {
     throw new Error(data.error || 'Respuesta inválida del asistente');
   }
@@ -840,6 +877,6 @@ const addMessage = (content, type = 'bot', save = true) => {
     el.tooltip.classList.add('hidden');
   }
 
-  console.log('Chatbot Pedagógico (v2.1) iniciado con persistencia');
+  debugLog('Chatbot Pedagógico iniciado con persistencia');
   
 })();

@@ -10,7 +10,7 @@ Herramienta web de autoevaluación, reflexión y orientación pedagógica sobre 
 
 IAG en clave de ética pedagógica es una aplicación educativa pensada para acompañar a docentes, estudiantes y colectivos institucionales en la revisión crítica del uso de inteligencia artificial generativa. Su propósito no es controlar, sancionar ni clasificar personas, sino abrir una conversación informada sobre cómo se usa la IA, qué decisiones pedagógicas están implicadas y qué criterios conviene fortalecer.
 
-La herramienta propone un recorrido guiado de preguntas, adaptado al perfil de quien la utiliza, y entrega una devolución formativa con orientaciones basadas en marcos de referencia como ANEP, UNESCO y FING. También permite descargar un reporte final, consultar recursos, revisar acuerdos didácticos y dejar una valoración anónima para seguir mejorando la propuesta.
+La herramienta propone un recorrido guiado de preguntas, adaptado al perfil de quien la utiliza, y entrega una devolución formativa con orientaciones basadas en marcos de referencia como ANEP, UNESCO, FING, Udelar y Ceibal. También permite descargar un reporte final, consultar recursos, revisar acuerdos didácticos y dejar una valoración anónima para seguir mejorando la propuesta.
 
 ## Propósito
 
@@ -38,6 +38,8 @@ La propuesta se apoya en:
 - Marcos de referencia de ANEP sobre IA en educación.
 - Orientaciones internacionales de UNESCO sobre IA generativa.
 - Aportes de FING sobre uso ético, documentación del proceso, originalidad y evaluación.
+- Aportes de Udelar sobre principios para el uso académico e institucional de IAG.
+- Aportes de Ceibal sobre IA para la educación, ciudadanía digital situada y uso ético.
 
 Desde esa base, la aplicación busca traducir marcos conceptuales en preguntas concretas que puedan ser respondidas por una persona real, en una situación educativa real.
 
@@ -46,11 +48,13 @@ Desde esa base, la aplicación busca traducir marcos conceptuales en preguntas c
 La herramienta permite:
 
 - Realizar un cuestionario de autoevaluación según perfil.
-- Seleccionar perfil docente o estudiante.
+- Seleccionar perfil estudiante, docente o docente/investigador/a en IA educativa.
 - Diferenciar recorridos para estudiantes de educación media, formación docente o universidad.
 - Recibir una devolución formativa según el recorrido realizado.
+- Revisar una brújula ética con ejes de transparencia, verificación, datos, equidad y agencia humana.
+- Generar un acuerdo didáctico editable a partir del recorrido.
 - Descargar un reporte final en PDF.
-- Consultar recursos vinculados a ANEP, UNESCO, FING y otros materiales educativos.
+- Consultar recursos vinculados a ANEP, UNESCO, FING, Udelar, Ceibal y otros materiales educativos.
 - Recibir apoyo de un asistente pedagógico conversacional.
 - Visualizar estadísticas globales agregadas y anónimas.
 - Dejar una valoración y sugerencias sobre la herramienta.
@@ -77,7 +81,7 @@ La herramienta está pensada para:
 - Estudiantes de educación media.
 - Estudiantes universitarios.
 - Estudiantes de formación docente.
-- Equipos de dirección y coordinación.
+- Docentes/investigadores/as o formadores/as que trabajan sobre IA educativa.
 - Colectivos docentes.
 - Espacios de formación, talleres, salas y jornadas institucionales.
 - Grupos interesados en discutir criterios de uso de IA generativa.
@@ -105,7 +109,7 @@ La herramienta está organizada en tres capas principales:
 
 1. **Interfaz web**
 
-   La experiencia principal se desarrolla en el navegador. La persona ingresa, selecciona su perfil, responde el cuestionario, revisa su devolución, descarga el reporte y puede dejar una valoración.
+   La experiencia principal se desarrolla en el navegador. La persona ingresa, selecciona su perfil, responde el cuestionario, revisa su devolución, consulta la brújula ética, ajusta un acuerdo didáctico, descarga el reporte y puede dejar una valoración.
 
 2. **Lógica pedagógica**
 
@@ -135,10 +139,10 @@ Flujo general:
 
 1. La persona ingresa a la web desde PC o celular.
 2. La app registra una visita anónima por sesión.
-3. La persona selecciona perfil y nivel educativo si corresponde.
+3. La persona selecciona perfil: estudiante, docente o docente/investigador/a.
 4. El cuestionario recorre un árbol de decisión.
-5. La app calcula una devolución formativa.
-6. Se genera un reporte descargable.
+5. La app calcula una devolución formativa y una brújula ética.
+6. Se genera un acuerdo didáctico editable y un reporte descargable.
 7. Si la persona lo desea, envía una valoración anónima.
 8. El backend guarda eventos y respuestas sin exponer datos individuales en la vista pública.
 9. El panel administrativo permite consultar información agregada o exportar datos para análisis.
@@ -165,14 +169,15 @@ Para un lanzamiento en colectivos o instituciones, se recomienda explicar claram
 1. Abrir el enlace de la herramienta en el navegador.
 2. Leer la presentación inicial y, si se desea, ingresar a la fundamentación.
 3. Presionar **Iniciar cuestionario**.
-4. Seleccionar el perfil: docente o estudiante.
+4. Seleccionar el perfil: estudiante, docente o docente/investigador/a.
 5. Completar los datos solicitados, especialmente el nivel educativo cuando corresponda.
 6. Responder cada pregunta con honestidad, pensando en prácticas reales.
 7. Usar el botón de contexto cuando se quiera comprender mejor el criterio pedagógico de una pregunta.
-8. Al finalizar, leer la devolución completa.
-9. Descargar el reporte PDF si se desea conservarlo o compartirlo.
-10. Revisar los recursos sugeridos.
-11. Dejar una valoración o comentario para mejorar la herramienta.
+8. Al finalizar, leer la devolución completa y la brújula ética.
+9. Revisar, editar o copiar el acuerdo didáctico generado.
+10. Descargar el reporte PDF si se desea conservarlo o compartirlo.
+11. Revisar los recursos sugeridos.
+12. Dejar una valoración o comentario para mejorar la herramienta.
 
 Sugerencia para uso en sala docente:
 
@@ -185,10 +190,10 @@ Sugerencia para uso en sala docente:
 1. Abrir el enlace desde el navegador del celular.
 2. Usar la herramienta en posición vertical.
 3. Tocar **Iniciar cuestionario**.
-4. Seleccionar perfil y nivel educativo.
+4. Seleccionar perfil y nivel educativo cuando corresponda.
 5. Avanzar pregunta por pregunta.
 6. Leer los textos de ayuda antes de responder si la pregunta genera duda.
-7. Al terminar, revisar la devolución.
+7. Al terminar, revisar la devolución, la brújula ética y el acuerdo generado.
 8. Descargar el PDF o compartirlo desde las opciones del navegador, si el dispositivo lo permite.
 9. Usar el asistente pedagógico si se desea profundizar alguna recomendación.
 10. Enviar una valoración final si se quiere aportar a la mejora de la herramienta.
@@ -298,9 +303,9 @@ Estimadas y estimados:
 
 Compartimos **IAG en clave de ética pedagógica**, una herramienta web desarrollada para acompañar la reflexión sobre el uso de inteligencia artificial generativa en contextos educativos.
 
-La aplicación propone un recorrido de autoevaluación para docentes y estudiantes. A partir de una serie de preguntas, ofrece una devolución formativa vinculada con criterios de transparencia, autoría, verificación de información, sesgos, evaluación y responsabilidad pedagógica. También permite descargar un reporte final y consultar recursos de referencia.
+La aplicación propone un recorrido de autoevaluación para estudiantes, docentes y docentes/investigadores/as en IA educativa. A partir de una serie de preguntas, ofrece una devolución formativa vinculada con criterios de transparencia, autoría, verificación de información, sesgos, evaluación y responsabilidad pedagógica. También genera una brújula ética, un acuerdo didáctico editable, un reporte final y recursos de referencia.
 
-La herramienta surge de procesos de investigación, formación docente y experiencia de aula, y dialoga con orientaciones de ANEP, UNESCO y FING. No pretende funcionar como mecanismo de control ni como certificación, sino como punto de partida para conversar y construir acuerdos.
+La herramienta surge de procesos de investigación, formación docente y experiencia de aula, y dialoga con orientaciones de ANEP, UNESCO, FING, Udelar y Ceibal. No pretende funcionar como mecanismo de control ni como certificación, sino como punto de partida para conversar y construir acuerdos.
 
 Enlace de acceso: [PEGAR ENLACE]
 
@@ -324,7 +329,7 @@ Les proponemos usarla como disparador de conversación. Cada persona puede compl
 - El foco no está en prohibir o habilitar IA, sino en construir criterios de uso.
 - El reporte final es una orientación formativa, no una calificación.
 - Los datos públicos se muestran de forma agregada y anónima.
-- La propuesta está vinculada con marcos de ANEP, UNESCO y FING.
+- La propuesta está vinculada con marcos de ANEP, UNESCO, FING, Udelar y Ceibal.
 - El uso de IA requiere transparencia, verificación, autoría y responsabilidad.
 - La herramienta puede funcionar como punto de partida para acuerdos didácticos.
 

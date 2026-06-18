@@ -40,13 +40,18 @@ function obtenerNombreParticipante() {
 
 function obtenerPerfilReporte() {
   const base = state.profileBase || state.profile;
-  const perfilBase = base === 'docente' ? 'Docente' : 'Estudiante';
+  const perfiles = {
+    docente: 'Docente',
+    estudiante: 'Estudiante',
+    especializado: 'Docente/investigador/a en IA educativa'
+  };
+  const perfilBase = perfiles[base] || 'Participante';
   return state.nivelEducativo ? `${perfilBase} - ${state.nivelEducativo}` : perfilBase;
 }
 
 function construirRetroalimentacionMarco(nodo, respuesta) {
   const respuestaTexto = respuesta ? 'La respuesta afirmativa muestra una práctica alineada con los marcos de referencia.' : 'La respuesta negativa señala una oportunidad concreta de mejora y formación.';
-  const referencia = nodo.anepRef || 'ANEP / UNESCO / FING';
+  const referencia = nodo.anepRef || 'ANEP / UNESCO / FING / Udelar / Ceibal';
   const titulo = (nodo.title || '').toLowerCase();
   let foco = 'conviene documentar el proceso, contrastar la información generada por IA con fuentes confiables y explicitar qué parte del trabajo corresponde a criterio humano';
 
@@ -66,11 +71,22 @@ function construirRetroalimentacionMarco(nodo, respuesta) {
     foco = 'antes de delegar tareas en la IA, conviene asegurar comprensión conceptual suficiente para evaluar la calidad, pertinencia y límites de la respuesta generada';
   }
 
-  return `${respuestaTexto} Desde ANEP, UNESCO y FING, este punto debe leerse en clave de responsabilidad pedagógica: ${foco}. Referencia vinculada: ${referencia}.`;
+  return `${respuestaTexto} Desde ANEP, UNESCO, FING, Udelar y Ceibal, este punto debe leerse en clave de responsabilidad pedagógica: ${foco}. Referencia vinculada: ${referencia}.`;
 }
 
 function construirSintesisMarco(nivel) {
-  return `El resultado debe interpretarse como un punto de partida para la reflexión, no como una calificación cerrada. Desde UNESCO, el uso de IA en educación requiere transparencia, agencia humana, equidad y revisión crítica de posibles sesgos. Desde ANEP, implica formar ciudadanía digital, promover pensamiento crítico y evitar usos acríticos o indiscriminados. Desde FING, se refuerza la necesidad de definir restricciones claras por tarea, documentar prompts y decisiones, preservar la originalidad y poder explicar el proceso de trabajo. En este recorrido, el nivel "${nivel.id}" orienta qué acuerdos conviene fortalecer para sostener un uso ético, crítico y reflexivo de la IAG.`;
+  return `El resultado debe interpretarse como un punto de partida para la reflexión, no como una calificación cerrada. Desde UNESCO, el uso de IA en educación requiere transparencia, agencia humana, equidad y revisión crítica de posibles sesgos. Desde ANEP, implica formar ciudadanía digital, promover pensamiento crítico y evitar usos acríticos o indiscriminados. Desde FING, se refuerza la necesidad de definir restricciones claras por tarea, documentar prompts y decisiones, preservar la originalidad y poder explicar el proceso de trabajo. Desde Udelar, se incorporan principios recientes para leer la IAG como práctica académica responsable, trazable y situada. Desde Ceibal, se suma una mirada ética sobre IA para la educación, ciudadanía digital e inclusión. En este recorrido, el nivel "${nivel.id}" orienta qué acuerdos conviene fortalecer para sostener un uso ético, crítico y reflexivo de la IAG.`;
+}
+
+function obtenerTextoAcuerdoDidactico() {
+  if (typeof window.obtenerAcuerdoDidacticoActual === 'function') {
+    return window.obtenerAcuerdoDidacticoActual();
+  }
+  return state.generatedAgreementText || '';
+}
+
+function respuestaEsAlineada(item) {
+  return item.answerKey === 'yes';
 }
 
 /* ========================================
@@ -143,17 +159,29 @@ if (elements.downloadBtn) {
 
       state.path.forEach((item, i) => {
         const nodo = perfil.nodos[item.id];
-        const respuesta = item.answer ? 'Sí' : 'No';
+        const respuesta = item.answer || 'No';
         y = agregarTextoMultilinea(doc, `${i + 1}. ${nodo.title}`, 15, y, 180, 6);
         y = agregarTextoMultilinea(doc, `   Respuesta: ${respuesta}`, 15, y, 180, 6);
         y = agregarTextoMultilinea(doc, `   Retroalimentación inicial: ${item.feedback}`, 15, y, 180, 6);
-        y = agregarTextoMultilinea(doc, `   Lectura desde marcos: ${construirRetroalimentacionMarco(nodo, item.answer)}`, 15, y, 180, 6);
+        y = agregarTextoMultilinea(doc, `   Lectura desde marcos: ${construirRetroalimentacionMarco(nodo, respuestaEsAlineada(item))}`, 15, y, 180, 6);
         y += 4;
       });
 
-      // Acuerdos didácticos
+      // Acuerdo didáctico generado
       doc.addPage();
       y = 20;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.setTextColor(33, 33, 33);
+      doc.text('Acuerdo didáctico generado', 15, y); y += 8;
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(11);
+      doc.setTextColor(55, 55, 55);
+      y = agregarTextoMultilinea(doc, obtenerTextoAcuerdoDidactico(), 15, y, 180, 6);
+
+      // Acuerdos didácticos
+      if (y > 230) { doc.addPage(); y = 20; } else { y += 8; }
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(14);
       doc.setTextColor(33, 33, 33);
@@ -180,6 +208,8 @@ if (elements.downloadBtn) {
       y = agregarTextoMultilinea(doc, 'ANEP: La inteligencia artificial en la educación (2024).', 15, y, 180, 6);
       y = agregarTextoMultilinea(doc, 'UNESCO: Guía para el uso de IA generativa en educación e investigación.', 15, y, 180, 6);
       y = agregarTextoMultilinea(doc, 'FING: Guía de ética para el uso de IA en unidades curriculares (2026).', 15, y, 180, 6);
+      y = agregarTextoMultilinea(doc, 'Udelar: 11 principios rectores para el desarrollo y uso responsable de IA.', 15, y, 180, 6);
+      y = agregarTextoMultilinea(doc, 'Ceibal: Uso ético de IA. Lineamientos para prácticas educativas críticas, reflexivas, seguras y responsables.', 15, y, 180, 6);
       y = agregarTextoMultilinea(doc, 'Artículo académico: https://horizontespedagogicos.ibero.edu.co/article/view/3235', 15, y, 180, 6);
       y = agregarTextoMultilinea(doc, 'Artículo académico: https://www.ucuauhtemoc.edu.mx/hubfs/revista-vol-6-num-1/Art%202%20Cuando%20el%20ocultamiento%20se%20hace%20visible.pdf', 15, y, 180, 6);
 
@@ -210,10 +240,13 @@ ${construirSintesisMarco(nivel)}
 Respuestas:
 ${state.path.map((p, i) => {
   const nodo = perfil.nodos[p.id];
-  return `${i + 1}. ${nodo.title} → ${p.answer ? 'Sí' : 'No'}
+  return `${i + 1}. ${nodo.title} → ${p.answer || 'No'}
    Retroalimentación: ${p.feedback}
-   Marco: ${construirRetroalimentacionMarco(nodo, p.answer)}`;
-}).join('\n\n')}`;
+   Marco: ${construirRetroalimentacionMarco(nodo, respuestaEsAlineada(p))}`;
+}).join('\n\n')}
+
+Acuerdo didáctico generado:
+${obtenerTextoAcuerdoDidactico()}`;
     navigator.clipboard.writeText(resumen).then(() => {
       elements.copyBtn.innerHTML = '<span>✓ Copiado</span>';
       setTimeout(() => { elements.copyBtn.innerHTML = '<span>Copiar resumen</span>'; }, 2000);

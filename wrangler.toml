@@ -8,4 +8,7 @@ database_name = "iag-etica-db"
 database_id = "9b4f5ad2-9e9d-421b-a712-71803b883e23"
 
 [env.production]
-vars = { ADMIN_KEY = "tu-clave-admin-segura", GEMINI_API_KEY = "tu-clave-gemini-aqui" }
+# Configuracion no sensible. Los secretos se cargan con:
+# wrangler secret put ADMIN_KEY --env production
+# wrangler secret put GEMINI_API_KEY --env production
+vars = { ALLOWED_ORIGINS = "https://santiherben.github.io,http://localhost:8000,http://127.0.0.1:8000" }
