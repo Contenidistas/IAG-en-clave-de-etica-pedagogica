@@ -227,7 +227,7 @@ function construirEstadoDePrincipios() {
   });
 }
 
-function escapeGraphText(value) {
+function escapeGameHtml(value) {
   return String(value ?? '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -235,8 +235,6 @@ function escapeGraphText(value) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 }
-
-const escapeHtml = escapeGraphText;
 
 function construirLayoutPrincipios(nodes) {
   const activeIndex = nodes.findIndex(node => node.active);
@@ -446,9 +444,9 @@ function renderDecisionBranchMap() {
       <article class="decision-branch-node ${tone}">
         <span class="decision-branch-index">${index + 1}</span>
         <div>
-          <strong>${escapeHtml(step.criterionLabel || 'Criterio')}</strong>
-          <p>${escapeHtml(shortQuestion)}</p>
-          <em>${escapeHtml(step.answer)}</em>
+          <strong>${escapeGameHtml(step.criterionLabel || 'Criterio')}</strong>
+          <p>${escapeGameHtml(shortQuestion)}</p>
+          <em>${escapeGameHtml(step.answer)}</em>
         </div>
       </article>
       <span class="decision-branch-connector ${tone}" aria-hidden="true"></span>
@@ -460,8 +458,8 @@ function renderDecisionBranchMap() {
       <article class="decision-branch-node current">
         <span class="decision-branch-index">${steps.length + 1}</span>
         <div>
-          <strong>${escapeHtml(inferirCriterioDeNodo(currentNode).label)}</strong>
-          <p>${escapeHtml(String(currentNode.title || '').replace(/^¿|[?]$/g, ''))}</p>
+          <strong>${escapeGameHtml(inferirCriterioDeNodo(currentNode).label)}</strong>
+          <p>${escapeGameHtml(String(currentNode.title || '').replace(/^¿|[?]$/g, ''))}</p>
           <em>Decisión actual</em>
         </div>
       </article>
@@ -759,8 +757,8 @@ function mostrarFeedback(texto, tone) {
 
   elements.feedbackBox.className = `feedback ${tipo}`;
   elements.feedbackBox.innerHTML = `
-    <h4 style="font-weight: 700; margin-bottom: 0.5rem;">${escapeHtml(titulo)}</h4>
-    <p style="color: var(--text-secondary); margin: 0;">${escapeHtml(texto)}</p>
+    <h4 style="font-weight: 700; margin-bottom: 0.5rem;">${escapeGameHtml(titulo)}</h4>
+    <p style="color: var(--text-secondary); margin: 0;">${escapeGameHtml(texto)}</p>
   `;
   elements.feedbackBox.classList.remove('hidden');
 }
@@ -841,11 +839,11 @@ function updateTimeline() {
   elements.timeline.innerHTML = state.path.map((item, index) => {
     const option = ANSWER_OPTIONS[item.answerKey] || { label: item.answer || 'No', badgeClass: 'badge-danger', tone: 'warning' };
     const clase = option.tone === 'success' ? 'success' : option.tone === 'neutral' ? 'neutral' : 'warning';
-    const badge = `<span class="badge ${option.badgeClass}">${escapeHtml(option.label)}</span>`;
+    const badge = `<span class="badge ${option.badgeClass}">${escapeGameHtml(option.label)}</span>`;
 
     return `
       <div class="timeline-item ${clase}">
-        <strong>${index + 1}.</strong> ${escapeHtml(item.question)}
+        <strong>${index + 1}.</strong> ${escapeGameHtml(item.question)}
         <div class="mt-1">${badge}</div>
       </div>
     `;
@@ -1022,9 +1020,9 @@ function mostrarResultados() {
     elements.didacticaList.innerHTML = CONFIG.acuerdos.map(acuerdo => `
       <li class="resource-card" style="margin-bottom: 0.75rem;">
         <div class="resource-content">
-          <p style="margin: 0; font-weight: 600;">${escapeHtml(acuerdo.text)}</p>
+          <p style="margin: 0; font-weight: 600;">${escapeGameHtml(acuerdo.text)}</p>
           <p style="margin: 0.25rem 0 0; font-size: 0.8rem; opacity: 0.7;">
-            Referencia: ${escapeHtml(acuerdo.ref)}
+            Referencia: ${escapeGameHtml(acuerdo.ref)}
           </p>
         </div>
       </li>
@@ -1036,8 +1034,8 @@ function mostrarResultados() {
     elements.toolsList.innerHTML = CONFIG.herramientas.map(tool => `
       <li class="resource-card" style="margin-bottom: 0.75rem;">
         <div class="resource-content">
-          <h4 style="margin: 0;">${escapeHtml(tool.name)}</h4>
-          <p style="margin: 0.25rem 0 0;">${escapeHtml(tool.desc)}</p>
+          <h4 style="margin: 0;">${escapeGameHtml(tool.name)}</h4>
+          <p style="margin: 0.25rem 0 0;">${escapeGameHtml(tool.desc)}</p>
         </div>
       </li>
     `).join('');
@@ -1053,15 +1051,15 @@ function mostrarResultados() {
       if (!nodo) return '';
       const option = ANSWER_OPTIONS[item.answerKey] || { label: item.answer || 'No', badgeClass: 'badge-danger', tone: 'warning' };
       const clase = option.tone === 'success' ? 'success' : option.tone === 'neutral' ? 'neutral' : 'warning';
-      const badge = `<span class="badge ${option.badgeClass}">${escapeHtml(option.label)}</span>`;
+      const badge = `<span class="badge ${option.badgeClass}">${escapeGameHtml(option.label)}</span>`;
 
       return `
         <div class="timeline-item ${clase}">
-          <strong>${index + 1}.</strong> ${escapeHtml(nodo.title)}
+          <strong>${index + 1}.</strong> ${escapeGameHtml(nodo.title)}
           <div class="mt-1">${badge}</div>
-          <p style="font-size: 0.9rem; margin: 0.25rem 0 0;">${escapeHtml(item.feedback)}</p>
+          <p style="font-size: 0.9rem; margin: 0.25rem 0 0;">${escapeGameHtml(item.feedback)}</p>
           <p style="font-size: 0.85rem; margin: 0.25rem 0 0; opacity: 0.7;">
-            Referencia: ${escapeHtml(nodo.anepRef)}
+            Referencia: ${escapeGameHtml(nodo.anepRef)}
           </p>
         </div>
       `;
@@ -1127,10 +1125,10 @@ function renderizarCasosSituados() {
   const casos = construirCasosSituados();
   elements.situatedCases.innerHTML = casos.map((caso, index) => `
     <article class="situated-case-card">
-      <span>${escapeHtml(caso.audience)}</span>
-      <h4>${escapeHtml(caso.title)}</h4>
-      <p>${escapeHtml(caso.prompt)}</p>
-      <small>Foco conectado: ${escapeHtml(caso.focus)}</small>
+      <span>${escapeGameHtml(caso.audience)}</span>
+      <h4>${escapeGameHtml(caso.title)}</h4>
+      <p>${escapeGameHtml(caso.prompt)}</p>
+      <small>Foco conectado: ${escapeGameHtml(caso.focus)}</small>
       <button type="button" class="btn btn-outline situated-case-btn" data-case-index="${index}">Copiar caso</button>
     </article>
   `).join('');
@@ -1143,7 +1141,7 @@ function renderizarCasosSituados() {
         button.textContent = 'Copiado';
         setTimeout(() => { button.textContent = 'Copiar caso'; }, 1600);
       } catch {
-        modal.show('Caso situado', `<p>${escapeHtml(caso.text).replace(/\n/g, '<br>')}</p>`);
+        modal.show('Caso situado', `<p>${escapeGameHtml(caso.text).replace(/\n/g, '<br>')}</p>`);
       }
     });
   });
@@ -1186,9 +1184,9 @@ function renderizarDevolucionFinal(nivel) {
 
   elements.resultInsights.innerHTML = tarjetas.map(tarjeta => `
     <article class="result-insight">
-      <h4>${escapeHtml(tarjeta.titulo)}</h4>
-      <p>${escapeHtml(tarjeta.texto)}</p>
-      <span>${escapeHtml(tarjeta.ref)}</span>
+      <h4>${escapeGameHtml(tarjeta.titulo)}</h4>
+      <p>${escapeGameHtml(tarjeta.texto)}</p>
+      <span>${escapeGameHtml(tarjeta.ref)}</span>
     </article>
   `).join('');
 }

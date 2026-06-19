@@ -834,16 +834,26 @@ function advanceOnboarding() {
   }
 
   if (state.onboardingStep >= keys.length - 1) {
-    const ready = updateStartButtonState();
-    if (ready && typeof window.iniciarJuego === 'function') {
+    const invalidIndex = findFirstInvalidOnboardingIndex(keys);
+    if (invalidIndex >= 0) {
+      state.onboardingStep = invalidIndex;
+      updateOnboardingUI();
+      updateStartButtonState();
+      window.setTimeout(focusCurrentOnboardingStep, 120);
+      return;
+    }
+
+    if (elements.startGuidanceTitle) {
+      elements.startGuidanceTitle.textContent = 'Iniciando recorrido...';
+    }
+
+    if (typeof window.iniciarJuego === 'function') {
       window.iniciarJuego();
     } else {
-      const invalidIndex = findFirstInvalidOnboardingIndex(keys);
-      if (invalidIndex >= 0) {
-        state.onboardingStep = invalidIndex;
-        updateOnboardingUI();
+      console.error('No se pudo iniciar: window.iniciarJuego no está disponible.');
+      if (elements.startGuidanceTitle) {
+        elements.startGuidanceTitle.textContent = 'No se pudo iniciar. Recargá la página e intentá de nuevo.';
       }
-      window.setTimeout(focusCurrentOnboardingStep, 120);
     }
     return;
   }
