@@ -18,6 +18,15 @@ const SECURITY_HEADERS = {
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
 };
 
+const VALID_PROFILES = ['docente', 'estudiante', 'especializado'];
+const VALID_LIKERT_LEVELS = [
+  'Amplio margen de mejora',
+  'En proceso inicial',
+  'Desarrollo progresivo',
+  'Prácticas consolidadas',
+  'Nivel avanzado',
+];
+
 export default {
   async fetch(request, env) {
     if (request.method === 'OPTIONS') {
@@ -234,7 +243,7 @@ function validateEventPayload(eventType, data) {
 
 function normalizeProfile(value) {
   const profile = clean(value);
-  return ['docente', 'estudiante', 'especializado'].includes(profile) ? profile : '';
+  return VALID_PROFILES.includes(profile) ? profile : '';
 }
 
 function normalizeProfileKey(value) {
@@ -251,14 +260,7 @@ function normalizeProfileKey(value) {
 
 function normalizeLikertLevel(value) {
   const level = clean(value);
-  const valid = [
-    'Amplio margen de mejora',
-    'En proceso inicial',
-    'Desarrollo progresivo',
-    'Prácticas consolidadas',
-    'Nivel avanzado',
-  ];
-  return valid.includes(level) ? level : '';
+  return VALID_LIKERT_LEVELS.includes(level) ? level : '';
 }
 
 function normalizeScore(value) {
@@ -296,8 +298,18 @@ async function buildStats(env) {
     FROM events
   `).first();
 
-  const levels = await groupedRows(env, 'likert_level', "event_type = 'completion' AND likert_level IS NOT NULL AND likert_level != ''");
-  const profiles = await groupedRows(env, 'profile', "event_type = 'completion' AND profile IS NOT NULL AND profile != ''");
+  const levels = await groupedRows(
+    env,
+    'likert_level',
+    `event_type = 'completion' AND likert_level IN (${VALID_LIKERT_LEVELS.map(() => '?').join(',')})`,
+    VALID_LIKERT_LEVELS
+  );
+  const profiles = await groupedRows(
+    env,
+    'profile',
+    `event_type = 'completion' AND profile IN (${VALID_PROFILES.map(() => '?').join(',')})`,
+    VALID_PROFILES
+  );
   const indicators = await weakIndicators(env);
 
   return {
@@ -482,14 +494,15 @@ function requireAdmin(request, env) {
   }
 }
 
-async function groupedRows(env, column, whereClause) {
-  const result = await env.DB.prepare(`
+async function groupedRows(env, column, whereClause, values = []) {
+  const statement = env.DB.prepare(`
     SELECT ${column} AS label, COUNT(*) AS count
     FROM events
     WHERE ${whereClause}
     GROUP BY ${column}
     ORDER BY count DESC
-  `).all();
+  `);
+  const result = values.length ? await statement.bind(...values).all() : await statement.all();
 
   return (result.results || []).map(row => ({
     label: row.label || 'Sin dato',

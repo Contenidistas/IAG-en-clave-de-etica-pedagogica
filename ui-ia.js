@@ -1456,14 +1456,55 @@ function normalizeStatsCollection(value) {
   return Object.entries(value).map(([label, count]) => ({ label, count }));
 }
 
+const VALID_STATS_LEVELS = new Set([
+  'Amplio margen de mejora',
+  'En proceso inicial',
+  'Desarrollo progresivo',
+  'Prácticas consolidadas',
+  'Nivel avanzado',
+]);
+
+const VALID_STATS_PROFILES = new Set(['docente', 'estudiante', 'especializado']);
+
+const STATS_PROFILE_LABELS = {
+  docente: 'Docente',
+  estudiante: 'Estudiante',
+  especializado: 'Docente/investigador/a',
+};
+
+function sanitizeStatsRows(rows, kind = 'generic') {
+  return normalizeStatsCollection(rows)
+    .filter(row => row && row.label)
+    .map(row => ({
+      label: String(row.label).trim(),
+      count: Number(row.count || row.value || 0)
+    }))
+    .filter(row => Number.isFinite(row.count) && row.count > 0)
+    .filter(row => {
+      if (kind === 'levels') return VALID_STATS_LEVELS.has(row.label);
+      if (kind === 'profiles') return VALID_STATS_PROFILES.has(row.label);
+      return !/[<>]|onerror|script|REGISTRO_PRUEBA/i.test(row.label);
+    })
+    .map(row => ({
+      ...row,
+      label: kind === 'profiles' ? STATS_PROFILE_LABELS[row.label] : row.label
+    }));
+}
+
+function resolveTopLevel(summary, levelRows) {
+  if (VALID_STATS_LEVELS.has(summary.topLevel)) return summary.topLevel;
+  return levelRows.length ? levelRows[0].label : '—';
+}
+
 function renderStatsBars(container, rows) {
   if (!container) return;
   const normalized = normalizeStatsCollection(rows)
     .filter(row => row && row.label)
     .map(row => ({
-      label: row.label,
+      label: String(row.label).trim(),
       count: Number(row.count || row.value || 0)
-    }));
+    }))
+    .filter(row => Number.isFinite(row.count) && row.count > 0);
 
   if (!normalized.length) {
     container.innerHTML = '<p class="stats-empty">Sin datos suficientes.</p>';
@@ -1489,14 +1530,18 @@ function renderStatsBars(container, rows) {
 
 function renderStats(data) {
   const summary = data.summary || data;
+  const levels = sanitizeStatsRows(data.levels || data.byLevel, 'levels');
+  const profiles = sanitizeStatsRows(data.profiles || data.byProfile, 'profiles');
+  const indicators = sanitizeStatsRows(data.indicators || data.weakIndicators, 'generic');
+
   if (elements.statVisits) elements.statVisits.textContent = formatNumber(summary.visits || summary.totalVisits);
   if (elements.statCompleted) elements.statCompleted.textContent = formatNumber(summary.completed || summary.totalCompleted);
   if (elements.statAverage) elements.statAverage.textContent = summary.averageScore != null ? Number(summary.averageScore).toFixed(1) : '—';
-  if (elements.statTopLevel) elements.statTopLevel.textContent = summary.topLevel || '—';
+  if (elements.statTopLevel) elements.statTopLevel.textContent = resolveTopLevel(summary, levels);
 
-  renderStatsBars(elements.statsLevels, data.levels || data.byLevel);
-  renderStatsBars(elements.statsProfiles, data.profiles || data.byProfile);
-  renderStatsBars(elements.statsIndicators, data.indicators || data.weakIndicators);
+  renderStatsBars(elements.statsLevels, levels);
+  renderStatsBars(elements.statsProfiles, profiles);
+  renderStatsBars(elements.statsIndicators, indicators);
 
   if (elements.statsStatus) elements.statsStatus.classList.add('hidden');
   if (elements.statsContent) elements.statsContent.classList.remove('hidden');
