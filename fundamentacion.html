@@ -3,24 +3,26 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
   <meta name="theme-color" content="#6366f1">
   <title>Fundamentación - IA Educativa ANEP</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header class="app-header">
-    <h1 class="home-btn" style="cursor:pointer; display:flex; align-items:center; gap:0.5rem;">
-      <div class="logo">AI</div>
-      <span>Fundamentación de la herramienta</span>
+    <h1>
+      <a href="index.html" class="home-btn" aria-label="Volver al inicio de la herramienta">
+        <div class="logo">AI</div>
+        <span>IAG en clave de ética pedagógica</span>
+      </a>
     </h1>
 
     <div class="header-actions">
-      <a href="index.html" class="btn-academic">
+      <a href="index.html" class="btn-academic" id="foundationBackBtn">
         <span class="btn-academic-icon">←</span>
         <span class="btn-academic-text">
           <span class="btn-academic-label">Volver</span>
-          <span class="btn-academic-title">Inicio</span>
+          <span class="btn-academic-title">Atrás</span>
         </span>
       </a>
     </div>
@@ -159,5 +161,6 @@
       Creado por <strong>Prof. Esp. Santiago Hernández</strong> y <strong>Prof. Diego Daluz</strong>
     </p>
   </footer>
+  <script src="fundamentacion.js"></script>
 </body>
 </html>
