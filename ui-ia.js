@@ -834,9 +834,9 @@ function advanceOnboarding() {
   }
 
   if (state.onboardingStep >= keys.length - 1) {
-    updateStartButtonState();
-    if (!elements.startBtn.disabled) {
-      iniciarJuego();
+    const ready = updateStartButtonState();
+    if (ready && typeof window.iniciarJuego === 'function') {
+      window.iniciarJuego();
     } else {
       const invalidIndex = findFirstInvalidOnboardingIndex(keys);
       if (invalidIndex >= 0) {
@@ -907,7 +907,7 @@ if (elements.onboardingDots) {
    🔧 HABILITAR / DESHABILITAR BOTÓN INICIO (RECTIFICADA)
    ======================================== */
 function updateStartButtonState() {
-  if (!elements.startBtn) return;
+  if (!elements.startBtn) return false;
 
   debugLog('Validando formulario');
   const missingItems = [];
@@ -1003,6 +1003,8 @@ if (todasOk) {
 
   if (nextSlideBtn) nextSlideBtn.classList.remove('hidden');
 }
+
+return todasOk;
 }
 
 /* ========================================

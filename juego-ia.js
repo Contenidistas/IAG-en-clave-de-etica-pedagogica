@@ -1497,9 +1497,11 @@ if (elements.yesBtn)   elements.yesBtn.addEventListener('click', () => responder
 if (elements.sometimesBtn) elements.sometimesBtn.addEventListener('click', () => responder('sometimes'));
 if (elements.noBtn)    elements.noBtn.addEventListener('click', () => responder('no'));
 if (elements.notApplicableBtn) elements.notApplicableBtn.addEventListener('click', () => responder('na'));
+window.iniciarJuego = iniciarJuego;
+
 if (elements.nextBtn)  elements.nextBtn.addEventListener('click', avanzar);
 if (elements.backBtn)  elements.backBtn.addEventListener('click', retroceder);
-if (elements.startBtn) elements.startBtn.addEventListener('click', iniciarJuego);
+if (elements.startBtn) elements.startBtn.addEventListener('click', () => window.iniciarJuego());
 
 if (elements.copyAgreementBtn) {
   elements.copyAgreementBtn.addEventListener('click', async () => {
