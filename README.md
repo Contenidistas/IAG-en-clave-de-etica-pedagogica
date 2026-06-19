@@ -39,6 +39,10 @@ Los recorridos estan definidos en `configuracion-ia.js`. La resolucion de perfil
 - `index.html`: interfaz principal de la app.
 - `fundamentacion.html`: pagina de fundamentacion pedagogica y marco conceptual.
 - `admin.html`: panel administrativo protegido.
+- `manifest.webmanifest`: configuracion PWA para instalacion como aplicacion.
+- `service-worker.js`: cache local de recursos publicos principales.
+- `pwa.js`: registro del service worker y control del boton de instalacion.
+- `icons/`: iconos PWA en 192 y 512 px.
 - `styles.css`: estilos visuales, responsive, brujula, mapa de decision y constructor de acuerdos.
 - `configuracion-ia.js`: configuracion general, endpoints, niveles, perfiles y arboles de decision.
 - `ui-ia.js`: manejo de interfaz, carrusel, seleccion de perfil, marcos colapsables, estadisticas, opiniones, modales y estado visual.
@@ -59,6 +63,18 @@ Consideraciones:
 - La navegacion, cuestionario, brujula, acuerdo didactico y recursos funcionan desde Live Server.
 - La descarga del PDF usa `jsPDF` desde CDN, por lo que requiere conexion a internet.
 - Estadisticas, opiniones, chatbot y registro anonimo dependen del Worker remoto configurado en `configuracion-ia.js`.
+
+## Instalacion como app
+
+La herramienta funciona como PWA instalable desde navegadores compatibles. En GitHub Pages se sirve con HTTPS, por lo que el navegador puede ofrecer la opcion de instalarla en escritorio o agregarla a la pantalla de inicio en dispositivos moviles.
+
+La instalacion se apoya en:
+
+- `manifest.webmanifest`: nombre, colores, alcance, modo standalone e iconos.
+- `service-worker.js`: cache de la experiencia publica principal para carga rapida y acceso basico sin conexion.
+- `pwa.js`: registro del service worker y boton `Instalar` cuando el navegador habilita el prompt.
+
+El panel `admin.html` no se cachea desde el service worker para mantener la administracion fuera de la experiencia offline.
 
 ## Marcos de referencia
 

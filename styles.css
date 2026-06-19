@@ -196,6 +196,21 @@ body.quiz-active .app-header {
   border-color: var(--primary);
 }
 
+.install-app-btn {
+  border-color: rgba(99, 102, 241, 0.32);
+}
+
+.install-app-btn .btn-academic-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 999px;
+  background: rgba(99, 102, 241, 0.12);
+  color: var(--primary);
+  font-weight: 800;
+}
+
 .btn-diagnostic-start {
   position: relative;
   isolation: isolate;
