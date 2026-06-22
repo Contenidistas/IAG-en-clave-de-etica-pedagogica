@@ -19,6 +19,7 @@
       refreshBtn: document.getElementById('refreshBtn'),
       logoutBtn: document.getElementById('logoutBtn'),
       resetDataBtn: document.getElementById('resetDataBtn'),
+      toggleSelectAllBtn: document.getElementById('toggleSelectAllBtn'),
       deleteSelectedBtn: document.getElementById('deleteSelectedBtn'),
       status: document.getElementById('status'),
       updatedAt: document.getElementById('updatedAt'),
@@ -55,7 +56,10 @@
     }
 
     async function api(path) {
-      const response = await fetch(`${API_BASE}${path}`, { headers: headers() });
+      const response = await fetch(`${API_BASE}${path}`, {
+        headers: headers(),
+        cache: 'no-store',
+      });
       if (response.status === 401) {
         throw new Error('Contraseña incorrecta o sesión vencida.');
       }
@@ -158,9 +162,11 @@
       return true;
     }
 
-    function setStatus(message, visible = true) {
+    function setStatus(message, visible = true, type = '') {
       els.status.textContent = message;
       els.status.classList.toggle('hidden', !visible);
+      els.status.classList.toggle('success', type === 'success');
+      els.status.classList.toggle('error', type === 'error');
     }
 
     function renderSummary(data) {
@@ -259,6 +265,19 @@
       return state.selectedCompletions.size + state.selectedFeedback.size;
     }
 
+    function currentVisibleSelectionState() {
+      const rows = state.tab === 'completions' ? filteredCompletions() : filteredFeedback();
+      const target = state.tab === 'completions' ? state.selectedCompletions : state.selectedFeedback;
+      const ids = rows.map(row => String(row.id));
+      const selected = ids.filter(id => target.has(id)).length;
+
+      return {
+        total: ids.length,
+        selected,
+        allSelected: ids.length > 0 && selected === ids.length,
+      };
+    }
+
     function syncSelectionControls() {
       const completionRows = filteredCompletions();
       const feedbackRows = filteredFeedback();
@@ -267,9 +286,12 @@
       const checkedCompletions = visibleCompletionIds.filter(id => state.selectedCompletions.has(id)).length;
       const checkedFeedback = visibleFeedbackIds.filter(id => state.selectedFeedback.has(id)).length;
       const totalSelected = selectedCount();
+      const currentState = currentVisibleSelectionState();
 
       els.deleteSelectedBtn.disabled = totalSelected === 0;
       els.deleteSelectedBtn.textContent = totalSelected ? `Eliminar selección (${totalSelected})` : 'Eliminar selección';
+      els.toggleSelectAllBtn.disabled = currentState.total === 0;
+      els.toggleSelectAllBtn.textContent = currentState.allSelected ? 'Quitar selección' : `Seleccionar todo (${currentState.total})`;
 
       els.selectAllCompletions.checked = visibleCompletionIds.length > 0 && checkedCompletions === visibleCompletionIds.length;
       els.selectAllCompletions.indeterminate = checkedCompletions > 0 && checkedCompletions < visibleCompletionIds.length;
@@ -391,10 +413,11 @@
       if (!silent) setStatus('Cargando datos...');
 
       try {
+        const cacheBust = `_=${Date.now()}`;
         const [summary, completions, feedback] = await Promise.all([
-          api('/admin/summary'),
-          api('/admin/completions'),
-          api('/admin/feedback'),
+          api(`/admin/summary?${cacheBust}`),
+          api(`/admin/completions?${cacheBust}`),
+          api(`/admin/feedback?${cacheBust}`),
         ]);
 
         state.completions = completions.completions || [];
@@ -407,7 +430,7 @@
         if (!silent) setStatus('', false);
         els.login.classList.add('hidden');
       } catch (error) {
-        setStatus(error.message);
+        setStatus(error.message, true, 'error');
         els.login.classList.remove('hidden');
         els.loginStatus.textContent = error.message;
         sessionStorage.removeItem(SESSION_KEY);
@@ -475,7 +498,7 @@
         link.remove();
         URL.revokeObjectURL(url);
       } catch (error) {
-        setStatus(`No se pudo descargar CSV: ${error.message}`);
+        setStatus(`No se pudo descargar CSV: ${error.message}`, true, 'error');
       }
     }
 
@@ -508,9 +531,9 @@
         link.click();
         link.remove();
         URL.revokeObjectURL(url);
-        setStatus(`Corte de datos descargado (${from} a ${to}).`);
+        setStatus(`Corte de datos descargado (${from} a ${to}).`, true, 'success');
       } catch (error) {
-        setStatus(`No se pudo descargar el corte: ${error.message}`);
+        setStatus(`No se pudo descargar el corte: ${error.message}`, true, 'error');
       } finally {
         els.exportCutZipBtn.disabled = false;
       }
@@ -541,9 +564,9 @@
           to: els.dateToFilter.value,
         });
         await loadAll({ silent: true });
-        setStatus(`Datos eliminados: ${fmtNumber(result.deleted.events)} eventos, ${fmtNumber(result.deleted.answers)} respuestas y ${fmtNumber(result.deleted.feedback)} valoraciones.`);
+        setStatus(`Datos eliminados correctamente: ${fmtNumber(result.deleted.events)} eventos, ${fmtNumber(result.deleted.answers)} respuestas y ${fmtNumber(result.deleted.feedback)} valoraciones.`, true, 'success');
       } catch (error) {
-        setStatus(`No se pudieron limpiar los datos: ${error.message}`);
+        setStatus(`No se pudieron limpiar los datos: ${error.message}`, true, 'error');
       } finally {
         els.resetDataBtn.disabled = false;
       }
@@ -552,6 +575,8 @@
     async function deleteSelected() {
       const payload = selectedPayload();
       const total = selectedCount();
+      const selectedEventIds = new Set(payload.eventIds.map(String));
+      const selectedFeedbackIds = new Set(payload.feedbackIds.map(String));
       if (!total) {
         setStatus('No hay registros seleccionados para eliminar.');
         return;
@@ -574,12 +599,25 @@
           confirmation: 'BORRAR DATOS',
           ...payload,
         });
+        const deletedTotal = Number(result.deleted?.events || 0) + Number(result.deleted?.answers || 0) + Number(result.deleted?.feedback || 0);
+        if (deletedTotal === 0) {
+          throw new Error('La API no encontró esos registros para borrar. Actualizá la lista y probá de nuevo.');
+        }
+
         state.selectedCompletions.clear();
         state.selectedFeedback.clear();
         await loadAll({ silent: true });
-        setStatus(`Selección eliminada: ${fmtNumber(result.deleted.events)} eventos, ${fmtNumber(result.deleted.answers)} respuestas y ${fmtNumber(result.deleted.feedback)} valoraciones.`);
+        const remainingEvents = state.completions.filter(row => selectedEventIds.has(String(row.id))).length;
+        const remainingFeedback = state.feedback.filter(row => selectedFeedbackIds.has(String(row.id))).length;
+
+        if (remainingEvents || remainingFeedback) {
+          setStatus('La API respondió, pero algunos registros siguen visibles. Tocá Actualizar; si continúan, avisame y revisamos esos IDs puntuales.', true, 'error');
+          return;
+        }
+
+        setStatus(`Datos eliminados correctamente: ${fmtNumber(result.deleted.events)} eventos, ${fmtNumber(result.deleted.answers)} respuestas y ${fmtNumber(result.deleted.feedback)} valoraciones.`, true, 'success');
       } catch (error) {
-        setStatus(`No se pudo eliminar la selección: ${error.message}`);
+        setStatus(`No se pudo eliminar la selección: ${error.message}`, true, 'error');
       } finally {
         els.deleteSelectedBtn.disabled = selectedCount() === 0;
         syncSelectionControls();
@@ -595,6 +633,11 @@
         else target.delete(id);
       });
       renderCurrentTab();
+    }
+
+    function toggleCurrentTabSelection() {
+      const currentState = currentVisibleSelectionState();
+      toggleVisibleSelection(state.tab, !currentState.allSelected);
     }
 
     els.loginForm.addEventListener('submit', event => {
@@ -614,6 +657,7 @@
 
     els.refreshBtn.addEventListener('click', loadAll);
     els.resetDataBtn.addEventListener('click', resetData);
+    els.toggleSelectAllBtn.addEventListener('click', toggleCurrentTabSelection);
     els.deleteSelectedBtn.addEventListener('click', deleteSelected);
     els.searchInput.addEventListener('input', renderCurrentTab);
     els.profileFilter.addEventListener('change', renderCurrentTab);
