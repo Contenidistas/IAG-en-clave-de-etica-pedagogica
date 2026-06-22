@@ -91,6 +91,11 @@ export default {
         return json(await resetAdminData(request, env), 200, request, env);
       }
 
+      if (request.method === 'POST' && url.pathname === '/admin/delete-selected') {
+        requireAdmin(request, env);
+        return json(await deleteSelectedAdminData(request, env), 200, request, env);
+      }
+
       return json({ ok: false, error: 'Not found' }, 404, request, env);
     } catch (error) {
       console.error(error);
@@ -663,6 +668,40 @@ async function resetAdminData(request, env) {
     } catch (error) {
       console.warn('No se pudo reiniciar sqlite_sequence:', error.message);
     }
+  }
+
+  return {
+    ok: true,
+    deleted,
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+async function deleteSelectedAdminData(request, env) {
+  const data = await request.json().catch(() => ({}));
+  const eventIds = uniqueNumbers(data.eventIds);
+  const feedbackIds = uniqueNumbers(data.feedbackIds);
+
+  if (!eventIds.length && !feedbackIds.length) {
+    const error = new Error('No hay registros seleccionados');
+    error.status = 400;
+    throw error;
+  }
+
+  let targetEventIds = eventIds;
+
+  if (feedbackIds.length) {
+    const feedbackEventIds = await selectFeedbackEventIds(env, feedbackIds);
+    targetEventIds = uniqueNumbers([...targetEventIds, ...feedbackEventIds]);
+  }
+
+  const deleted = await deleteScopedData(env, targetEventIds, feedbackIds);
+  const deletedTotal = Number(deleted.events || 0) + Number(deleted.answers || 0) + Number(deleted.feedback || 0);
+
+  if (!deletedTotal) {
+    const error = new Error('No se encontraron registros seleccionados para borrar');
+    error.status = 404;
+    throw error;
   }
 
   return {

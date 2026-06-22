@@ -582,23 +582,16 @@
         return;
       }
 
-      const confirmation = window.prompt(`Vas a eliminar ${total} registro(s) seleccionado(s) y sus datos asociados. Escribí ELIMINAR para confirmar.`);
-      if (confirmation === null) {
+      const confirmed = window.confirm(`Vas a eliminar ${total} registro(s) seleccionado(s) y sus datos asociados. Esta acción no se puede deshacer.`);
+      if (!confirmed) {
         setStatus('Eliminación cancelada.');
-        return;
-      }
-      if (confirmation.trim().toUpperCase() !== 'ELIMINAR') {
-        setStatus('No se eliminó nada: la confirmación debe ser ELIMINAR.');
         return;
       }
 
       try {
         els.deleteSelectedBtn.disabled = true;
         setStatus('Eliminando selección...');
-        const result = await apiPost('/admin/reset-data', {
-          confirmation: 'BORRAR DATOS',
-          ...payload,
-        });
+        const result = await apiPost('/admin/delete-selected', payload);
         const deletedTotal = Number(result.deleted?.events || 0) + Number(result.deleted?.answers || 0) + Number(result.deleted?.feedback || 0);
         if (deletedTotal === 0) {
           throw new Error('La API no encontró esos registros para borrar. Actualizá la lista y probá de nuevo.');
