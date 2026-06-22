@@ -572,20 +572,45 @@ async function buildOpinions(env) {
   const result = await env.DB.prepare(`
     SELECT rating, suggestion, profile, nivel_educativo AS nivelEducativo
     FROM feedback
-    WHERE rating >= 4 AND suggestion IS NOT NULL AND suggestion != ''
+    WHERE rating >= 4
+      AND suggestion IS NOT NULL
+      AND suggestion != ''
+      AND suggestion NOT LIKE '=%'
+      AND suggestion NOT LIKE '+%'
+      AND suggestion NOT LIKE '-%'
+      AND suggestion NOT LIKE '@%'
+      AND suggestion NOT LIKE '%HYPERLINK%'
+      AND suggestion NOT LIKE '%http://%'
+      AND suggestion NOT LIKE '%https://%'
+      AND suggestion NOT LIKE '%REGISTRO_PRUEBA%'
+      AND suggestion NOT LIKE '%<%'
+      AND suggestion NOT LIKE '%>%'
     ORDER BY timestamp DESC
-    LIMIT 8
+    LIMIT 20
   `).all();
 
   return {
-    opinions: (result.results || []).map(row => ({
-      rating: Number(row.rating || 0),
-      suggestion: clean(row.suggestion).slice(0, 240),
-      profile: row.profile || '',
-      nivelEducativo: row.nivelEducativo || '',
-    })),
+    opinions: (result.results || [])
+      .filter(row => isPublicOpinionSafe(row.suggestion))
+      .slice(0, 8)
+      .map(row => ({
+        rating: Number(row.rating || 0),
+        suggestion: clean(row.suggestion).slice(0, 240),
+        profile: row.profile || '',
+        nivelEducativo: row.nivelEducativo || '',
+      })),
     updatedAt: new Date().toISOString(),
   };
+}
+
+function isPublicOpinionSafe(value) {
+  const text = clean(value);
+  if (!text || text.length < 6) return false;
+  if (/^[=+\-@\t\r]/.test(text)) return false;
+  if (/[<>]/.test(text)) return false;
+  if (/https?:\/\//i.test(text)) return false;
+  if (/HYPERLINK|REGISTRO_PRUEBA|onerror|script|javascript:/i.test(text)) return false;
+  return true;
 }
 
 async function buildAdminSummary(env) {
