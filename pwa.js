@@ -12,6 +12,10 @@ function isMobileViewport() {
   return window.matchMedia('(max-width: 820px), (pointer: coarse)').matches;
 }
 
+function shouldOfferMobileInstallGuide() {
+  return isMobileViewport() && !isStandaloneDisplay();
+}
+
 function getInstallModal() {
   return {
     overlay: document.getElementById('modalOverlay'),
@@ -25,7 +29,7 @@ function canUseNativeInstallPrompt() {
 }
 
 function showInstallButton() {
-  if (installButton && !isStandaloneDisplay()) {
+  if (installButton && shouldOfferMobileInstallGuide()) {
     installButton.classList.remove('hidden');
   }
 }
@@ -57,7 +61,7 @@ function closeInstallGuide() {
 }
 
 function showInstallGuide(options = {}) {
-  if (isStandaloneDisplay()) return;
+  if (!shouldOfferMobileInstallGuide()) return;
 
   const modal = getInstallModal();
   if (!modal.overlay || !modal.title || !modal.body) return;
@@ -107,7 +111,7 @@ function showInstallGuide(options = {}) {
 }
 
 function maybeShowInstallGuide() {
-  if (!isMobileViewport() || isStandaloneDisplay()) return;
+  if (!shouldOfferMobileInstallGuide()) return;
 
   window.setTimeout(() => {
     const modal = getInstallModal();
@@ -124,7 +128,7 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./service-worker.js').catch((error) => {
       console.warn('No se pudo registrar la app instalable.', error);
     });
-    if (isMobileViewport() && !isStandaloneDisplay()) {
+    if (shouldOfferMobileInstallGuide()) {
       showInstallButton();
       maybeShowInstallGuide();
     }
