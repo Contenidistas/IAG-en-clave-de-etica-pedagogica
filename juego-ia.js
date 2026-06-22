@@ -1011,9 +1011,11 @@ function mostrarResultados() {
   elements.resultLevel.textContent = `Tu nivel: ${nivel.id}`;
   elements.resultLevel.style.color = '#ffffff';
   renderizarDevolucionFinal(nivel);
+  renderizarInformeCalidad(nivel);
   renderizarBrujulaEtica(nivel);
   renderizarAcuerdoDidactico(nivel);
   renderizarCasosSituados();
+  guardarDiagnosticoEnHistorialLocal(nivel);
 
   // Lista de acuerdos didácticos
   if (elements.didacticaList) {
@@ -1190,6 +1192,105 @@ function renderizarDevolucionFinal(nivel) {
     </article>
   `).join('');
 }
+
+function construirInformeCalidad(nivel) {
+  const respuestasAFortalecer = state.path.filter(p => p.answerKey === 'no' || p.answerKey === 'sometimes');
+  const respuestasAlineadas = state.path.filter(p => p.answerKey === 'yes');
+  const brujula = typeof calcularBrujulaEtica === 'function' ? calcularBrujulaEtica() : [];
+  const prioridadBrujula = brujula.length
+    ? brujula.reduce((min, axis) => axis.score < min.score ? axis : min, brujula[0])
+    : null;
+  const fortalezas = respuestasAlineadas.slice(0, 3).map(p => p.question);
+  const riesgos = respuestasAFortalecer.slice(0, 3).map(p => p.question);
+  const foco = prioridadBrujula ? prioridadBrujula.label : (riesgos[0] || 'Transparencia y verificación');
+  const perfilHumano = state.profileBase === 'especializado'
+    ? 'docente/investigador/a'
+    : state.profileBase === 'docente'
+      ? 'docente'
+      : state.profileBase === 'estudiante'
+        ? 'estudiante'
+        : 'participante';
+
+  const accionesBase = [
+    `Definir por escrito qué usos de IA se permiten, cuáles no y cómo se declara la asistencia en la próxima ${state.profileBase === 'estudiante' ? 'entrega' : 'actividad'}.`,
+    `Incorporar una verificación mínima de fuentes: contrastar resultados de IA con documentos institucionales, bibliografía o criterios acordados.`,
+    `Usar el acuerdo editable de esta herramienta para explicitar responsabilidad humana, protección de datos y criterios de evaluación.`
+  ];
+
+  if (foco && foco.toLowerCase().includes('datos')) {
+    accionesBase[0] = 'Revisar qué información no debe ingresarse en herramientas de IA y dejar esa restricción escrita antes de iniciar la actividad.';
+  } else if (foco && foco.toLowerCase().includes('sesgos')) {
+    accionesBase[1] = 'Agregar una instancia de revisión de sesgos, omisiones culturales, accesibilidad y pertinencia para el grupo.';
+  } else if (foco && foco.toLowerCase().includes('agencia')) {
+    accionesBase[2] = 'Solicitar una breve explicación del aporte humano: decisiones tomadas, cambios realizados y criterios usados para aceptar o descartar respuestas de IA.';
+  }
+
+  return {
+    level: nivel.id,
+    evidence: state.evidence,
+    profile: perfilHumano,
+    focus: foco,
+    executiveSummary: `El recorrido muestra un punto de partida ${nivel.id.toLowerCase()} para ${perfilHumano}. La mejora principal pasa por convertir criterios éticos en acuerdos observables: qué se permite, qué se declara, qué se verifica y qué queda bajo responsabilidad humana.`,
+    strengths: fortalezas.length ? fortalezas : ['Hay una base de trabajo para formalizar criterios de uso responsable y compartirlos con otras personas.'],
+    risks: riesgos.length ? riesgos : ['El principal desafío es sostener estas prácticas en distintas tareas y no dejarlas como decisiones aisladas.'],
+    actions: accionesBase,
+    rubric: [
+      'Declaración de uso de IA: herramienta, finalidad y partes asistidas.',
+      'Verificación: fuentes contrastadas o criterio de validación explícito.',
+      'Aporte humano: decisiones propias, contextualización y revisión final.',
+      'Cuidado de datos: ausencia de información sensible o identificable.'
+    ],
+    references: 'ANEP, UNESCO, FING, Udelar y Ceibal'
+  };
+}
+
+function renderizarInformeCalidad(nivel) {
+  if (!elements.qualityReportContent) return;
+  const report = construirInformeCalidad(nivel);
+  elements.qualityReportContent.innerHTML = `
+    <section class="quality-report-summary">
+      <strong>Resumen ejecutivo</strong>
+      <p>${escapeGameHtml(report.executiveSummary)}</p>
+    </section>
+    <div class="quality-report-grid">
+      <article>
+        <h4>Fortalezas detectadas</h4>
+        <ul>${report.strengths.map(item => `<li>${escapeGameHtml(item)}</li>`).join('')}</ul>
+      </article>
+      <article>
+        <h4>Riesgos a atender</h4>
+        <ul>${report.risks.map(item => `<li>${escapeGameHtml(item)}</li>`).join('')}</ul>
+      </article>
+      <article>
+        <h4>3 acciones próximas</h4>
+        <ol>${report.actions.map(item => `<li>${escapeGameHtml(item)}</li>`).join('')}</ol>
+      </article>
+      <article>
+        <h4>Rúbrica breve</h4>
+        <ul>${report.rubric.map(item => `<li>${escapeGameHtml(item)}</li>`).join('')}</ul>
+      </article>
+    </div>
+  `;
+}
+
+function guardarDiagnosticoEnHistorialLocal(nivel) {
+  if (typeof window.saveLocalDiagnostic !== 'function') return;
+  const report = construirInformeCalidad(nivel);
+  window.saveLocalDiagnostic({
+    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    date: new Date().toLocaleDateString('es-UY'),
+    level: nivel.id,
+    evidence: state.evidence,
+    profile: `${report.profile}${state.nivelEducativo ? ` · ${state.nivelEducativo}` : ''}`,
+    focus: report.focus,
+    summary: report.actions[0],
+  });
+}
+
+window.getQualityReportData = function getQualityReportData() {
+  const nivel = CONFIG.likert.find(l => state.evidence >= l.min && l.max >= state.evidence) || CONFIG.likert[0];
+  return construirInformeCalidad(nivel);
+};
 
 function obtenerReferenciaDePaso(paso) {
   const perfil = CONFIG.perfiles[state.profileKey];

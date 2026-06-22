@@ -89,6 +89,40 @@ function respuestaEsAlineada(item) {
   return item.answerKey === 'yes';
 }
 
+function obtenerInformeCalidadReporte(nivel) {
+  if (typeof window.getQualityReportData === 'function') {
+    return window.getQualityReportData();
+  }
+  return {
+    level: nivel.id,
+    evidence: state.evidence,
+    focus: 'Transparencia y verificación',
+    executiveSummary: construirSintesisMarco(nivel),
+    strengths: ['Prácticas alineadas detectadas en el recorrido.'],
+    risks: ['Criterios a fortalecer según respuestas del recorrido.'],
+    actions: ['Definir acuerdos explícitos de uso, declaración y verificación.'],
+    rubric: ['Declaración de uso de IA.', 'Verificación de fuentes.', 'Aporte humano.', 'Cuidado de datos.'],
+    references: 'ANEP, UNESCO, FING, Udelar y Ceibal'
+  };
+}
+
+function agregarListaReporte(doc, titulo, items, x, y) {
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(13);
+  doc.setTextColor(33, 33, 33);
+  doc.text(titulo, x, y);
+  y += 7;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10.5);
+  doc.setTextColor(55, 55, 55);
+  (items || []).forEach((item, index) => {
+    y = agregarTextoMultilinea(doc, `${index + 1}. ${item}`, x, y, 180, 5.5);
+    y += 1;
+  });
+  return y + 3;
+}
+
 /* ========================================
    ACCIONES FINALES
    ======================================== */
@@ -136,6 +170,23 @@ if (elements.downloadBtn) {
       y = agregarTextoMultilinea(doc, nivel.desc, 15, y, 180, 7);
       y += 6;
 
+      const informeCalidad = obtenerInformeCalidadReporte(nivel);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.setTextColor(33, 33, 33);
+      doc.text('Resumen ejecutivo', 15, y); y += 8;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(11);
+      doc.setTextColor(55, 55, 55);
+      y = agregarTextoMultilinea(doc, informeCalidad.executiveSummary, 15, y, 180, 6);
+      y += 4;
+      y = agregarListaReporte(doc, 'Fortalezas detectadas', informeCalidad.strengths, 15, y);
+      y = agregarListaReporte(doc, 'Riesgos a atender', informeCalidad.risks, 15, y);
+      if (y > 235) { doc.addPage(); y = 20; }
+      y = agregarListaReporte(doc, 'Tres acciones próximas', informeCalidad.actions, 15, y);
+      y = agregarListaReporte(doc, 'Rúbrica breve para compartir', informeCalidad.rubric, 15, y);
+
+      if (y > 230) { doc.addPage(); y = 20; } else { y += 4; }
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(14);
       doc.setTextColor(33, 33, 33);
@@ -228,11 +279,24 @@ if (elements.copyBtn) {
     const perfil = CONFIG.perfiles[state.profileKey || state.profile];
     const appName = obtenerNombreApp();
     const nombre = obtenerNombreParticipante();
+    const informeCalidad = obtenerInformeCalidadReporte(nivel);
     const resumen = `${appName} - Reporte de resultados
 
 Participante: ${nombre}
 Perfil: ${obtenerPerfilReporte()}
 Nivel: ${nivel.id}
+
+Resumen ejecutivo:
+${informeCalidad.executiveSummary}
+
+Fortalezas:
+${informeCalidad.strengths.map((item, index) => `${index + 1}. ${item}`).join('\n')}
+
+Riesgos a atender:
+${informeCalidad.risks.map((item, index) => `${index + 1}. ${item}`).join('\n')}
+
+Acciones próximas:
+${informeCalidad.actions.map((item, index) => `${index + 1}. ${item}`).join('\n')}
 
 Lectura desde marcos:
 ${construirSintesisMarco(nivel)}

@@ -317,6 +317,12 @@ async function buildStats(env) {
     VALID_PROFILES
   );
   const indicators = await weakIndicators(env);
+  const education = await groupedRows(
+    env,
+    'nivel_educativo',
+    `event_type = 'completion' AND nivel_educativo IS NOT NULL AND nivel_educativo != ''`
+  );
+  const insight = buildPedagogicalInsight(indicators, levels, summaryRow);
 
   return {
     summary: {
@@ -330,6 +336,8 @@ async function buildStats(env) {
     levels,
     profiles,
     indicators,
+    education,
+    insight,
     updatedAt: new Date().toISOString(),
   };
 }
@@ -533,6 +541,31 @@ async function weakIndicators(env) {
     .map(([label, count]) => ({ label, count }))
     .sort((a, b) => b.count - a.count)
     .slice(0, 6);
+}
+
+function buildPedagogicalInsight(indicators, levels, summaryRow) {
+  const focus = indicators.length ? indicators[0].label : 'Criterios de uso responsable';
+  const average = Number(summaryRow?.averageScore || 0);
+  const topLevel = levels.length ? levels[0].label : '';
+  let recommendation = 'Reforzar acuerdos explícitos sobre transparencia, verificación, protección de datos y aporte humano.';
+
+  if (focus.includes('Verificación')) {
+    recommendation = 'Aparece como prioridad reforzar contraste de fuentes, revisión de alucinaciones y criterios para no tomar la respuesta de IA como evidencia suficiente.';
+  } else if (focus.includes('Autoría') || focus.includes('Transparencia')) {
+    recommendation = 'Conviene trabajar declaraciones de uso de IA, registro de herramientas y diferenciación entre asistencia automatizada y aporte humano.';
+  } else if (focus.includes('Sesgos')) {
+    recommendation = 'Se recomienda incorporar revisión de sesgos, accesibilidad, diversidad cultural y pertinencia contextual antes de usar resultados generados.';
+  } else if (focus.includes('Reglas')) {
+    recommendation = 'El dato sugiere fortalecer acuerdos previos: usos permitidos, límites, evidencias requeridas y consecuencias pedagógicas.';
+  }
+
+  if (average && average < 55) {
+    recommendation += ' El promedio general indica oportunidad de formación inicial con ejemplos concretos y rúbricas simples.';
+  } else if (topLevel) {
+    recommendation += ` El nivel más frecuente es "${topLevel}", útil para ajustar futuras orientaciones.`;
+  }
+
+  return { focus, recommendation };
 }
 
 async function buildOpinions(env) {

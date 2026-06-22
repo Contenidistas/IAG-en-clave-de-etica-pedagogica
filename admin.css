@@ -115,6 +115,39 @@
       line-height: 1.1;
     }
 
+    .admin-insight {
+      display: grid;
+      grid-template-columns: minmax(220px, 0.35fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: center;
+      padding: 16px;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      background: #eff6ff;
+      box-shadow: var(--shadow);
+    }
+
+    .admin-insight span {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--brand);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .admin-insight strong {
+      color: var(--ink);
+      font-size: 18px;
+    }
+
+    .admin-insight p {
+      margin: 0;
+      color: #334155;
+      line-height: 1.5;
+    }
+
     .panel {
       overflow: hidden;
     }
@@ -423,6 +456,10 @@
       }
 
       .summary {
+        grid-template-columns: 1fr;
+      }
+
+      .admin-insight {
         grid-template-columns: 1fr;
       }
 

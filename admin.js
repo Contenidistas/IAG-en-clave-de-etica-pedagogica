@@ -45,6 +45,8 @@
       metricAverage: document.getElementById('metricAverage'),
       metricFeedback: document.getElementById('metricFeedback'),
       metricRating: document.getElementById('metricRating'),
+      adminInsightFocus: document.getElementById('adminInsightFocus'),
+      adminInsightText: document.getElementById('adminInsightText'),
       exportCompletionsBtn: document.getElementById('exportCompletionsBtn'),
       exportFeedbackBtn: document.getElementById('exportFeedbackBtn'),
       exportAnswersBtn: document.getElementById('exportAnswersBtn'),
@@ -172,12 +174,15 @@
     function renderSummary(data) {
       const summary = data.summary || {};
       const admin = data.admin || {};
+      const insight = data.insight || {};
       els.metricVisits.textContent = fmtNumber(summary.visits);
       els.metricCompleted.textContent = fmtNumber(summary.completed);
       els.metricAverage.textContent = fmtDecimal(summary.averageScore);
       els.metricFeedback.textContent = fmtNumber(summary.feedback || admin.totalFeedback);
       els.metricRating.textContent = fmtDecimal(admin.averageRating);
       els.updatedAt.textContent = `Actualizado: ${fmtDate(data.updatedAt)}`;
+      if (els.adminInsightFocus) els.adminInsightFocus.textContent = insight.focus || 'Sin datos suficientes';
+      if (els.adminInsightText) els.adminInsightText.textContent = insight.recommendation || 'Todavía no hay una tendencia clara para interpretar.';
     }
 
     function fillFilters() {

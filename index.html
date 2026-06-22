@@ -563,6 +563,16 @@
               <h3>Indicadores a fortalecer</h3>
               <div id="statsIndicators" class="stats-bars"></div>
             </article>
+
+            <article class="stats-card">
+              <h3>Distribución por formación</h3>
+              <div id="statsEducation" class="stats-bars"></div>
+            </article>
+
+            <article class="stats-card stats-card--insight">
+              <h3>Lectura pedagógica</h3>
+              <div id="statsInsight" class="stats-insight"></div>
+            </article>
           </div>
         </div>
       </section>
@@ -580,6 +590,20 @@
         </div>
         <div id="opinionsStatus" class="opinions-status">Cargando opiniones...</div>
         <div id="opinionsCarousel" class="opinions-carousel hidden" aria-live="polite"></div>
+      </section>
+
+      <section class="local-history-section" aria-labelledby="localHistoryTitle">
+        <div class="local-history-header">
+          <div>
+            <p class="section-kicker">Historial local</p>
+            <h2 id="localHistoryTitle">Mis últimos diagnósticos</h2>
+          </div>
+          <button type="button" class="btn btn-outline" id="clearLocalHistoryBtn">Limpiar historial</button>
+        </div>
+        <p class="stats-note">
+          Este historial se guarda solo en este dispositivo. No contiene respuestas completas ni datos identificables.
+        </p>
+        <div id="localHistoryList" class="local-history-list"></div>
       </section>
     </section>
     <!-- FIN PANTALLA 1: INTRO + CARRUSEL -->
@@ -737,6 +761,17 @@
         <h3>Orientaciones para seguir avanzando</h3>
         <p id="resultSummary">Revisá tu recorrido para identificar acuerdos, prácticas y criterios a fortalecer.</p>
         <div class="result-insights-grid" id="resultInsights"></div>
+      </div>
+
+      <div class="card quality-report-card mb-3 result-tab-panel active" data-result-panel="sintesis">
+        <div class="quality-report-header">
+          <div>
+            <p class="section-kicker">Informe accionable</p>
+            <h3>Resumen ejecutivo y próximos pasos</h3>
+          </div>
+          <span class="agreement-builder-badge">Para llevar al aula</span>
+        </div>
+        <div id="qualityReportContent" class="quality-report-content"></div>
       </div>
 
       <div class="card ethical-compass-card mb-3 result-tab-panel" data-result-panel="brujula">

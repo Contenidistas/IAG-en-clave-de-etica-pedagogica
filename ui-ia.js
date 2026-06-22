@@ -85,6 +85,7 @@ const elements = {
   resultLevel: document.getElementById('resultLevel'),
   resultSummary: document.getElementById('resultSummary'),
   resultInsights: document.getElementById('resultInsights'),
+  qualityReportContent: document.getElementById('qualityReportContent'),
   ethicalCompassLevel: document.getElementById('ethicalCompassLevel'),
   ethicalCompassFocus: document.getElementById('ethicalCompassFocus'),
   ethicalCompassCopy: document.getElementById('ethicalCompassCopy'),
@@ -117,10 +118,14 @@ const elements = {
   statsLevels: document.getElementById('statsLevels'),
   statsProfiles: document.getElementById('statsProfiles'),
   statsIndicators: document.getElementById('statsIndicators'),
+  statsEducation: document.getElementById('statsEducation'),
+  statsInsight: document.getElementById('statsInsight'),
   opinionsStatus: document.getElementById('opinionsStatus'),
   opinionsCarousel: document.getElementById('opinionsCarousel'),
   prevOpinionBtn: document.getElementById('prevOpinionBtn'),
   nextOpinionBtn: document.getElementById('nextOpinionBtn'),
+  localHistoryList: document.getElementById('localHistoryList'),
+  clearLocalHistoryBtn: document.getElementById('clearLocalHistoryBtn'),
 
   // Valoración de la herramienta
   toolRatingRadios: document.querySelectorAll('input[name="toolRating"]'),
@@ -1533,6 +1538,8 @@ function renderStats(data) {
   const levels = sanitizeStatsRows(data.levels || data.byLevel, 'levels');
   const profiles = sanitizeStatsRows(data.profiles || data.byProfile, 'profiles');
   const indicators = sanitizeStatsRows(data.indicators || data.weakIndicators, 'generic');
+  const education = sanitizeStatsRows(data.education || data.byEducation, 'generic');
+  const insight = data.insight || {};
 
   if (elements.statVisits) elements.statVisits.textContent = formatNumber(summary.visits || summary.totalVisits);
   if (elements.statCompleted) elements.statCompleted.textContent = formatNumber(summary.completed || summary.totalCompleted);
@@ -1542,6 +1549,16 @@ function renderStats(data) {
   renderStatsBars(elements.statsLevels, levels);
   renderStatsBars(elements.statsProfiles, profiles);
   renderStatsBars(elements.statsIndicators, indicators);
+  renderStatsBars(elements.statsEducation, education);
+
+  if (elements.statsInsight) {
+    const focus = insight.focus || (indicators[0] ? indicators[0].label : 'Criterios de uso responsable');
+    const recommendation = insight.recommendation || 'Reforzar acuerdos explícitos sobre transparencia, verificación, protección de datos y aporte humano.';
+    elements.statsInsight.innerHTML = `
+      <p><strong>Foco observado:</strong> ${escapeHtml(focus)}</p>
+      <p>${escapeHtml(recommendation)}</p>
+    `;
+  }
 
   if (elements.statsStatus) elements.statsStatus.classList.add('hidden');
   if (elements.statsContent) elements.statsContent.classList.remove('hidden');
@@ -1646,6 +1663,69 @@ if (elements.prevOpinionBtn) {
 if (elements.nextOpinionBtn) {
   elements.nextOpinionBtn.addEventListener('click', () => showOpinion(currentOpinionIndex + 1));
 }
+
+/* ========================================
+   HISTORIAL LOCAL DE DIAGNÓSTICOS
+   ======================================== */
+const LOCAL_HISTORY_KEY = 'iag_local_diagnostic_history';
+
+function readLocalHistory() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(LOCAL_HISTORY_KEY) || '[]');
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeLocalHistory(items) {
+  try {
+    localStorage.setItem(LOCAL_HISTORY_KEY, JSON.stringify(items.slice(0, 6)));
+  } catch (error) {
+    console.warn('No se pudo guardar el historial local:', error);
+  }
+}
+
+function saveLocalDiagnostic(record) {
+  const history = readLocalHistory().filter(item => item && item.id !== record.id);
+  history.unshift(record);
+  writeLocalHistory(history);
+  renderLocalHistory();
+}
+
+function renderLocalHistory() {
+  if (!elements.localHistoryList) return;
+  const history = readLocalHistory();
+
+  if (!history.length) {
+    elements.localHistoryList.innerHTML = '<p class="stats-empty">Todavía no hay diagnósticos guardados en este dispositivo.</p>';
+    if (elements.clearLocalHistoryBtn) elements.clearLocalHistoryBtn.disabled = true;
+    return;
+  }
+
+  if (elements.clearLocalHistoryBtn) elements.clearLocalHistoryBtn.disabled = false;
+  elements.localHistoryList.innerHTML = history.map(item => `
+    <article class="local-history-item">
+      <div>
+        <strong>${escapeHtml(item.level || 'Resultado')}</strong>
+        <span>${escapeHtml(item.profile || 'Perfil no indicado')} · ${escapeHtml(item.date || '')}</span>
+      </div>
+      <p>${escapeHtml(item.summary || 'Diagnóstico guardado localmente.')}</p>
+      <small>Puntaje: ${escapeHtml(item.evidence ?? '—')} · Foco: ${escapeHtml(item.focus || '—')}</small>
+    </article>
+  `).join('');
+}
+
+if (elements.clearLocalHistoryBtn) {
+  elements.clearLocalHistoryBtn.addEventListener('click', () => {
+    if (!window.confirm('¿Querés limpiar el historial guardado en este dispositivo?')) return;
+    writeLocalHistory([]);
+    renderLocalHistory();
+  });
+}
+
+window.saveLocalDiagnostic = saveLocalDiagnostic;
+window.renderLocalHistory = renderLocalHistory;
 
 /* ========================================
    VALORACIÓN Y SUGERENCIAS
@@ -1784,6 +1864,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   cargarEstadisticasAnonimas();
   cargarOpinionesAnonimas();
+  renderLocalHistory();
 
   setTimeout(mostrarGuiaRapidaInicial, 450);
 });
