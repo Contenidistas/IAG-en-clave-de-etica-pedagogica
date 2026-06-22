@@ -1817,6 +1817,44 @@ body.result-active .app-footer {
   margin: 0.5rem 0;
 }
 
+.install-guide {
+  display: grid;
+  gap: 1rem;
+}
+
+.install-guide-intro {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.install-guide-video {
+  width: 100%;
+  max-height: 58vh;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #000;
+}
+
+.install-guide-note {
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-main);
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.install-guide-note strong {
+  color: var(--text-primary);
+}
+
+.install-guide-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
 .quick-guide {
   display: grid;
   gap: 1rem;
