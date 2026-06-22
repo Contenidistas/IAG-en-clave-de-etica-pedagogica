@@ -1,4 +1,5 @@
 const DEFAULT_ALLOWED_ORIGINS = [
+  'https://contenidistas.github.io',
   'https://santiherben.github.io',
   'http://localhost:8787',
   'http://localhost:8000',
