@@ -7,6 +7,8 @@
       completions: [],
       feedback: [],
       answers: [],
+      selectedCompletions: new Set(),
+      selectedFeedback: new Set(),
     };
 
     const els = {
@@ -17,12 +19,15 @@
       refreshBtn: document.getElementById('refreshBtn'),
       logoutBtn: document.getElementById('logoutBtn'),
       resetDataBtn: document.getElementById('resetDataBtn'),
+      deleteSelectedBtn: document.getElementById('deleteSelectedBtn'),
       status: document.getElementById('status'),
       updatedAt: document.getElementById('updatedAt'),
       completionsView: document.getElementById('completionsView'),
       feedbackView: document.getElementById('feedbackView'),
       completionsBody: document.getElementById('completionsBody'),
       feedbackBody: document.getElementById('feedbackBody'),
+      selectAllCompletions: document.getElementById('selectAllCompletions'),
+      selectAllFeedback: document.getElementById('selectAllFeedback'),
       answersPanel: document.getElementById('answersPanel'),
       searchInput: document.getElementById('searchInput'),
       profileFilter: document.getElementById('profileFilter'),
@@ -238,20 +243,52 @@
         if (profile && row.profileKey !== profile && row.profile !== profile) return false;
         if (education && row.nivelEducativo !== education) return false;
         if (country && row.country !== country) return false;
+        if (!dateInRange(row.timestamp)) return false;
         return true;
       });
+    }
+
+    function selectedPayload() {
+      return {
+        eventIds: Array.from(state.selectedCompletions).map(Number).filter(Number.isFinite),
+        feedbackIds: Array.from(state.selectedFeedback).map(Number).filter(Number.isFinite),
+      };
+    }
+
+    function selectedCount() {
+      return state.selectedCompletions.size + state.selectedFeedback.size;
+    }
+
+    function syncSelectionControls() {
+      const completionRows = filteredCompletions();
+      const feedbackRows = filteredFeedback();
+      const visibleCompletionIds = completionRows.map(row => String(row.id));
+      const visibleFeedbackIds = feedbackRows.map(row => String(row.id));
+      const checkedCompletions = visibleCompletionIds.filter(id => state.selectedCompletions.has(id)).length;
+      const checkedFeedback = visibleFeedbackIds.filter(id => state.selectedFeedback.has(id)).length;
+      const totalSelected = selectedCount();
+
+      els.deleteSelectedBtn.disabled = totalSelected === 0;
+      els.deleteSelectedBtn.textContent = totalSelected ? `Eliminar selección (${totalSelected})` : 'Eliminar selección';
+
+      els.selectAllCompletions.checked = visibleCompletionIds.length > 0 && checkedCompletions === visibleCompletionIds.length;
+      els.selectAllCompletions.indeterminate = checkedCompletions > 0 && checkedCompletions < visibleCompletionIds.length;
+      els.selectAllFeedback.checked = visibleFeedbackIds.length > 0 && checkedFeedback === visibleFeedbackIds.length;
+      els.selectAllFeedback.indeterminate = checkedFeedback > 0 && checkedFeedback < visibleFeedbackIds.length;
     }
 
     function renderCompletions() {
       const rows = filteredCompletions();
 
       if (!rows.length) {
-        els.completionsBody.innerHTML = '<tr><td colspan="7" class="empty">No hay recorridos para mostrar.</td></tr>';
+        els.completionsBody.innerHTML = '<tr><td colspan="8" class="empty">No hay recorridos para mostrar.</td></tr>';
+        syncSelectionControls();
         return;
       }
 
       els.completionsBody.innerHTML = rows.map(row => `
         <tr>
+          <td><input type="checkbox" data-select-completion="${escapeHtml(row.id)}" aria-label="Seleccionar recorrido ${escapeHtml(row.id)}" ${state.selectedCompletions.has(String(row.id)) ? 'checked' : ''}></td>
           <td>${escapeHtml(fmtDate(row.timestamp))}</td>
           <td>
             <strong>${escapeHtml(row.profileKey || row.profile || 'Sin dato')}</strong>
@@ -268,18 +305,28 @@
       els.completionsBody.querySelectorAll('[data-answers]').forEach(button => {
         button.addEventListener('click', () => loadAnswers(button.dataset.answers));
       });
+      els.completionsBody.querySelectorAll('[data-select-completion]').forEach(input => {
+        input.addEventListener('change', () => {
+          if (input.checked) state.selectedCompletions.add(String(input.dataset.selectCompletion));
+          else state.selectedCompletions.delete(String(input.dataset.selectCompletion));
+          syncSelectionControls();
+        });
+      });
+      syncSelectionControls();
     }
 
     function renderFeedback() {
       const rows = filteredFeedback();
 
       if (!rows.length) {
-        els.feedbackBody.innerHTML = '<tr><td colspan="6" class="empty">No hay valoraciones para mostrar.</td></tr>';
+        els.feedbackBody.innerHTML = '<tr><td colspan="7" class="empty">No hay valoraciones para mostrar.</td></tr>';
+        syncSelectionControls();
         return;
       }
 
       els.feedbackBody.innerHTML = rows.map(row => `
         <tr>
+          <td><input type="checkbox" data-select-feedback="${escapeHtml(row.id)}" aria-label="Seleccionar valoración ${escapeHtml(row.id)}" ${state.selectedFeedback.has(String(row.id)) ? 'checked' : ''}></td>
           <td>${escapeHtml(fmtDate(row.timestamp))}</td>
           <td><span class="badge warn">${escapeHtml(row.rating || 0)} / 5</span></td>
           <td>${escapeHtml(row.suggestion || 'Sin comentario')}</td>
@@ -288,6 +335,14 @@
           <td>${escapeHtml(row.country || '')}</td>
         </tr>
       `).join('');
+      els.feedbackBody.querySelectorAll('[data-select-feedback]').forEach(input => {
+        input.addEventListener('change', () => {
+          if (input.checked) state.selectedFeedback.add(String(input.dataset.selectFeedback));
+          else state.selectedFeedback.delete(String(input.dataset.selectFeedback));
+          syncSelectionControls();
+        });
+      });
+      syncSelectionControls();
     }
 
     function renderCurrentTab() {
@@ -344,6 +399,8 @@
 
         state.completions = completions.completions || [];
         state.feedback = feedback.feedback || [];
+        state.selectedCompletions = new Set(Array.from(state.selectedCompletions).filter(id => state.completions.some(row => String(row.id) === id)));
+        state.selectedFeedback = new Set(Array.from(state.selectedFeedback).filter(id => state.feedback.some(row => String(row.id) === id)));
         renderSummary(summary);
         fillFilters();
         renderCurrentTab();
@@ -460,7 +517,11 @@
     }
 
     async function resetData() {
-      const confirmation = window.prompt('Antes de borrar, conviene descargar un ZIP de corte de datos. Esta acción borra visitas, recorridos, respuestas y valoraciones. Escribí BORRAR DATOS para confirmar.');
+      const hasRange = Boolean(els.dateFromFilter.value || els.dateToFilter.value);
+      const scope = hasRange
+        ? `el rango ${els.dateFromFilter.value || 'inicio'} a ${els.dateToFilter.value || 'hoy'}`
+        : 'todos los datos';
+      const confirmation = window.prompt(`Antes de borrar, conviene descargar un ZIP de corte de datos. Esta acción borra visitas, recorridos, respuestas y valoraciones de ${scope}. Escribí BORRAR DATOS para confirmar.`);
       if (confirmation === null) {
         setStatus('Limpieza cancelada.');
         return;
@@ -474,7 +535,11 @@
       try {
         els.resetDataBtn.disabled = true;
         setStatus('Limpiando datos...');
-        const result = await apiPost('/admin/reset-data', { confirmation: confirmation.trim() });
+        const result = await apiPost('/admin/reset-data', {
+          confirmation: confirmation.trim(),
+          from: els.dateFromFilter.value,
+          to: els.dateToFilter.value,
+        });
         await loadAll({ silent: true });
         setStatus(`Datos eliminados: ${fmtNumber(result.deleted.events)} eventos, ${fmtNumber(result.deleted.answers)} respuestas y ${fmtNumber(result.deleted.feedback)} valoraciones.`);
       } catch (error) {
@@ -482,6 +547,54 @@
       } finally {
         els.resetDataBtn.disabled = false;
       }
+    }
+
+    async function deleteSelected() {
+      const payload = selectedPayload();
+      const total = selectedCount();
+      if (!total) {
+        setStatus('No hay registros seleccionados para eliminar.');
+        return;
+      }
+
+      const confirmation = window.prompt(`Vas a eliminar ${total} registro(s) seleccionado(s) y sus datos asociados. Escribí ELIMINAR para confirmar.`);
+      if (confirmation === null) {
+        setStatus('Eliminación cancelada.');
+        return;
+      }
+      if (confirmation.trim().toUpperCase() !== 'ELIMINAR') {
+        setStatus('No se eliminó nada: la confirmación debe ser ELIMINAR.');
+        return;
+      }
+
+      try {
+        els.deleteSelectedBtn.disabled = true;
+        setStatus('Eliminando selección...');
+        const result = await apiPost('/admin/reset-data', {
+          confirmation: 'BORRAR DATOS',
+          ...payload,
+        });
+        state.selectedCompletions.clear();
+        state.selectedFeedback.clear();
+        await loadAll({ silent: true });
+        setStatus(`Selección eliminada: ${fmtNumber(result.deleted.events)} eventos, ${fmtNumber(result.deleted.answers)} respuestas y ${fmtNumber(result.deleted.feedback)} valoraciones.`);
+      } catch (error) {
+        setStatus(`No se pudo eliminar la selección: ${error.message}`);
+      } finally {
+        els.deleteSelectedBtn.disabled = selectedCount() === 0;
+        syncSelectionControls();
+      }
+    }
+
+    function toggleVisibleSelection(type, checked) {
+      const rows = type === 'completions' ? filteredCompletions() : filteredFeedback();
+      const target = type === 'completions' ? state.selectedCompletions : state.selectedFeedback;
+      rows.forEach(row => {
+        const id = String(row.id);
+        if (checked) target.add(id);
+        else target.delete(id);
+      });
+      renderCurrentTab();
     }
 
     els.loginForm.addEventListener('submit', event => {
@@ -501,6 +614,7 @@
 
     els.refreshBtn.addEventListener('click', loadAll);
     els.resetDataBtn.addEventListener('click', resetData);
+    els.deleteSelectedBtn.addEventListener('click', deleteSelected);
     els.searchInput.addEventListener('input', renderCurrentTab);
     els.profileFilter.addEventListener('change', renderCurrentTab);
     els.educationFilter.addEventListener('change', renderCurrentTab);
@@ -514,6 +628,8 @@
     els.exportCompletionsBtn.addEventListener('click', () => downloadFilteredCsv('completions'));
     els.exportFeedbackBtn.addEventListener('click', () => downloadFilteredCsv('feedback'));
     els.exportAnswersBtn.addEventListener('click', () => downloadFilteredCsv('answers'));
+    els.selectAllCompletions.addEventListener('change', () => toggleVisibleSelection('completions', els.selectAllCompletions.checked));
+    els.selectAllFeedback.addEventListener('change', () => toggleVisibleSelection('feedback', els.selectAllFeedback.checked));
 
     els.tabs.forEach(tab => {
       tab.addEventListener('click', () => {

@@ -234,6 +234,20 @@
       vertical-align: top;
     }
 
+    th:first-child,
+    td:first-child {
+      width: 44px;
+      text-align: center;
+    }
+
+    th input[type="checkbox"],
+    td input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--bad);
+      cursor: pointer;
+    }
+
     th {
       position: sticky;
       top: 0;

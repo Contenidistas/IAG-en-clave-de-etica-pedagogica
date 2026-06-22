@@ -32,6 +32,7 @@
       <div class="actions">
         <button id="refreshBtn" class="btn" type="button">Actualizar</button>
         <button id="resetDataBtn" class="btn danger solid" type="button">Limpiar datos</button>
+        <button id="deleteSelectedBtn" class="btn danger" type="button" disabled>Eliminar selección</button>
         <button id="logoutBtn" class="btn danger" type="button">Cerrar sesión</button>
       </div>
     </header>
@@ -114,6 +115,7 @@
             <table>
               <thead>
                 <tr>
+                  <th><input id="selectAllCompletions" type="checkbox" aria-label="Seleccionar recorridos visibles"></th>
                   <th>Fecha</th>
                   <th>Perfil</th>
                   <th>Nivel educativo</th>
@@ -141,6 +143,7 @@
           <table>
             <thead>
               <tr>
+                <th><input id="selectAllFeedback" type="checkbox" aria-label="Seleccionar valoraciones visibles"></th>
                 <th>Fecha</th>
                 <th>Valoración</th>
                 <th>Comentario</th>

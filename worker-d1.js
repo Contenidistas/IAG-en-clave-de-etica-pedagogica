@@ -635,6 +635,91 @@ async function resetAdminData(request, env) {
     throw error;
   }
 
+  const eventIds = uniqueNumbers(data.eventIds);
+  const feedbackIds = uniqueNumbers(data.feedbackIds);
+  const range = dateRangeFromBody(data);
+  const hasSelection = eventIds.length > 0 || feedbackIds.length > 0;
+  const hasRange = Boolean(range.from || range.to);
+
+  let targetEventIds = eventIds;
+
+  if (feedbackIds.length) {
+    const feedbackEventIds = await selectFeedbackEventIds(env, feedbackIds);
+    targetEventIds = uniqueNumbers([...targetEventIds, ...feedbackEventIds]);
+  }
+
+  if (!hasSelection && hasRange) {
+    targetEventIds = await selectEventIdsForRange(env, range);
+  }
+
+  const deleted = hasSelection || hasRange
+    ? await deleteScopedData(env, targetEventIds, feedbackIds)
+    : await deleteAllAdminData(env);
+
+  if (!hasSelection && !hasRange) {
+    try {
+      await env.DB.prepare("DELETE FROM sqlite_sequence WHERE name IN ('events', 'answers', 'feedback')").run();
+    } catch (error) {
+      console.warn('No se pudo reiniciar sqlite_sequence:', error.message);
+    }
+  }
+
+  return {
+    ok: true,
+    deleted,
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+function dateRangeFromBody(data) {
+  const rawFrom = clean(data.from);
+  const rawTo = clean(data.to);
+  const from = normalizeDateParam(rawFrom);
+  const to = normalizeDateParam(rawTo);
+
+  if ((rawFrom && !from) || (rawTo && !to)) {
+    const error = new Error('Rango de fechas inválido');
+    error.status = 400;
+    throw error;
+  }
+
+  const params = new URLSearchParams();
+  if (from) params.set('from', from);
+  if (to) params.set('to', to);
+  return dateRangeFromParams(params);
+}
+
+function uniqueNumbers(values) {
+  if (!Array.isArray(values)) return [];
+  return Array.from(new Set(
+    values
+      .map(value => Number(value))
+      .filter(value => Number.isInteger(value) && value > 0)
+  ));
+}
+
+async function selectFeedbackEventIds(env, feedbackIds) {
+  const rows = await selectRowsByIds(env, `
+    SELECT event_id AS eventId
+    FROM feedback
+    WHERE id IN (__IDS__)
+  `, feedbackIds);
+  return uniqueNumbers(rows.map(row => row.eventId));
+}
+
+async function selectEventIdsForRange(env, range) {
+  const where = rangeWhere(range, 'timestamp');
+  const result = await runAll(env.DB.prepare(`
+    SELECT id
+    FROM events
+    ${where.sql}
+    ORDER BY id
+    LIMIT 50000
+  `), where.values);
+  return uniqueNumbers((result.results || []).map(row => row.id));
+}
+
+async function deleteAllAdminData(env) {
   const before = await env.DB.prepare(`
     SELECT
       (SELECT COUNT(*) FROM events) AS events,
@@ -648,21 +733,75 @@ async function resetAdminData(request, env) {
     env.DB.prepare('DELETE FROM events'),
   ]);
 
-  try {
-    await env.DB.prepare("DELETE FROM sqlite_sequence WHERE name IN ('events', 'answers', 'feedback')").run();
-  } catch (error) {
-    console.warn('No se pudo reiniciar sqlite_sequence:', error.message);
+  return {
+    events: Number(before?.events || 0),
+    answers: Number(before?.answers || 0),
+    feedback: Number(before?.feedback || 0),
+  };
+}
+
+async function deleteScopedData(env, eventIds, feedbackIds) {
+  const targetEventIds = uniqueNumbers(eventIds);
+  const selectedFeedbackIds = uniqueNumbers(feedbackIds);
+  const counts = {
+    events: targetEventIds.length ? await countRowsByIds(env, 'events', 'id', targetEventIds) : 0,
+    answers: targetEventIds.length ? await countRowsByIds(env, 'answers', 'event_id', targetEventIds) : 0,
+    feedback: 0,
+  };
+
+  const feedbackByEvent = targetEventIds.length ? await countRowsByIds(env, 'feedback', 'event_id', targetEventIds) : 0;
+  const directFeedback = selectedFeedbackIds.length ? await countRowsByIds(env, 'feedback', 'id', selectedFeedbackIds) : 0;
+  counts.feedback = Math.max(feedbackByEvent, directFeedback);
+
+  if (selectedFeedbackIds.length) {
+    await deleteRowsByIds(env, 'feedback', 'id', selectedFeedbackIds);
+  }
+  if (targetEventIds.length) {
+    await deleteRowsByIds(env, 'feedback', 'event_id', targetEventIds);
+    await deleteRowsByIds(env, 'answers', 'event_id', targetEventIds);
+    await deleteRowsByIds(env, 'events', 'id', targetEventIds);
   }
 
-  return {
-    ok: true,
-    deleted: {
-      events: Number(before?.events || 0),
-      answers: Number(before?.answers || 0),
-      feedback: Number(before?.feedback || 0),
-    },
-    updatedAt: new Date().toISOString(),
-  };
+  return counts;
+}
+
+async function countRowsByIds(env, table, column, ids) {
+  let count = 0;
+  for (const chunk of chunks(ids, 90)) {
+    const placeholders = chunk.map(() => '?').join(',');
+    const row = await env.DB.prepare(`
+      SELECT COUNT(*) AS count
+      FROM ${table}
+      WHERE ${column} IN (${placeholders})
+    `).bind(...chunk).first();
+    count += Number(row?.count || 0);
+  }
+  return count;
+}
+
+async function deleteRowsByIds(env, table, column, ids) {
+  for (const chunk of chunks(ids, 90)) {
+    const placeholders = chunk.map(() => '?').join(',');
+    await env.DB.prepare(`DELETE FROM ${table} WHERE ${column} IN (${placeholders})`).bind(...chunk).run();
+  }
+}
+
+async function selectRowsByIds(env, sqlTemplate, ids) {
+  const rows = [];
+  for (const chunk of chunks(ids, 90)) {
+    const placeholders = chunk.map(() => '?').join(',');
+    const result = await env.DB.prepare(sqlTemplate.replace('__IDS__', placeholders)).bind(...chunk).all();
+    rows.push(...(result.results || []));
+  }
+  return rows;
+}
+
+function chunks(values, size) {
+  const output = [];
+  for (let index = 0; index < values.length; index += size) {
+    output.push(values.slice(index, index + size));
+  }
+  return output;
 }
 
 async function listAnswers(env, eventId) {
