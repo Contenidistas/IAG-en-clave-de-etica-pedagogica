@@ -1,4 +1,4 @@
-const CACHE_NAME = 'iag-etica-pedagogica-v4';
+const CACHE_NAME = 'iag-etica-pedagogica-v5';
 
 const CORE_ASSETS = [
   './',
@@ -45,18 +45,42 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
   if (url.pathname.endsWith('/admin.html') || url.pathname.endsWith('/admin.js') || url.pathname.endsWith('/admin.css')) return;
 
+  const shouldPreferNetwork = request.mode === 'navigate'
+    || request.destination === 'script'
+    || request.destination === 'style';
+
+  if (shouldPreferNetwork) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response && response.ok) {
+            const copy = response.clone();
+            return caches.open(CACHE_NAME)
+              .then((cache) => cache.put(request, copy))
+              .then(() => response);
+          }
+          return response;
+        })
+        .catch(() => caches.match(request))
+    );
+    return;
+  }
+
   event.respondWith(
     caches.match(request).then((cached) => {
       const networkFetch = fetch(request)
         .then((response) => {
           if (response && response.ok) {
             const copy = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+            return caches.open(CACHE_NAME)
+              .then((cache) => cache.put(request, copy))
+              .then(() => response);
           }
           return response;
         })
         .catch(() => cached);
 
+      if (cached) event.waitUntil(networkFetch);
       return cached || networkFetch;
     })
   );

@@ -1647,7 +1647,10 @@ async function cargarOpinionesAnonimas() {
   elements.opinionsStatus.textContent = 'Cargando opiniones...';
 
   try {
-    const response = await fetch(CONFIG.opinionsEndpoint, { method: 'GET' });
+    const response = await fetch(CONFIG.opinionsEndpoint, {
+      method: 'GET',
+      cache: 'no-store'
+    });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
     renderOpinions(data.opinions || []);
