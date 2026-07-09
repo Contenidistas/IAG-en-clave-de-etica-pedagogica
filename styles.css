@@ -3773,6 +3773,27 @@ img, video {
     padding: 1rem 0;
 }
 
+.team-member-detail {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    text-align: left;
+}
+
+.team-member-photo {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--primary);
+    box-shadow: var(--shadow);
+    flex-shrink: 0;
+}
+
+.team-member-info {
+    flex: 1;
+}
+
 .team-member-detail h4 {
     color: var(--primary);
     margin-bottom: 0.2rem;
