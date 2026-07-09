@@ -9,9 +9,12 @@
 
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; connect-src 'self' https://iag-etica-api.suscripcionessh.workers.dev; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' https://iag-etica-api.suscripcionessh.workers.dev; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
   <meta name="theme-color" content="#6366f1">
   <title>IA Educativa ANEP - Uso Crítico y Reflexivo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
@@ -171,6 +174,26 @@
 
                 <!-- Selección de perfil (define la densidad del recorrido) -->
                 <div class="profile-selector-panel onboarding-step" id="profileSelectorPanel" data-onboarding-step="profile">
+                  <!-- Fondo de Red Neuronal -->
+                  <div class="neural-net-bg" aria-hidden="true">
+                    <svg viewBox="0 0 400 200" preserveAspectRatio="none">
+                      <line x1="40" y1="40" x2="140" y2="30" class="synapse" />
+                      <line x1="40" y1="40" x2="140" y2="100" class="synapse" />
+                      <line x1="40" y1="160" x2="140" y2="100" class="synapse" />
+                      <line x1="40" y1="160" x2="140" y2="170" class="synapse" />
+                      <line x1="140" y1="30" x2="280" y2="20" class="synapse" />
+                      <line x1="140" y1="100" x2="280" y2="100" class="synapse" />
+                      <line x1="140" y1="170" x2="280" y2="180" class="synapse" />
+                      <circle cx="40" cy="40" r="5" class="neuron" />
+                      <circle cx="40" cy="160" r="5" class="neuron" />
+                      <circle cx="140" cy="30" r="6" class="neuron" />
+                      <circle cx="140" cy="100" r="6" class="neuron" />
+                      <circle cx="140" cy="170" r="6" class="neuron" />
+                      <circle cx="280" cy="20" r="7" class="neuron" />
+                      <circle cx="280" cy="100" r="7" class="neuron" />
+                      <circle cx="280" cy="180" r="7" class="neuron" />
+                    </svg>
+                  </div>
                   <p class="section-kicker">Punto de partida</p>
                   <h3>¿Desde qué lugar querés hacer el recorrido?</h3>
                   <div class="chips-container profile-choice-grid">
@@ -191,13 +214,15 @@
 
                 <!-- Campo de nivel educativo (aparece dinámicamente según perfil) -->
                 <div id="nivelEducativoWrapper" class="onboarding-step" data-onboarding-step="nivel" style="max-width: 500px; margin: 1.5rem auto; display: none;">
-                  <label for="nivelEducativo" style="display:block; margin-bottom:0.5rem; font-weight:600;">
+                  <label style="display:block; margin-bottom:0.75rem; font-weight:600; text-align:center;">
                     <span id="nivelEducativoLabel">En qué nivel trabajás</span>
                   </label>
-                  <select id="nivelEducativo" class="input">
+                  <select id="nivelEducativo" class="input" style="display:none;">
                     <option value="">Seleccioná una opción</option>
-                    <!-- Opciones se cargan dinámicamente según perfil -->
                   </select>
+                  <div id="nivelEducativoChips" class="chips-container select-chips vertical-chips" style="display:flex; flex-direction:column; gap:0.55rem; width:100%;">
+                    <!-- Chips se cargarán dinámicamente por JS -->
+                  </div>
                 </div>
 
                 <!-- Principios clave UNESCO/ANEP/FING/Udelar/Ceibal -->
@@ -385,9 +410,9 @@
                 </div>
 
                 <!-- Selector de país -->
-                <div id="countryWrapper" class="onboarding-step" data-onboarding-step="contexto" style="max-width: 400px; margin: 1rem auto;">
-                  <label for="countrySelect" style="display:block; margin-bottom:0.5rem; font-weight:600;">País</label>
-                  <select id="countrySelect" name="pais" class="input">
+                <div id="countryWrapper" class="onboarding-step" data-onboarding-step="contexto" style="max-width: 500px; margin: 1rem auto;">
+                  <label style="display:block; margin-bottom:0.5rem; font-weight:600; text-align:center;">País</label>
+                  <select id="countrySelect" name="pais" class="input" style="display:none;">
                     <option value="Uruguay" selected>Uruguay</option>
                     <option value="Argentina">Argentina</option>
                     <option value="Brasil">Brasil</option>
@@ -398,6 +423,9 @@
                     <option value="España">España</option>
                     <option value="Otro">Otro (especificar)</option>
                   </select>
+                  <div id="countryChips" class="chips-container select-chips" style="justify-content:center; gap:0.5rem;">
+                    <!-- Chips se generarán automáticamente vía JS -->
+                  </div>
                 </div>
 
                 <!-- Campo "Otro país" (aparece si selecciona "Otro") -->
@@ -411,10 +439,10 @@
 
                 <!-- Nivel de familiaridad con el tema -->
                 <div id="familiaridadInicialWrapper" class="onboarding-step" data-onboarding-step="familiaridad" style="max-width: 500px; margin: 1.5rem auto;">
-                  <label for="familiaridadInicial" style="display:block; margin-bottom:0.5rem; font-weight:600;">
+                  <label style="display:block; margin-bottom:0.75rem; font-weight:600; text-align:center;">
                     Antes de comenzar, ¿qué nivel de familiaridad tenés con este tema?
                   </label>
-                  <select id="familiaridadInicial" class="input">
+                  <select id="familiaridadInicial" class="input" style="display:none;">
                     <option value="">Seleccioná una opción</option>
                     <option value="Nunca lo estudié">Nunca lo estudié</option>
                     <option value="Lo conozco superficialmente">Lo conozco superficialmente</option>
@@ -422,6 +450,9 @@
                     <option value="Lo domino a nivel práctico">Lo domino a nivel práctico</option>
                     <option value="Lo manejo en profundidad o lo enseño">Lo manejo en profundidad o lo enseño</option>
                   </select>
+                  <div id="familiaridadChips" class="chips-container select-chips vertical-chips" style="display:flex; flex-direction:column; gap:0.55rem; width:100%;">
+                    <!-- Chips se generarán automáticamente vía JS -->
+                  </div>
                 </div>
 
                 <!-- Uso de recursos similares -->

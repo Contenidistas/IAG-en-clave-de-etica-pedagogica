@@ -446,6 +446,28 @@ function updateNivelEducativo(perfil) {
     window.state.nivelEducativo = '';
   }
 
+  // Ocultar select nativo y generar chips
+  elements.nivelEducativo.style.display = 'none';
+  const chipsContainer = document.getElementById('nivelEducativoChips');
+  if (chipsContainer) {
+    chipsContainer.innerHTML = '';
+    niveles.forEach(nivel => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'chip select-chip';
+      btn.textContent = nivel;
+      btn.dataset.value = nivel;
+
+      btn.addEventListener('click', () => {
+        chipsContainer.querySelectorAll('.select-chip').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        elements.nivelEducativo.value = nivel;
+        elements.nivelEducativo.dispatchEvent(new Event('change'));
+      });
+      chipsContainer.appendChild(btn);
+    });
+  }
+
   // Actualizar botón de inicio
   updateStartButtonState();
 }
@@ -455,6 +477,10 @@ function hideNivelEducativo() {
   elements.nivelEducativoWrapper.style.display = 'none';
   if (elements.nivelEducativo) {
     elements.nivelEducativo.value = '';
+  }
+  const chipsContainer = document.getElementById('nivelEducativoChips');
+  if (chipsContainer) {
+    chipsContainer.querySelectorAll('.select-chip').forEach(c => c.classList.remove('active'));
   }
   if (window.state) {
     window.state.nivelEducativo = '';
@@ -1226,6 +1252,15 @@ if (homeBtn) {
             }
             if (elements.consentTracking) elements.consentTracking.checked = false;
 
+            // Reset custom select chips in UI
+            document.querySelectorAll('.select-chips').forEach(container => {
+              container.querySelectorAll('.select-chip').forEach(c => c.classList.remove('active'));
+              if (container.id === 'countryChips') {
+                const uruguayChip = container.querySelector('[data-value="Uruguay"]');
+                if (uruguayChip) uruguayChip.classList.add('active');
+              }
+            });
+
             updateStartButtonState();
             updateCarousel();
             showScreen('intro');
@@ -1512,7 +1547,12 @@ function renderStatsBars(container, rows) {
     .filter(row => Number.isFinite(row.count) && row.count > 0);
 
   if (!normalized.length) {
-    container.innerHTML = '<p class="stats-empty">Sin datos suficientes.</p>';
+    container.innerHTML = `
+      <div class="stats-empty-container">
+        <span class="stats-empty-icon">📊</span>
+        <p class="stats-empty">Sin registros suficientes en este momento</p>
+      </div>
+    `;
     return;
   }
 
@@ -1579,7 +1619,14 @@ async function cargarEstadisticasAnonimas() {
   } catch (error) {
     console.warn('No se pudieron cargar estadísticas anónimas:', error);
     elements.statsStatus.innerHTML = `
-      Las estadísticas todavía no están disponibles. Para activarlas, la API con base de datos debe publicar un endpoint de lectura con datos agregados y anónimos.
+      <div class="stats-offline-card">
+        <div class="stats-offline-icon">🌐</div>
+        <h4>Modo local / Sin conexión</h4>
+        <p>Las estadísticas globales no están disponibles en este momento (se activarán automáticamente al desplegar la actualización en producción con el servidor de base de datos).</p>
+        <div class="stats-offline-action-note">
+          Puedes consultar tu <strong>Historial de Diagnósticos</strong> local en este dispositivo en la sección de abajo.
+        </div>
+      </div>
     `;
   }
 }
@@ -1809,6 +1856,38 @@ function enviarValoracionHerramienta() {
     });
 }
 
+function syncSelectWithChips(selectId, chipsContainerId) {
+  const select = document.getElementById(selectId);
+  const container = document.getElementById(chipsContainerId);
+  if (!select || !container) return;
+
+  // Ocultar select nativo
+  select.style.display = 'none';
+
+  // Leer opciones y construir chips
+  const options = Array.from(select.options).filter(opt => opt.value !== "");
+  container.innerHTML = '';
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'chip select-chip';
+    if (select.value === opt.value) {
+      btn.classList.add('active');
+    }
+    btn.textContent = opt.textContent;
+    btn.dataset.value = opt.value;
+
+    btn.addEventListener('click', () => {
+      container.querySelectorAll('.select-chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      select.value = opt.value;
+      select.dispatchEvent(new Event('change'));
+    });
+
+    container.appendChild(btn);
+  });
+}
+
 if (elements.sendToolFeedbackBtn) {
   elements.sendToolFeedbackBtn.addEventListener('click', enviarValoracionHerramienta);
 }
@@ -1819,6 +1898,10 @@ if (elements.sendToolFeedbackBtn) {
 // Ejecutar después de que todo se cargue
 document.addEventListener('DOMContentLoaded', () => {
   debugLog('Sincronizando estado inicial...');
+  
+  // Sincronizar país y familiaridad inicial con chips
+  syncSelectWithChips('countrySelect', 'countryChips');
+  syncSelectWithChips('familiaridadInicial', 'familiaridadChips');
   
   // Sincronizar perfil si hay un chip activo
   const activeChip = document.querySelector('.chip.active');

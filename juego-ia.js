@@ -589,6 +589,15 @@ function renderQuestion() {
   elements.questionNumber.textContent = state.currentQuestion;
   elements.questionTitle.textContent  = nodo.title;
   elements.questionHelp.textContent   = nodo.help;
+
+  // Trigger smooth question card animation
+  const card = document.querySelector('.question-card');
+  if (card) {
+    card.classList.remove('fade-in-slide');
+    void card.offsetWidth; // Force reflow
+    card.classList.add('fade-in-slide');
+  }
+
   state.awaitingNext = false;
   state.graphFocusCriterionId = null;
   renderDecisionContext(nodo);
