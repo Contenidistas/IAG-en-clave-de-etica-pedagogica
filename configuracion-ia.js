@@ -362,57 +362,57 @@ likert: [
       inicio: 'ef1',
       nodos: {
         ef1: { 
-          title: '¿Usás IA para diseñar actividades o materiales?',
-          help: 'Ideas de consignas o explicaciones para tus futuros alumnos.',
+          title: '¿Usás IA para diseñar actividades, materiales o propuestas en el marco de las asignaturas que cursás en tu formación docente (o pensás hacerlo en el futuro)?',
+          help: 'Propuestas de aula, recursos educativos o tareas de entrega en tu centro. Si aún no cursás didáctica o práctica, respondé pensando en cualquier diseño curricular o entrega académica.',
           context: 'La IA vinculada al rol de mediador pedagógico.',
           gainYes: 14, gainNo: 4, onYes: 'ef2', onNo: 'ef2',
           anepRef: 'ANEP'
         },
         ef2: { 
-          title: '¿Evaluás si las propuestas respetan el contexto y diversidad?',
-          help: 'Analizar si las sugerencias son inclusivas y realistas.',
+          title: '¿Evaluás si las propuestas y respuestas devueltas por la IA respetan el contexto local y la diversidad del estudiantado?',
+          help: 'Analizar críticamente si el contenido sugerido por la IA es inclusivo, realista y libre de sesgos o términos ajenos a las aulas uruguayas.',
           context: 'Importancia del contexto y la equidad.',
           gainYes: 16, gainNo: 0, onYes: 'g1', onNo: 'g1',
           anepRef: 'Sección 6'
         },
         g1: { 
-          title: '¿Contrastás con bibliografía didáctica y currículo?',
-          help: 'Programas oficiales y propuestas de ANEP.',
+          title: '¿Contrastás las respuestas y contenidos obtenidos mediante la IA con la teoría didáctica, la bibliografía académica y el currículo oficial?',
+          help: 'Verificar que la propuesta generada por el algoritmo tenga un sustento didáctico sólido y se alinee con los programas educativos vigentes.',
           context: 'Articular la IA con los marcos vigentes.',
           gainYes: 18, gainNo: 0, onYes: 'g2', onNo: 'g1b',
           anepRef: 'ANEP'
         },
         g1b: { 
-          title: '¿Si tomás ideas de IA, lo dejás claro en tu planificación?',
-          help: 'Reconocer origen y cambios personales realizados.',
+          title: '¿Si tomás ideas de la IA para realizar tus tareas académicas o planificaciones de práctica, declarás de forma transparente cómo y para qué la utilizaste?',
+          help: 'Indicar de forma honesta si usaste la IA como apoyo para buscar información, estructurar el texto o generar ideas, y qué cambios u opiniones son tuyos.',
           context: 'Centralidad de la reflexión en formación inicial.',
           gainYes: 10, gainNo: 0, onYes: 'g2', onNo: 'g2',
           anepRef: 'ANEP'
         },
         g2: { 
-          title: '¿Analizás cómo los sesgos afectan a tus futuros estudiantes?',
-          help: 'Lenguaje excluyente o ausencia de realidades locales.',
+          title: '¿Reflexionás sobre cómo los sesgos de la IA (de género, culturales o geográficos) pueden aparecer en los materiales que generás para tus tareas o prácticas?',
+          help: 'Aprender a detectar si las respuestas del modelo traen estereotipos, términos ajenos o excluyen realidades locales, revisándolas críticamente antes de usarlas.',
           context: 'El rol docente incluye generar alternativas pedagógicas.',
           gainYes: 18, gainNo: 0, onYes: 'g3', onNo: 'g3',
           anepRef: 'UNESCO'
         },
         g3: { 
-          title: '¿Tus secuencias mantienen el lugar central del estudiante?',
-          help: 'Evitar que la IA haga todo; priorizar pensamiento crítico.',
+          title: '¿Al diseñar propuestas didácticas en tus materias, buscás que el estudiante de secundaria o primaria mantenga un rol activo y reflexivo frente al uso de tecnologías?',
+          help: 'Pensar propuestas donde tu futuro alumno investigue, cree y debata, evitando consignas de mera repetición o copia de lo que genera la IA.',
           context: 'Construcción colectiva en el aula.',
           gainYes: 16, gainNo: 0, onYes: 'g4', onNo: 'g4',
           anepRef: 'Sección 6'
         },
         g4: { 
-          title: '¿Compartís con docentes de práctica cómo usás la IA?',
-          help: 'Abrir el tema en tutorías para recibir orientación ética.',
+          title: '¿Conversás con tus docentes de práctica, orientadores o profesores de didáctica sobre los límites éticos y pedagógicos del uso de la IA en la enseñanza?',
+          help: 'Aprovechar los espacios de tutoría, talleres o clases para debatir dudas, riesgos de privacidad y buenas prácticas tecnológicas. Si no tenés práctica aún, marcá "No aplica".',
           context: 'Comunidad profesional de aprendizaje.',
           gainYes: 14, gainNo: 0, onYes: 'ef3', onNo: 'ef3',
           anepRef: 'ANEP'
         },
         ef3: { 
-          title: '¿Te preguntás cómo modelarás el uso responsable de IA?',
-          help: 'El ejemplo que das como referente en ética digital.',
+          title: '¿Reflexionás sobre la responsabilidad ética que tendrás como futuro docente al modelar el uso crítico, honesto y transparente de la IA frente a tu grupo?',
+          help: 'Pensar en tu futuro rol como referente y en cómo orientarás a tus estudiantes para que utilicen la tecnología con ciudadanía digital activa.',
           context: 'Rol docente y ciudadanía digital.',
           gainYes: 12, gainNo: 2, onYes: 'FIN', onNo: 'FIN',
           anepRef: 'ANEP'
@@ -638,7 +638,7 @@ const state = {
   familiaridadInicial: '',
   recursosSimilares: '',
   consentTracking: false,
-  activeResultTab: 'sintesis',
+  activeResultTab: 'resumen',
   agreementFormat: 'aula'
 };
 

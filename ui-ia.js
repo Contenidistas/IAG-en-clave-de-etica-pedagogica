@@ -96,6 +96,7 @@ const elements = {
   resultTabPanels: document.querySelectorAll('.result-tab-panel'),
   agreementBuilderText: document.getElementById('agreementBuilderText'),
   copyAgreementBtn: document.getElementById('copyAgreementBtn'),
+  downloadAgreementBtn: document.getElementById('downloadAgreementBtn'),
   regenerateAgreementBtn: document.getElementById('regenerateAgreementBtn'),
   agreementBuilderStatus: document.getElementById('agreementBuilderStatus'),
   agreementFormatBtns: document.querySelectorAll('.agreement-format-btn'),
@@ -537,7 +538,14 @@ function updateCarousel() {
   });
 
   if (activeSlide) {
-    elements.carouselTrack.style.height = `${activeSlide.offsetHeight}px`;
+    const adjustHeight = () => {
+      if (activeSlide.offsetHeight > 0) {
+        elements.carouselTrack.style.height = `${activeSlide.offsetHeight}px`;
+      }
+    };
+    adjustHeight();
+    // Ajuste secundario para asegurar que el reflow del navegador haya terminado
+    setTimeout(adjustHeight, 50);
   }
 
   if (elements.carouselDots && elements.carouselDots.length) {
@@ -874,6 +882,12 @@ function advanceOnboarding() {
       return;
     }
 
+    // Si es perfil Docente, dar opción de iniciar cuestionario o entrar a Casos
+    if (state.profile === 'docente') {
+      mostrarDecisionModoDocente();
+      return;
+    }
+
     if (elements.startGuidanceTitle) {
       elements.startGuidanceTitle.textContent = 'Iniciando recorrido...';
     }
@@ -891,6 +905,52 @@ function advanceOnboarding() {
 
   state.onboardingStep += 1;
   updateOnboardingUI();
+}
+
+function mostrarDecisionModoDocente() {
+  const content = `
+    <div class="mode-selection-modal-body" style="text-align: center; padding: 1rem 0;">
+      <p style="margin-bottom: 1.5rem; font-size: 1.05rem; line-height: 1.5; color: var(--text-secondary);">
+        Como docente, tenés la opción de realizar el cuestionario reflexivo para evaluar tu práctica con inteligencia artificial generativa, o ingresar de manera directa al **Laboratorio de Casos (Modo Taller)**.
+      </p>
+      <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 320px; margin: 0 auto;">
+        <button type="button" class="btn btn-primary" id="btnChooseQuiz" style="padding: 0.85rem; font-size: 1rem; width: 100%;">
+          📝 Iniciar cuestionario reflexivo
+        </button>
+        <button type="button" class="btn btn-outline" id="btnChooseLab" style="padding: 0.85rem; font-size: 1rem; width: 100%; border-color: var(--primary); color: var(--primary); background: var(--bg-main);">
+          🧪 Entrar al Laboratorio de Casos
+        </button>
+      </div>
+    </div>
+  `;
+  
+  if (typeof modal !== 'undefined' && typeof modal.show === 'function') {
+    modal.show('¿Qué recorrido deseás realizar?', content);
+    
+    const btnQuiz = document.getElementById('btnChooseQuiz');
+    const btnLab = document.getElementById('btnChooseLab');
+    
+    if (btnQuiz) {
+      btnQuiz.addEventListener('click', () => {
+        modal.hide();
+        if (elements.startGuidanceTitle) {
+          elements.startGuidanceTitle.textContent = 'Iniciando recorrido...';
+        }
+        if (typeof window.iniciarJuego === 'function') {
+          window.iniciarJuego();
+        }
+      });
+    }
+    
+    if (btnLab) {
+      btnLab.addEventListener('click', () => {
+        modal.hide();
+        if (typeof abrirLaboratorioCasos === 'function') {
+          abrirLaboratorioCasos();
+        }
+      });
+    }
+  }
 }
 
 function retreatOnboarding() {
@@ -916,6 +976,41 @@ if (elements.startGuidance) {
     focusInitialField(button.dataset.guideTarget);
   });
 }
+
+// 🧪 Botones para el Modo Laboratorio de Casos
+const goToCasesBtn = document.getElementById('goToCasesBtn');
+const btnVerCasosDirecto = document.getElementById('btnVerCasosDirecto');
+
+if (goToCasesBtn) {
+  goToCasesBtn.addEventListener('click', (event) => {
+    event.preventDefault();
+    if (typeof abrirLaboratorioCasos === 'function') {
+      abrirLaboratorioCasos();
+    }
+  });
+}
+
+if (btnVerCasosDirecto) {
+  btnVerCasosDirecto.addEventListener('click', (event) => {
+    event.preventDefault();
+    if (typeof abrirLaboratorioCasos === 'function') {
+      abrirLaboratorioCasos();
+    }
+  });
+}
+
+// 💡 Alternar descripción de ayuda colapsable
+document.addEventListener('click', (event) => {
+  const toggleBtn = event.target.closest('#toggleHelpBtn');
+  if (toggleBtn) {
+    const wrapper = document.getElementById('questionHelpWrapper');
+    if (wrapper) {
+      const isExpanded = wrapper.classList.toggle('expanded');
+      toggleBtn.classList.toggle('active', isExpanded);
+      toggleBtn.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+    }
+  }
+});
 
 if (elements.onboardingNextBtn) {
   elements.onboardingNextBtn.addEventListener('click', advanceOnboarding);
@@ -1262,8 +1357,8 @@ if (homeBtn) {
             });
 
             updateStartButtonState();
-            updateCarousel();
             showScreen('intro');
+            updateCarousel();
             window.scrollTo(0, 0);
           }, { once: true });
         }
@@ -1299,7 +1394,7 @@ if (btnVerAutores) btnVerAutores.addEventListener('click', function() {
 updateFrameworkAudience(state.profile || null);
 
 function activateResultTab(tabName) {
-  const activeTab = tabName || 'sintesis';
+  const activeTab = tabName || 'resumen';
   state.activeResultTab = activeTab;
 
   if (elements.resultTabs && elements.resultTabs.length) {
@@ -1951,6 +2046,7 @@ document.addEventListener('DOMContentLoaded', () => {
   cargarEstadisticasAnonimas();
   cargarOpinionesAnonimas();
   renderLocalHistory();
+  initNeuralNetBackground();
 
   setTimeout(mostrarGuiaRapidaInicial, 450);
 });
@@ -1958,3 +2054,214 @@ document.addEventListener('DOMContentLoaded', () => {
 window.addEventListener('resize', () => {
   updateCarousel();
 });
+
+if (elements.downloadAgreementBtn) {
+  elements.downloadAgreementBtn.addEventListener('click', () => {
+    descargarAcuerdoPDF();
+  });
+}
+
+async function descargarAcuerdoPDF() {
+  const btn = elements.downloadAgreementBtn;
+  const txtArea = elements.agreementBuilderText;
+  const status = elements.agreementBuilderStatus;
+  
+  if (!txtArea || !txtArea.value.trim()) return;
+  
+  const text = txtArea.value.trim();
+  
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Generando...';
+  }
+  
+  const cargarJsPDF = () => {
+    return new Promise((resolve) => {
+      if (window.jspdf && window.jspdf.jsPDF) {
+        resolve();
+        return;
+      }
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+      s.onload = () => resolve();
+      s.onerror = () => resolve();
+      document.body.appendChild(s);
+    });
+  };
+
+  try {
+    await cargarJsPDF();
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+      if (status) {
+        status.textContent = 'Error al cargar jsPDF. Comprobá tu conexión.';
+        status.style.color = 'var(--warning)';
+      }
+      return;
+    }
+    
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+    
+    // Encabezado
+    doc.setFillColor(79, 70, 229);
+    doc.rect(0, 0, 210, 30, 'F');
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+    doc.text("ACUERDO DIDÁCTICO PARA EL USO DE IA", 15, 14);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text("Políticas acordadas y orientaciones para actividades de aula", 15, 22);
+    
+    doc.setTextColor(31, 41, 55);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    
+    const lines = doc.splitTextToSize(text, 180);
+    let y = 45;
+    
+    lines.forEach(line => {
+      if (y > 275) {
+        doc.addPage();
+        y = 20;
+      }
+      
+      const cleanLine = line.trim();
+      if (cleanLine.startsWith('###') || cleanLine.startsWith('**') || cleanLine.startsWith('- **') || cleanLine.endsWith(':')) {
+        doc.setFont('helvetica', 'bold');
+      } else {
+        doc.setFont('helvetica', 'normal');
+      }
+      
+      doc.text(line, 15, y);
+      y += 6;
+    });
+    
+    doc.setFontSize(8);
+    doc.setTextColor(156, 163, 175);
+    doc.text("Documento generado por la app 'IAG en clave de ética pedagógica'. Recurso editable.", 15, 287);
+    
+    doc.save("Acuerdo_Didactico_IA.pdf");
+    
+    if (status) {
+      status.textContent = '¡PDF de acuerdo descargado!';
+      status.style.color = 'var(--success)';
+      setTimeout(() => { status.textContent = ''; }, 3000);
+    }
+  } catch (err) {
+    console.error(err);
+    if (status) {
+      status.textContent = 'Error al generar el PDF.';
+      status.style.color = 'var(--warning)';
+    }
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Descargar PDF';
+    }
+  }
+}
+
+function initNeuralNetBackground() {
+  const canvas = document.getElementById('neuralNetCanvas');
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  let mouse = { x: null, y: null, active: false };
+
+  const resizeCanvas = () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  };
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  window.addEventListener('mousemove', (e) => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+    mouse.active = true;
+  });
+
+  window.addEventListener('mouseleave', () => {
+    mouse.active = false;
+  });
+
+  class Particle {
+    constructor() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.vx = (Math.random() - 0.5) * 0.4;
+      this.vy = (Math.random() - 0.5) * 0.4;
+      this.radius = Math.random() * 2.5 + 1.5;
+    }
+
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+
+      if (this.x < 0 || this.x > canvas.width) this.vx = -this.vx;
+      if (this.y < 0 || this.y > canvas.height) this.vy = -this.vy;
+    }
+
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(99, 102, 241, 0.4)';
+      ctx.fill();
+    }
+  }
+
+  const particleCount = window.innerWidth < 768 ? 25 : 60;
+  for (let i = 0; i < particleCount; i++) {
+    particles.push(new Particle());
+  }
+
+  const animate = () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    particles.forEach(p => {
+      p.update();
+      p.draw();
+    });
+
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < 120) {
+          const alpha = (1 - dist / 120) * 0.15;
+          ctx.strokeStyle = `rgba(99, 102, 241, ${alpha})`;
+          ctx.lineWidth = 0.8;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.stroke();
+        }
+      }
+
+      if (mouse.active) {
+        const dx = particles[i].x - mouse.x;
+        const dy = particles[i].y - mouse.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < 180) {
+          const alpha = (1 - dist / 180) * 0.25;
+          ctx.strokeStyle = `rgba(99, 102, 241, ${alpha})`;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(mouse.x, mouse.y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    requestAnimationFrame(animate);
+  };
+
+  animate();
+}

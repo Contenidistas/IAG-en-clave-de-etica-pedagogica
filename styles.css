@@ -6903,13 +6903,14 @@ select.input,
 
 @keyframes neuronPulse {
   0%, 100% {
-    transform: scale(1);
-    opacity: 0.8;
+    opacity: 0.5;
+    fill: var(--primary-dark);
+    stroke: var(--secondary);
   }
   50% {
-    transform: scale(1.2);
     opacity: 1;
     fill: var(--secondary);
+    stroke: var(--primary);
   }
 }
 
@@ -7060,4 +7061,455 @@ select.input,
 [data-theme="dark"] .select-chip.active {
   box-shadow: 0 6px 22px rgba(99, 102, 241, 0.48), 0 0 14px rgba(99, 102, 241, 0.28) !important;
   border-color: rgba(99, 102, 241, 0.6) !important;
+}
+
+/* ==========================================================================
+   VISUAL CLEANUP & CASE LABORATORY OVERRIDES
+   ========================================================================== */
+
+/* Cuestionario Limpio y Enfocado */
+#screenGame .question-card {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+#screenGame .progress-card {
+  display: none !important;
+}
+
+#screenGame .question-principle-graph {
+  display: none !important;
+}
+
+/* Ayuda de Pregunta Colapsable */
+.btn-toggle-help {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-main);
+  color: var(--primary);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+  box-shadow: var(--shadow);
+  padding: 0;
+}
+
+.btn-toggle-help:hover {
+  background: var(--primary);
+  color: white;
+  transform: scale(1.08);
+  border-color: var(--primary);
+}
+
+.btn-toggle-help.active {
+  background: var(--primary-dark);
+  color: white;
+  border-color: var(--primary-dark);
+}
+
+.question-help-wrapper {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out, opacity 0.25s ease-out, margin 0.25s ease;
+  margin: 0;
+}
+
+.question-help-wrapper.expanded {
+  max-height: 250px;
+  opacity: 1;
+  margin-top: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.question-help-wrapper p.question-help {
+  background: rgba(99, 102, 241, 0.05);
+  border-left: 4px solid var(--primary);
+  padding: 0.85rem 1.1rem;
+  border-radius: 0 10px 10px 0;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  text-align: left;
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .question-help-wrapper p.question-help {
+  background: rgba(99, 102, 241, 0.12);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Laboratorio de Casos */
+.cases-laboratory-title {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.cases-list-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.case-summary-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: var(--shadow);
+  text-align: left;
+}
+
+.case-summary-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--primary);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+}
+
+.case-badge-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.case-badge {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.25rem 0.65rem;
+  border-radius: 99px;
+}
+
+.case-badge-privacidad { background: rgba(99, 102, 241, 0.12); color: var(--primary); }
+.case-badge-sesgos { background: rgba(245, 158, 11, 0.12); color: var(--warning); }
+.case-badge-agencia { background: rgba(16, 185, 129, 0.12); color: var(--success); }
+.case-badge-transparencia { background: rgba(59, 130, 246, 0.12); color: #2563eb; }
+.case-badge-equidad { background: rgba(236, 72, 153, 0.12); color: #db2777; }
+
+[data-theme="dark"] .case-badge-privacidad { background: rgba(99, 102, 241, 0.22); color: #818cf8; }
+[data-theme="dark"] .case-badge-sesgos { background: rgba(245, 158, 11, 0.22); color: #fbbf24; }
+[data-theme="dark"] .case-badge-agencia { background: rgba(16, 185, 129, 0.22); color: #34d399; }
+[data-theme="dark"] .case-badge-transparencia { background: rgba(59, 130, 246, 0.22); color: #60a5fa; }
+[data-theme="dark"] .case-badge-equidad { background: rgba(236, 72, 153, 0.22); color: #f472b6; }
+
+.case-audience-badge {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.case-summary-card h4 {
+  font-size: 1.15rem;
+  margin: 0 0 0.5rem;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.case-summary-card p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  flex-grow: 1;
+  margin: 0 0 1.25rem;
+}
+
+/* Reproductor de Caso Activo */
+.active-case-player {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  animation: onboardingSlideIn 0.35s ease;
+  text-align: left;
+}
+
+.active-case-player-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.case-player-meta h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1.35rem;
+  color: var(--text-primary);
+}
+
+.case-story-box {
+  background: var(--bg-main);
+  border-left: 4px solid var(--primary);
+  padding: 1.25rem;
+  border-radius: 0 12px 12px 0;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+  font-size: 0.98rem;
+}
+
+.case-dilemma-box {
+  background: rgba(99, 102, 241, 0.04);
+  border: 1px dashed var(--primary);
+  padding: 1.1rem;
+  border-radius: 12px;
+  margin-bottom: 1.75rem;
+  text-align: center;
+}
+
+.case-dilemma-box strong {
+  display: block;
+  color: var(--primary);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.4rem;
+}
+
+.case-dilemma-box p {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.45;
+  color: var(--text-primary);
+}
+
+/* Opciones de Decisión */
+.case-options-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1.75rem;
+}
+
+.case-option-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  background: var(--bg-main);
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.case-option-card:hover {
+  border-color: var(--primary);
+  transform: translateX(4px);
+  background: var(--bg-card);
+}
+
+.case-option-card.selected {
+  border-color: var(--primary);
+  background: rgba(99, 102, 241, 0.08);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.12);
+}
+
+[data-theme="dark"] .case-option-card.selected {
+  background: rgba(99, 102, 241, 0.16);
+}
+
+.case-option-letter {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--border);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.case-option-card.selected .case-option-letter {
+  background: var(--primary);
+  color: white;
+}
+
+.case-option-text {
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--text-primary);
+}
+
+/* Giro del Caso (Alerta) */
+.case-giro-box {
+  background: rgba(239, 68, 68, 0.04);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 14px;
+  padding: 1.25rem;
+  margin-bottom: 1.75rem;
+  animation: onboardingSlideIn 0.35s ease;
+}
+
+[data-theme="dark"] .case-giro-box {
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.case-giro-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #ef4444;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+[data-theme="dark"] .case-giro-header {
+  color: #f87171;
+}
+
+.case-giro-text {
+  line-height: 1.55;
+  color: var(--text-primary);
+  font-size: 0.98rem;
+  margin-bottom: 1rem;
+}
+
+.case-giro-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* Resolución y Devolución */
+.case-resolution-box {
+  border-top: 1px solid var(--border);
+  padding-top: 1.5rem;
+  margin-top: 1.5rem;
+  animation: onboardingSlideIn 0.4s ease;
+}
+
+.case-resolution-box h4 {
+  font-size: 1.2rem;
+  margin: 0 0 0.75rem;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.case-feedback-alert {
+  background: rgba(16, 185, 129, 0.05);
+  border-left: 4px solid var(--success);
+  padding: 1rem;
+  border-radius: 0 8px 8px 0;
+  margin-bottom: 1.5rem;
+  line-height: 1.55;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .case-feedback-alert {
+  background: rgba(16, 185, 129, 0.12);
+}
+
+.case-debate-guide {
+  background: rgba(99, 102, 241, 0.04);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+[data-theme="dark"] .case-debate-guide {
+  background: rgba(99, 102, 241, 0.08);
+  border-color: rgba(99, 102, 241, 0.25);
+}
+
+.case-debate-guide h5 {
+  color: var(--primary);
+  font-size: 1rem;
+  margin: 0 0 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 700;
+}
+
+.case-debate-guide ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.case-debate-guide li {
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.case-debate-guide li:last-child {
+  margin-bottom: 0;
+}
+
+/* Ocultar pestañas en Modo Laboratorio */
+body.laboratorio-active .result-tabs {
+  display: none !important;
+}
+
+body.laboratorio-active .certificate {
+  display: none !important;
+}
+
+body.laboratorio-active .result-tab-panel:not([data-result-panel="operacionalizar"]) {
+  display: none !important;
+}
+
+body.laboratorio-active .result-tab-panel[data-result-panel="operacionalizar"] {
+  display: block !important;
+}
+
+body.laboratorio-active .agreement-builder-card {
+  display: none !important;
+}
+
+body.laboratorio-active .flex.flex-center.gap-2.flex-wrap.mt-3 button:not(#restartBtn) {
+  display: none !important;
+}
+
+body.laboratorio-active #restartBtn {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+#neuralNetCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  pointer-events: none;
+  background: transparent;
+  opacity: 0.45;
+  transition: opacity 0.5s ease;
+}
+
+/* Reducir opacidad en pantallas de juego y resultados para no distraer */
+body.quiz-active #neuralNetCanvas,
+body.result-active #neuralNetCanvas {
+  opacity: 0.18;
 }

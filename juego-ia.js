@@ -590,6 +590,17 @@ function renderQuestion() {
   elements.questionTitle.textContent  = nodo.title;
   elements.questionHelp.textContent   = nodo.help;
 
+  // Colapsar la ayuda al cambiar de pregunta
+  const helpWrapper = document.getElementById('questionHelpWrapper');
+  if (helpWrapper) {
+    helpWrapper.classList.remove('expanded');
+  }
+  const toggleHelpBtn = document.getElementById('toggleHelpBtn');
+  if (toggleHelpBtn) {
+    toggleHelpBtn.classList.remove('active');
+    toggleHelpBtn.setAttribute('aria-expanded', 'false');
+  }
+
   // Trigger smooth question card animation
   const card = document.querySelector('.question-card');
   if (card) {
@@ -1102,60 +1113,658 @@ function obtenerCriterioPrioritario() {
     || estados[0];
 }
 
-function construirCasosSituados() {
-  const criterio = obtenerCriterioPrioritario();
-  const perfil = state.profileBase || state.profile || 'participante';
-  const nivel = state.nivelEducativo || 'contexto no especificado';
-  const casosBase = [
-    {
-      title: 'Entrega con IA no declarada',
-      audience: 'Aula',
-      prompt: `Un estudiante entrega una producción que parece asistida por IA, pero no lo declara. ¿Cómo conversar la situación sin reducirla a sanción y cómo reconstruir un acuerdo de transparencia?`
+const CASOS_LABORATORIO = [
+  {
+    id: 'privacidad',
+    title: 'Personalizar sin etiquetar ni exponer',
+    axis: 'privacidad',
+    axisLabel: 'Privacidad y datos',
+    audience: 'Docencia / Inclusión',
+    story: 'Un docente de educación media desea adaptar sus materiales para 12 estudiantes con orientaciones de ajustes razonables vinculadas a dislexia y TDAH en un grupo de 35. Para lograrlo, ingresa descripciones de perfiles tomadas directamente de informes psicopedagógicos detallados en un modelo de lenguaje de acceso público. Aunque no incluye nombres ni apellidos, copia descripciones minuciosas de desempeño, problemas de atención y apoyos sugeridos. El sistema le genera materiales adaptados y tareas diferenciadas.',
+    dilemma: '¿Cómo puede utilizarse la IA generativa para personalizar la enseñanza y favorecer la inclusión sin comprometer la protección de datos, la dignidad de los estudiantes ni el juicio pedagógico?',
+    options: {
+      A: {
+        text: 'Utilizar las adaptaciones obtentas, dado que se eliminaron los nombres y el propósito es puramente pedagógico.',
+        feedback: '<strong>Análisis de la opción A (Riesgosa):</strong> Aunque no se ingresaron nombres propios, las descripciones minuciosas del historial de aprendizaje y diagnósticos médicos pueden constituir datos reidentificables. El uso de plataformas comerciales abiertas expone información sensible que pasa a formar parte del entrenamiento del modelo.'
+      },
+      B: {
+        text: 'Usar la IA solo para generar ideas de consignas generales, evitando ingresar descripciones detalladas de informes de estudiantes.',
+        feedback: '<strong>Análisis de la opción B (Prudente):</strong> Limita la fuga de información sensible. Utiliza la IA para lo que destaca (torbellino de ideas y estructuras conceptuales), dejando la especificación, el ajuste y el análisis particular en manos del juicio del docente.'
+      },
+      C: {
+        text: 'Describir las barreras pedagógicas y apoyos de manera genérica en la consulta, sin ingresar perfiles individualizados de estudiantes.',
+        feedback: '<strong>Análisis de la opción C (Pedagógicamente sólida / Enfoque DUA):</strong> Se alinea con el Diseño Universal para el Aprendizaje. En lugar de segmentar el grupo etiquetando a estudiantes individuales en el algoritmo, busca flexibilizar la propuesta para que el entorno y los materiales beneficien a toda la diversidad del grupo.'
+      },
+      D: {
+        text: 'Utilizarla bajo condiciones explícitas de minimización de datos en el prompt, revisión crítica de las propuestas generadas y consentimiento informado.',
+        feedback: '<strong>Análisis de la opción D (Integral / Institucional):</strong> Reconoce que personalizar con IA exige una gobernanza ética. Implica evaluar las condiciones de privacidad de la herramienta, acordar criterios con la institución y sostener una mirada crítica frente a las sugerencias de la máquina.'
+      }
     },
-    {
-      title: 'Consigna con IA permitida',
-      audience: 'Docencia',
-      prompt: `Una actividad permite usar IA para idear, revisar y mejorar un borrador. ¿Qué condiciones deberían explicitarse para sostener autoría, verificación y aporte humano?`
+    giro: 'Al revisar las adaptaciones generadas por la IA, el docente nota que el sistema propone para los estudiantes con dislexia y TDAH únicamente tareas repetitivas, mecánicas y de menor complejidad cognitiva (como completar palabras o realizar sopas de letras), mientras reserva las tareas de investigación, argumentación y creación para el resto del grupo.',
+    analysis: 'Este dilema ilustra el riesgo de delegar el diseño curricular en sistemas algorítmicos. La IA tiende a reproducir sesgos capacitistas, reduciendo la expectativa de logro para los estudiantes etiquetados. La personalización con IA debe enfocarse en diversificar las vías de acceso y expresión de los aprendizajes, y nunca en empobrecer el desafío cognitivo.',
+    debateQuestions: [
+      '¿Eliminar el nombre de un estudiante es suficiente para considerar que la información es anónima?',
+      '¿De qué manera las adaptaciones generadas por la IA pueden terminar etiquetando o limitando el potencial del estudiante en lugar de potenciarlo?',
+      '¿Qué acuerdos institucionales o de centro deberían existir antes de utilizar datos educativos de estudiantes en plataformas externas?'
+    ],
+    stats: { A: 12, B: 38, C: 32, D: 18 }
+  },
+  {
+    id: 'sesgos',
+    title: 'La selección invisible de autores',
+    axis: 'sesgos',
+    axisLabel: 'Sesgos y representatividad',
+    audience: 'Docencia / Didáctica',
+    story: 'Un docente de literatura utiliza una IA generativa para diseñar un módulo sobre literatura latinoamericana contemporánea y pedirle recomendaciones de autores. El sistema le genera un programa académico compuesto en un 100% por escritores masculinos del Río de la Plata, ignorando la representatividad regional, de género y de minorías. Al solicitarle que diversifique la lista e incorpore autoras destacadas de otros países de América Latina, la IA comienza a sugerir nombres de escritoras e inventa de manera sumamente convincente sus biografías y libros ficticios (alucinación).',
+    dilemma: '¿Cómo podemos garantizar la equidad y representatividad cultural en los materiales de enseñanza frente a los sesgos y las alucinaciones de la IA?',
+    options: {
+      A: {
+        text: 'Aceptar el primer programa generado porque incluye autores reconocidos y acelera el trabajo de planificación.',
+        feedback: '<strong>Análisis de la opción A (Inadecuada):</strong> Valora la eficiencia por encima de la justicia curricular. Al delegar la curaduría crítica en la IA sin verificar, se consolidan y repiten sesgos de género e invisibilización geográfica históricos.'
+      },
+      B: {
+        text: 'Usar la lista inicial y complementarla manualmente investigando en bibliotecas digitales y catálogos académicos.',
+        feedback: '<strong>Análisis de la opción B (Correcta):</strong> Combina la rapidez de la IA con la responsabilidad intelectual del docente, quien interviene activamente para balancear y enriquecer el programa con criterio académico propio.'
+      },
+      C: {
+        text: 'Insistir a la IA que equilibre la lista pero comprobar y contrastar de manera estricta cada nombre y libro sugerido antes de incluirlos.',
+        feedback: '<strong>Análisis de la opción C (Necesaria y crítica):</strong> Muestra comprensión del fenómeno de la alucinación. Evita divulgar fuentes inventadas por la máquina mediante una verificación sistemática del material en motores de búsqueda reales.'
+      },
+      D: {
+        text: 'Analizar la lista sesgada y las alucinaciones del modelo junto con los estudiantes para discutir de forma crítica el sesgo en los algoritmos.',
+        feedback: '<strong>Análisis de la opción D (Didácticamente potente):</strong> Transforma el límite técnico del software en un objeto de estudio pedagógico. Fomenta el pensamiento crítico y la alfabetización de datos entre los estudiantes.'
+      }
     },
-    {
-      title: 'Criterio institucional común',
-      audience: 'Equipo',
-      prompt: `Un equipo necesita definir criterios mínimos de uso de IA para varias asignaturas. ¿Qué acuerdos comunes evitarían decisiones contradictorias o desiguales?`
-    }
-  ];
+    giro: 'Al realizar una búsqueda rápida en internet, el docente descubre que tres de las autoras recomendadas en la segunda vuelta y presentadas por la IA como pioneras del realismo mágico son ficticias y que las citas de sus obras presentadas por el modelo son inventadas.',
+    analysis: 'Los modelos de lenguaje no son enciclopedias fiables; funcionan asociando palabras de forma estadística. Por ello, tienden a repetir los sesgos mayoritarios de internet (como el predominio masculino) y a inventar datos para satisfacer la solicitud del usuario de forma coherente y creíble.',
+    debateQuestions: [
+      '¿Cuáles son las consecuencias pedagógicas de enseñar utilizando fuentes inventadas o sesgadas por un software?',
+      '¿Cómo podemos educar a los estudiantes para que identifiquen y mitiguen sesgos en las respuestas de la IA generativa?',
+      '¿Qué papel juega la soberanía cultural y pedagógica de cada docente al planificar con herramientas entrenadas mayoritariamente en contextos ajenos?'
+    ],
+    stats: { A: 8, B: 24, C: 42, D: 26 }
+  },
+  {
+    id: 'agencia',
+    title: 'El algoritmo evaluador',
+    axis: 'agencia',
+    axisLabel: 'Agencia y autonomía',
+    audience: 'Gestión / Evaluación',
+    story: 'Un centro educativo adopta una plataforma de tutoría inteligente asistida por IA. El protocolo del centro establece que los docentes deben seguir las rutas de aprendizaje automatizadas y utilizar las calificaciones que el algoritmo asigna. Un docente nota que la IA calificó como "incorrecto" el ejercicio de un estudiante que utilizó un método de resolución matemático muy creativo y no estándar, el cual demostraba una excelente comprensión conceptual del problema, pero difería del patrón de la base de datos de la IA.',
+    dilemma: '¿Cómo sostener la autonomía profesional del docente y el derecho de los estudiantes a la creatividad frente a la estandarización y eficiencia de los sistemas de evaluación automáticos?',
+    options: {
+      A: {
+        text: 'Mantener la nota de la IA para respetar el protocolo del centro y asegurar la consistencia del sistema.',
+        feedback: '<strong>Análisis de la opción A (Riesgosa):</strong> Subordina el juicio humano y el valor de la creatividad al control de una máquina. Desincentiva el pensamiento original y puede generar frustración en estudiantes destacados.'
+      },
+      B: {
+        text: 'Modificar manualmente la nota en la libreta del docente sin informar al sistema ni a los coordinadores para evitar conflictos.',
+        feedback: '<strong>Análisis de la opción B (Evasiva):</strong> Resuelve la injusticia puntual de forma individual, pero no problematiza a nivel institucional el uso inadecuada de la herramienta ni propicia cambios en los protocolos.'
+      },
+      C: {
+        text: 'Explicar el error del algoritmo al estudiante, reevaluar manualmente y elevar un informe técnico/pedagógico a la dirección escolar.',
+        feedback: '<strong>Análisis de la opción C (Responsable):</strong> Ejerce la supervisión humana de forma activa y promueve la mejora del sistema mediante canales institucionales, resguardando el juicio pedagógico del docente.'
+      },
+      D: {
+        text: 'Realizar un espacio de debate en la clase para contrastar la lógica rígida de la máquina con el pensamiento heurístico y libre de las personas.',
+        feedback: '<strong>Análisis de la opción D (Formativa):</strong> Utiliza el incidente para enriquecer la comprensión sobre cómo piensan los sistemas artificiales en comparación con las mentes humanas, potenciando la metacognición del grupo.'
+      }
+    },
+    giro: 'La dirección del centro le advierte al docente que anular la decisión del software reduce el porcentaje de fiabilidad reportado en el panel administrativo que se envía trimestralmente a las familias.',
+    analysis: 'La automatización de la evaluación en base a IA puede socabar el valor humano del acompañamiento y la valoración integral del proceso de aprendizaje. Las herramientas son apoyos; la responsabilidad pedagógica, legal y ética de la evaluación debe seguir residiendo en los profesionales humanos.',
+    debateQuestions: [
+      '¿Qué dimensiones de la evaluación formativa e integral son completamente indelegables en un software de IA?',
+      '¿Cómo afecta a la autonomía docente y a la motivación estudiantil la imposición de métricas de rendimiento estandarizadas basadas en datos algorítmicos?',
+      '¿Qué límites éticos y pedagógicos deberían delimitar las decisiones tomadas de manera automática por sistemas artificiales?'
+    ],
+    stats: { A: 14, B: 34, C: 38, D: 14 }
+  },
+  {
+    id: 'transparencia',
+    title: 'La entrega bajo sospecha',
+    axis: 'transparencia',
+    axisLabel: 'Transparencia e integridad',
+    audience: 'Aula / Didáctica',
+    story: 'Una estudiante entrega una producción que cumple formalmente con todas las consignas pero muestra un vocabulario muy técnico y giros lingüísticos idénticos a los generados por IA. La estudiante niega haber utilizado IA y afirma que es de su autoría. El reglamento institucional cataloga el uso de IA sin citar como un acto de plagio. El docente se enfrenta a la decisión de cómo actuar, sabiendo que las herramientas detectoras de IA son poco fiables y suelen dar falsos positivos (especialmente en estudiantes no nativos o muy formales).',
+    dilemma: '¿Cómo abordar la sospecha de uso de IA no declarado de manera formativa, manteniendo la confianza y el diálogo, en lugar de recurrir de forma directa a la penalización?',
+    options: {
+      A: {
+        text: 'Aplicar el reglamento directamente basándose en la sospecha visual y penalizar la entrega.',
+        feedback: '<strong>Análisis de la opción A (Poco recomendable):</strong> Puede cometer una injusticia severa debido a que la sospecha no es una prueba concluyente. Quiebra la confianza del estudiante en el docente y en la institución.'
+      },
+      B: {
+        text: 'Pasar la entrega por detectores de IA online y aplicar la sanción si el porcentaje de probabilidad supera el 80%.',
+        feedback: '<strong>Análisis de la opción B (Inadecuada):</strong> Otorga validez a herramientas de detección de plagio que científicamente han demostrado ser sesgadas, poco fiables y fáciles de burlar mediante simples parafraseos.'
+      },
+      C: {
+        text: 'Citar a la estudiante a una tutoría de retroalimentación para conversar sobre su proceso de escritura y pedirle que explique la estructuración y términos clave.',
+        feedback: '<strong>Análisis de la opción C (Formativa y justa):</strong> Utiliza la mediación y el diálogo pedagógico para evaluar la comprensión real. Permite al docente indagar en el proceso y ayuda a la estudiante a defender su trabajo.'
+      },
+      D: {
+        text: 'Proponer una segunda entrega donde se requiera documentar el proceso a través de borradores, historial de cambios o una bitácora de prompts.',
+        feedback: '<strong>Análisis de la opción D (Pedagógicamente sólida / Basada en acuerdos):</strong> Introduce la cultura de la trazabilidad. Reorienta la evaluación para valorar el camino recorrido del pensamiento y no solo el producto acabado.'
+      }
+    },
+    giro: 'Durante la entrevista personal, la estudiante se quiebra emocionalmente y confiesa que utilizó la IA porque sufre de un fuerte bloqueo de escritura por ansiedad y temía fracasar en la entrega, revelando que el uso de la máquina fue un síntoma de un problema socioafectivo.',
+    analysis: 'El "plagio" con IA suele ocultar necesidades de apoyo que los estudiantes no saben resolver solos. Enfocar la situación desde la sanción o la sospecha tecnológica no atiende la causa educativa. Promover acuerdos claros de transparencia (bitácoras, citas del nivel de ayuda de la IA) y cambiar los métodos de evaluación hacia procesos reduce estas tensiones.',
+    debateQuestions: [
+      '¿Por qué las herramientas detectoras de IA no son instrumentos éticos ni técnicamente fiables para calificar a los estudiantes?',
+      '¿Cómo podemos enseñar a los estudiantes a declarar el uso asistido de IA en sus trabajos (transparencia de proceso) en lugar de ocultarlo?',
+      '¿De qué manera los métodos de evaluación tradicionales incentivan la copia con IA y qué alternativas evaluativas basadas en procesos podemos implementar?'
+    ],
+    stats: { A: 28, B: 22, C: 34, D: 16 }
+  },
+  {
+    id: 'equidad',
+    title: 'La brecha de las licencias',
+    axis: 'equidad',
+    axisLabel: 'Equidad y acceso',
+    audience: 'Aula / Gestión',
+    story: 'Un docente de diseño audiovisual propone un proyecto donde los estudiantes deben utilizar una herramienta de IA generativa de imágenes para ilustrar un guion técnico. El instituto no cuenta con cuentas institucionales de pago para esta herramienta. En la entrega final, se observa que la mitad de los estudiantes usó cuentas familiares premium (obteniendo imágenes de alta calidad en segundos) mientras que el resto utilizó la versión gratuita (que tiene un límite de créditos diario, baja resolución y marcas de agua).',
+    dilemma: '¿Cómo diseñar y evaluar tareas basadas en tecnologías de vanguardia garantizando la justicia educativa y la equidad cuando existen diferencias en los recursos socioeconómicos de los estudiantes?',
+    options: {
+      A: {
+        text: 'Evaluar el resultado visual final por igual, dado que el acceso a herramientas mejores forma parte del contexto real.',
+        feedback: '<strong>Análisis de la opción A (Injusta):</strong> Convalida la desigualdad socioeconómica traduciéndola directamente en una ventaja en la calificación. Penaliza indirectamente a los estudiantes de menor nivel de ingresos.'
+      },
+      B: {
+        text: 'Centrar la rúbrica y la evaluación en la coherencia de la narrativa y la justificación técnica del guion, no en la calidad estética de la IA.',
+        feedback: '<strong>Análisis de la opción B (Equitativa):</strong> Neutraliza la brecha de licencias. Valora el esfuerzo intelectual, el diseño metodológico y las competencias conceptuales del alumno.'
+      },
+      C: {
+        text: 'Permitir realizar el trabajo utilizando técnicas de ilustración analógicas o repositorios de imágenes libres para quienes no deseen o no puedan usar IA.',
+        feedback: '<strong>Análisis de la opción C (Inclusiva):</strong> Asegura que nadie quede excluido de la actividad por cuestiones tecnológicas o éticas, aunque exige diversificar las rúbricas para que sigan siendo justas.'
+      },
+      D: {
+        text: 'Restringir el uso de IA únicamente a aquellas herramientas gratuitas que el centro escolar garantice o prohibir el uso de versiones premium en la entrega.',
+        feedback: '<strong>Análisis de la opción D (Niveladora):</strong> Establece una base común de juego para todo el grupo para evitar privilegios en la entrega, priorizando la equidad grupal por sobre el uso individual de tecnología avanzada.'
+      }
+    },
+    giro: 'Las calificaciones de la entrega muestran que los proyectos realizados con la IA de pago obtuvieron mayoritariamente notas excelentes debido a que el impacto visual influyó en la percepción general del jurado evaluador, a pesar de tener una planificación narrativa más débil.',
+    analysis: 'El "efecto halo" del impacto visual de las imágenes generadas por IA de pago puede distorsionar el juicio evaluativo. La introducción de la IA en clase exige revisar si no estamos introduciendo nuevas formas de exclusión digital. La evaluación debe medir el proceso cognitivo del estudiante y no la calidad de renderizado del servidor de la IA.',
+    debateQuestions: [
+      '¿Qué responsabilidades tienen los centros educativos antes de proponer tareas que requieren suscripciones o recursos digitales personales?',
+      '¿Cómo construir rúbricas de evaluación robustas que premien las habilidades intelectuales del estudiante por sobre la potencia tecnológica del software?',
+      '¿De qué manera podemos atenuar la brecha digital generacional y económica en el uso crítico de tecnologías avanzadas dentro de las aulas?'
+    ],
+    stats: { A: 15, B: 55, C: 20, D: 10 }
+  }
+];
 
-  return casosBase.map(caso => ({
-    ...caso,
-    focus: criterio ? criterio.label : 'Criterios éticos',
-    text: `${caso.prompt}\n\nPerfil/contexto: ${perfil}, ${nivel}.\nPrincipio a mirar con especial atención: ${criterio ? criterio.label : 'criterios éticos'}.\nDecisión esperada: acordar qué se permite, qué se declara, qué se verifica y qué queda bajo responsabilidad humana.`
-  }));
+function construirCasosSituados() {
+  return CASOS_LABORATORIO;
+}
+
+function abrirLaboratorioCasos() {
+  if (state.profile !== 'docente') {
+    const content = `
+      <div class="mode-selection-modal-body" style="text-align: center; padding: 1rem 0;">
+        <p style="margin-bottom: 1.5rem; font-size: 1.05rem; line-height: 1.5; color: var(--text-secondary);">
+          El **Laboratorio de Casos (Modo Taller)** es una herramienta diseñada para el perfil **Docente** para la deliberación y el trabajo ético situado.
+        </p>
+        <p style="margin-bottom: 1.5rem; font-weight: 600; color: var(--text-primary);">
+          ¿Deseás configurar tu perfil como Docente ahora para ingresar?
+        </p>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem; max-width: 300px; margin: 0 auto;">
+          <button type="button" class="btn btn-primary" id="btnConfirmDocenteProfile" style="padding: 0.85rem; font-size: 1rem; width: 100%;">
+            ✅ Sí, configurar e ingresar
+          </button>
+          <button type="button" class="btn btn-outline" id="btnCancelDocenteProfile" style="padding: 0.85rem; font-size: 1rem; width: 100%; background: var(--bg-main);">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    `;
+    
+    if (typeof modal !== 'undefined' && typeof modal.show === 'function') {
+      modal.show('Acceso al Laboratorio de Casos', content);
+      
+      const btnConfirm = document.getElementById('btnConfirmDocenteProfile');
+      const btnCancel = document.getElementById('btnCancelDocenteProfile');
+      
+      if (btnConfirm) {
+        btnConfirm.addEventListener('click', () => {
+          modal.hide();
+          state.profile = 'docente';
+          state.profileKey = 'docente';
+          state.country = 'Uruguay';
+          state.consentTracking = true;
+          state.nivelEducativo = 'Secundaria';
+          
+          const consentCheckbox = document.getElementById('consentTracking');
+          if (consentCheckbox) consentCheckbox.checked = true;
+          
+          abrirLaboratorioCasos();
+        });
+      }
+      
+      if (btnCancel) {
+        btnCancel.addEventListener('click', () => {
+          modal.hide();
+        });
+      }
+    }
+    return;
+  }
+
+  state.isLaboratorioMode = true;
+  document.body.classList.add('laboratorio-active');
+
+  // Ocultar otras pantallas
+  if (screens.intro) screens.intro.classList.add('hidden');
+  if (screens.game) screens.game.classList.add('hidden');
+  if (screens.result) {
+    screens.result.classList.remove('hidden');
+    screens.result.classList.add('fade-in');
+  }
+
+  // Activar la pestaña de operacionalizar
+  if (elements.resultTabs && elements.resultTabs.length) {
+    elements.resultTabs.forEach(tab => {
+      const isOperTab = tab.dataset.resultTab === 'operacionalizar';
+      tab.classList.toggle('active', isOperTab);
+    });
+  }
+  if (elements.resultTabPanels && elements.resultTabPanels.length) {
+    elements.resultTabPanels.forEach(panel => {
+      const isOperPanel = panel.dataset.resultPanel === 'operacionalizar';
+      panel.classList.toggle('active', isOperPanel);
+      if (isOperPanel) panel.style.display = 'block';
+      else panel.style.display = 'none';
+    });
+  }
+
+  // Renderizar
+  renderizarCasosSituados();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function renderizarCasosSituados() {
   if (!elements.situatedCases) return;
-  const casos = construirCasosSituados();
-  elements.situatedCases.innerHTML = casos.map((caso, index) => `
-    <article class="situated-case-card">
-      <span>${escapeGameHtml(caso.audience)}</span>
-      <h4>${escapeGameHtml(caso.title)}</h4>
-      <p>${escapeGameHtml(caso.prompt)}</p>
-      <small>Foco conectado: ${escapeGameHtml(caso.focus)}</small>
-      <button type="button" class="btn btn-outline situated-case-btn" data-case-index="${index}">Copiar caso</button>
-    </article>
-  `).join('');
-
-  elements.situatedCases.querySelectorAll('.situated-case-btn').forEach(button => {
-    button.addEventListener('click', async () => {
-      const caso = casos[Number(button.dataset.caseIndex || 0)];
-      try {
-        await navigator.clipboard.writeText(caso.text);
-        button.textContent = 'Copiado';
-        setTimeout(() => { button.textContent = 'Copiar caso'; }, 1600);
-      } catch {
-        modal.show('Caso situado', `<p>${escapeGameHtml(caso.text).replace(/\n/g, '<br>')}</p>`);
-      }
+  
+  elements.situatedCases.innerHTML = '';
+  
+  const wrapperDiv = document.createElement('div');
+  wrapperDiv.className = 'cases-laboratory-container';
+  
+  const title = document.createElement('h3');
+  title.className = 'cases-laboratory-title';
+  title.style.fontWeight = '700';
+  title.textContent = state.isLaboratorioMode 
+    ? 'Laboratorio de Casos: Dilemas Éticos en Modo Taller' 
+    : 'Dilemas pedagógicos situados';
+  wrapperDiv.appendChild(title);
+  
+  const listGrid = document.createElement('div');
+  listGrid.className = 'cases-list-grid';
+  
+  CASOS_LABORATORIO.forEach(caso => {
+    const card = document.createElement('article');
+    card.className = 'case-summary-card';
+    
+    card.innerHTML = `
+      <div class="case-badge-row">
+        <span class="case-badge case-badge-${caso.axis}">${caso.axisLabel}</span>
+        <span class="case-audience-badge">${caso.audience}</span>
+      </div>
+      <h4>${caso.title}</h4>
+      <p>${caso.story.substring(0, 120)}...</p>
+      <button type="button" class="btn btn-primary btn-play-case" data-case-id="${caso.id}">Analizar dilema</button>
+    `;
+    
+    card.querySelector('.btn-play-case').addEventListener('click', () => {
+      cargarCasoInteractivo(caso.id);
     });
+    
+    listGrid.appendChild(card);
   });
+  
+  wrapperDiv.appendChild(listGrid);
+  elements.situatedCases.appendChild(wrapperDiv);
+}
+
+function cargarCasoInteractivo(caseId) {
+  if (!elements.situatedCases) return;
+  const caso = CASOS_LABORATORIO.find(c => c.id === caseId);
+  if (!caso) return;
+  
+  let decisionInicial = null;
+  let decisionFinal = null;
+  
+  const player = document.createElement('div');
+  player.className = 'active-case-player';
+  
+  function renderPlayerState() {
+    player.innerHTML = `
+      <div class="active-case-player-header">
+        <div class="case-player-meta">
+          <span class="case-badge case-badge-${caso.axis}" style="display:inline-block; margin-bottom:0.4rem;">${caso.axisLabel}</span>
+          <h3 style="font-weight:700;">${caso.title}</h3>
+        </div>
+        <button type="button" class="btn btn-outline btn-close-case" id="btnCloseCase" style="min-width:auto; padding: 0.5rem 1rem;">← Volver</button>
+      </div>
+      
+      <div class="case-story-box">
+        ${caso.story}
+      </div>
+      
+      <div class="case-dilemma-box">
+        <strong>Dilema ético-pedagógico</strong>
+        <p>${caso.dilemma}</p>
+      </div>
+      
+      <div id="caseDecisionArea">
+        <h4 style="margin-bottom:1rem; font-weight:700;">Tomá tu decisión inicial:</h4>
+        <div class="case-options-grid">
+          ${Object.entries(caso.options).map(([key, opt]) => `
+            <button type="button" class="case-option-card${decisionInicial === key ? ' selected' : ''}" data-option="${key}">
+              <span class="case-option-letter">${key}</span>
+              <span class="case-option-text">${opt.text}</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+      
+      <div id="caseGiroArea" class="hidden"></div>
+      <div id="caseResolutionArea" class="hidden"></div>
+    `;
+    
+    player.querySelectorAll('.case-option-card').forEach(card => {
+      if (decisionInicial !== null) {
+        card.style.cursor = 'default';
+        card.style.pointerEvents = 'none';
+        return;
+      }
+      card.addEventListener('click', () => {
+        decisionInicial = card.dataset.option;
+        renderPlayerState();
+        mostrarGiroDelCaso();
+      });
+    });
+    
+    const closeBtn = player.querySelector('#btnCloseCase');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        renderizarCasosSituados();
+      });
+    }
+  }
+  
+  function mostrarGiroDelCaso() {
+    const giroArea = player.querySelector('#caseGiroArea');
+    if (!giroArea) return;
+    
+    giroArea.className = 'case-giro-box';
+    giroArea.innerHTML = `
+      <div class="case-giro-header">
+        <span>⚠</span>
+        <strong>GIRO DEL CASO (Nueva información)</strong>
+      </div>
+      <div class="case-giro-text">
+        ${caso.giro}
+      </div>
+      <div class="case-giro-question" style="margin-bottom:1.25rem; font-weight:700;">
+        ¿Mantendrías tu decisión inicial "${decisionInicial}" o preferís cambiarla tras esta nueva información?
+      </div>
+      <div class="case-giro-actions">
+        <button type="button" class="btn btn-success" id="btnMantenerDecision">Mantener opción "${decisionInicial}"</button>
+        <button type="button" class="btn btn-outline" id="btnCambiarDecision">Cambiar mi decisión</button>
+      </div>
+    `;
+    
+    player.querySelector('#btnMantenerDecision').addEventListener('click', () => {
+      decisionFinal = decisionInicial;
+      giroArea.innerHTML = `<p class="case-giro-text" style="background:var(--bg-main); padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid var(--border);"><em>Decidiste mantener tu opción inicial: <strong>"${decisionInicial}"</strong>.</em></p>`;
+      mostrarResolucionFinal();
+    });
+    
+    player.querySelector('#btnCambiarDecision').addEventListener('click', () => {
+      giroArea.innerHTML = `
+        <p class="case-giro-text"><em>Seleccioná tu nueva opción de resolución:</em></p>
+        <div class="case-options-grid" style="margin-bottom: 0;">
+          ${Object.entries(caso.options).map(([key, opt]) => `
+            <button type="button" class="case-option-card${decisionInicial === key ? ' disabled' : ''}" id="btnNewOpt-${key}" data-option="${key}">
+              <span class="case-option-letter">${key}</span>
+              <span class="case-option-text">${opt.text}</span>
+            </button>
+          `).join('')}
+        </div>
+      `;
+      
+      Object.keys(caso.options).forEach(key => {
+        const btn = player.querySelector(`#btnNewOpt-${key}`);
+        if (btn) {
+          btn.addEventListener('click', () => {
+            decisionFinal = key;
+            giroArea.innerHTML = `<p class="case-giro-text" style="background:var(--bg-main); padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid var(--border);"><em>Cambiaste tu decisión de la opción inicial "${decisionInicial}" a la opción: <strong>"${decisionFinal}"</strong>.</em></p>`;
+            mostrarResolucionFinal();
+          });
+        }
+      });
+    });
+    
+    giroArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  
+  function mostrarResolucionFinal() {
+    const resArea = player.querySelector('#caseResolutionArea');
+    if (!resArea) return;
+    
+    resArea.className = 'case-resolution-box';
+    
+    const feedbackOpt = caso.options[decisionFinal]?.feedback || '';
+    
+    resArea.innerHTML = `
+      <h4>Análisis pedagógico y resolución</h4>
+      <div class="case-feedback-alert">
+        ${feedbackOpt}
+      </div>
+      
+      <p style="line-height: 1.65; margin-bottom: 1.75rem;">
+        <strong>Reflexión ética general:</strong> ${caso.analysis}
+      </p>
+      
+      <div class="case-debate-guide">
+        <h5>
+          <span style="font-size:1.15rem;">👥</span>
+          Guía de debate para talleres
+        </h5>
+        <ul>
+          ${caso.debateQuestions.map(q => `<li>${q}</li>`).join('')}
+        </ul>
+      </div>
+
+      <!-- 📊 Distribución de Decisiones de la Comunidad (Sección Admin/Talleres) -->
+      <div class="community-stats-card" style="margin-top: 2rem; background: var(--bg-hover); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+        <h5 style="margin-bottom: 0.5rem; font-weight: 700; color: var(--primary);">📊 Decisiones de la Comunidad de Docentes</h5>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+          Resultados acumulados de las elecciones de docentes en talleres formativos (se resalta tu decisión final en color):
+        </p>
+        <div class="stats-bars-container" id="caseCommunityStatsBars"></div>
+        
+        <!-- Comentarios dinámicos cargados desde la DB -->
+        <div id="caseCommunityComments" style="margin-top: 1.5rem; border-top: 1px dashed var(--border); padding-top: 1.25rem; display: none;">
+          <h6 style="font-weight: 700; margin-bottom: 0.75rem; font-size: 0.9rem; color: var(--text-primary);">💬 Reflexiones de otros colegas sobre este caso:</h6>
+          <div id="caseCommentsList" style="font-size: 0.85rem; display: flex; flex-direction: column; gap: 0.65rem; max-height: 250px; overflow-y: auto; padding-right: 0.5rem;"></div>
+        </div>
+      </div>
+
+      <!-- Espacio para recoger sugerencias o mejoras (Carácter evolutivo de la app) -->
+      <div class="case-feedback-form" style="margin-top: 2rem; border-top: 1px dashed var(--border); padding-top: 1.5rem; margin-bottom: 2rem;">
+        <h5 style="margin-bottom: 0.5rem; font-weight: 700; color: var(--primary);">✏️ Sugerencias o mejoras para este caso:</h5>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+          Este laboratorio es un recurso evolutivo. Compartí tus reflexiones o propuestas de mejora para esta situación.
+        </p>
+        <textarea id="caseSuggestionText" class="input" style="width:100%; min-height: 80px; resize: vertical; margin-bottom: 0.75rem; border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem;" placeholder="Escribí aquí tus sugerencias o ideas de mejora para este caso..."></textarea>
+        <button type="button" class="btn btn-outline" id="btnSendCaseSuggestion" style="width: 100%; font-weight: 600;">Enviar sugerencia</button>
+        <div id="caseSuggestionStatus" style="font-size: 0.88rem; margin-top: 0.65rem; text-align: center; font-weight: 600;"></div>
+      </div>
+      
+      <div style="display:flex; flex-direction: column; gap: 1rem; margin-top:2.5rem; max-width: 500px; margin-left: auto; margin-right: auto;">
+        <button type="button" class="btn btn-outline" id="btnPrintCaseGuide" style="width: 100%; font-weight: 600;">🖨️ Descargar Ficha de Taller (PDF)</button>
+        <button type="button" class="btn btn-primary" id="btnFinishCase" style="width: 100%; font-weight: 600;">Volver a la lista de dilemas</button>
+      </div>
+    `;
+    
+    // Renderizar estadísticas de la comunidad
+    const statsContainer = resArea.querySelector('#caseCommunityStatsBars');
+    if (statsContainer && caso.stats) {
+      statsContainer.innerHTML = Object.entries(caso.options).map(([key, opt]) => {
+        const percentage = caso.stats[key] || 0;
+        const isUserChoice = decisionFinal === key;
+        return `
+          <div class="stats-bar-row" style="margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.35rem;">
+              <span style="${isUserChoice ? 'font-weight: 700; color: var(--primary);' : 'color: var(--text-primary);'}">
+                <strong>Opción ${key}</strong> ${isUserChoice ? ' 👈 (Tu decisión final)' : ''}
+              </span>
+              <span style="font-weight: 700; color: var(--text-primary);">${percentage}%</span>
+            </div>
+            <div class="progress-bar-bg" style="background: var(--border); height: 12px; border-radius: 6px; overflow: hidden; width: 100%;">
+              <div class="progress-bar-fill" style="background: ${isUserChoice ? 'var(--primary)' : 'var(--text-secondary)'}; width: ${percentage}%; height: 100%; border-radius: 6px; transition: width 0.8s ease-in-out;"></div>
+            </div>
+            <p style="font-size: 0.78rem; color: var(--text-secondary); margin: 0.3rem 0 0 0; line-height: 1.4;">
+              ${opt.text}
+            </p>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Cargar comentarios comunitarios de forma dinámica
+    const commentsSection = resArea.querySelector('#caseCommunityComments');
+    const commentsList = resArea.querySelector('#caseCommentsList');
+    if (commentsSection && commentsList && CONFIG.opinionsEndpoint) {
+      fetch(CONFIG.opinionsEndpoint)
+        .then(response => response.json())
+        .then(data => {
+          const opinions = data.opinions || [];
+          const prefix = `[Caso: ${caso.title}]`;
+          const caseComments = opinions.filter(op => op.suggestion && op.suggestion.includes(prefix));
+          
+          if (caseComments.length > 0) {
+            commentsSection.style.display = 'block';
+            commentsList.innerHTML = caseComments.map(op => {
+              const cleanText = op.suggestion.replace(prefix, '').trim();
+              return `
+                <div style="background: var(--bg-main); padding: 0.75rem 1rem; border-radius: 8px; border-left: 4px solid var(--primary); border: 1px solid var(--border); border-left-width: 4px; border-left-color: var(--primary);">
+                  <p style="margin: 0; line-height: 1.5; font-style: italic;">"${cleanText}"</p>
+                  <small style="color: var(--text-secondary); display: block; margin-top: 0.35rem; font-size: 0.75rem; font-weight: 600;">
+                    — Colega (${op.nivelEducativo || 'Docente'})
+                  </small>
+                </div>
+              `;
+            }).join('');
+          }
+        })
+        .catch(err => console.warn('Error al cargar comentarios del caso:', err));
+    }
+
+    // Registrar la decisión final del docente en la base de datos de manera anónima (si hay consentimiento)
+    if (state.consentTracking && CONFIG.dataEndpoint) {
+      const payload = {
+        eventType: 'feedback',
+        consentTracking: true,
+        rating: 4, // rating 4 = caso resuelto
+        suggestion: `=CHOICE= [Caso: ${caso.title}] Inicial: ${decisionInicial}, Final: ${decisionFinal}`,
+        profile: state.profile || 'docente',
+        profileKey: state.profileKey || 'docente',
+        sessionId: typeof getAnalyticsSessionId === 'function' ? getAnalyticsSessionId() : 'anonimo',
+        country: state.country || 'Uruguay',
+        nivelEducativo: state.nivelEducativo || 'Secundaria'
+      };
+      
+      fetch(CONFIG.dataEndpoint, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).catch(err => console.warn('Error al guardar registro de elección del caso:', err));
+    }
+    
+    const sendBtn = resArea.querySelector('#btnSendCaseSuggestion');
+    const suggestionText = resArea.querySelector('#caseSuggestionText');
+    const statusDiv = resArea.querySelector('#caseSuggestionStatus');
+    
+    if (sendBtn && suggestionText && statusDiv) {
+      sendBtn.addEventListener('click', () => {
+        const text = suggestionText.value.trim();
+        if (!text) {
+          statusDiv.textContent = 'Por favor, escribí una sugerencia antes de enviar.';
+          statusDiv.style.color = 'var(--warning)';
+          return;
+        }
+        
+        if (!state.consentTracking) {
+          statusDiv.textContent = 'Para enviar tu sugerencia, primero debés aceptar el registro de datos anónimos en el inicio.';
+          statusDiv.style.color = 'var(--warning)';
+          return;
+        }
+        
+        sendBtn.disabled = true;
+        sendBtn.textContent = 'Enviando...';
+        statusDiv.textContent = 'Guardando tu aporte de forma anónima...';
+        statusDiv.style.color = 'var(--text-secondary)';
+        
+        const payload = {
+          eventType: 'feedback',
+          consentTracking: true,
+          rating: 5,
+          suggestion: `[Caso: ${caso.title}] ${text}`,
+          profile: state.profile || 'docente',
+          profileKey: state.profileKey || 'docente',
+          sessionId: typeof getAnalyticsSessionId === 'function' ? getAnalyticsSessionId() : 'anonimo',
+          country: state.country || 'Uruguay',
+          nivelEducativo: state.nivelEducativo || 'Secundaria'
+        };
+        
+        fetch(CONFIG.dataEndpoint, {
+          method: 'POST',
+          mode: 'cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+          .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return response.json();
+          })
+          .then(() => {
+            sendBtn.textContent = '✓ Enviada';
+            suggestionText.value = '';
+            statusDiv.textContent = '¡Gracias! Tu sugerencia quedó registrada para seguir mejorando el caso.';
+            statusDiv.style.color = 'var(--success)';
+            
+            if (typeof cargarOpinionesAnonimas === 'function') {
+              cargarOpinionesAnonimas();
+            }
+          })
+          .catch(err => {
+            console.warn('Error al guardar la sugerencia del caso:', err);
+            sendBtn.disabled = false;
+            sendBtn.textContent = 'Enviar sugerencia';
+            statusDiv.textContent = 'No se pudo enviar. Comprobá tu conexión e intentá de nuevo.';
+            statusDiv.style.color = 'var(--warning)';
+          });
+      });
+    }
+
+    const printBtn = resArea.querySelector('#btnPrintCaseGuide');
+    if (printBtn) {
+      printBtn.addEventListener('click', () => {
+        descargarCasoFichaPDF(caso);
+      });
+    }
+    
+    resArea.querySelector('#btnFinishCase').addEventListener('click', () => {
+      renderizarCasosSituados();
+    });
+    
+    resArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  
+  elements.situatedCases.innerHTML = '';
+  elements.situatedCases.appendChild(player);
+  renderPlayerState();
 }
 
 function renderizarDevolucionFinal(nivel) {
@@ -1666,4 +2275,148 @@ if (elements.agreementFormatBtns && elements.agreementFormatBtns.length) {
       }
     });
   });
+}
+
+async function descargarCasoFichaPDF(caso) {
+  const cargarJsPDF = () => {
+    return new Promise((resolve) => {
+      if (window.jspdf && window.jspdf.jsPDF) {
+        resolve();
+        return;
+      }
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+      s.onload = () => resolve();
+      s.onerror = () => resolve();
+      document.body.appendChild(s);
+    });
+  };
+
+  try {
+    await cargarJsPDF();
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+      alert("No se pudo cargar la librería PDF. Por favor comprueba tu conexión a internet.");
+      return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+    
+    let y = 20;
+    
+    // Encabezado
+    doc.setFillColor(79, 70, 229);
+    doc.rect(0, 0, 210, 30, 'F');
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+    doc.text("LABORATORIO DE CASOS: ÉTICA PEDAGÓGICA E IAG", 15, 14);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text("Guía de Debate para Talleres de Formación Docente", 15, 22);
+    
+    y = 42;
+    
+    // Título del caso
+    doc.setTextColor(31, 41, 55);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.text(`Caso: ${caso.title}`, 15, y);
+    y += 8;
+    
+    // Eje pedagógico
+    doc.setFillColor(243, 244, 246);
+    doc.rect(15, y, 180, 8, 'F');
+    doc.setTextColor(79, 70, 229);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`Eje: ${caso.axisLabel.toUpperCase()}`, 18, y + 5.5);
+    y += 15;
+    
+    // Situación (Caso)
+    doc.setTextColor(31, 41, 55);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.text("SITUACIÓN INICIAL (Dilema Ético):", 15, y);
+    y += 5;
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    let splitText = doc.splitTextToSize(caso.story, 180);
+    doc.text(splitText, 15, y);
+    y += splitText.length * 5 + 8;
+    
+    // Giro del caso
+    doc.setFont('helvetica', 'bold');
+    doc.text("GIRO DEL CASO (Nueva información de contexto):", 15, y);
+    y += 5;
+    
+    doc.setFont('helvetica', 'normal');
+    splitText = doc.splitTextToSize(caso.giro, 180);
+    doc.text(splitText, 15, y);
+    y += splitText.length * 5 + 8;
+    
+    // Opciones de resolución
+    doc.setFont('helvetica', 'bold');
+    doc.text("OPCIONES DE RESOLUCIÓN DISPONIBLES:", 15, y);
+    y += 5;
+    
+    doc.setFont('helvetica', 'normal');
+    for (const [letter, option] of Object.entries(caso.options)) {
+      const optText = doc.splitTextToSize(`Opción ${letter}: ${option.text}`, 175);
+      doc.text("•", 15, y);
+      doc.text(optText, 20, y);
+      y += optText.length * 5 + 2;
+    }
+    y += 6;
+    
+    if (y > 235) {
+      doc.addPage();
+      y = 20;
+    }
+    
+    // Análisis Pedagógico
+    doc.setFont('helvetica', 'bold');
+    doc.text("ANÁLISIS PEDAGÓGICO Y REFLEXIÓN ÉTICA:", 15, y);
+    y += 5;
+    
+    doc.setFont('helvetica', 'normal');
+    splitText = doc.splitTextToSize(caso.analysis, 180);
+    doc.text(splitText, 15, y);
+    y += splitText.length * 5 + 8;
+    
+    if (y > 235) {
+      doc.addPage();
+      y = 20;
+    }
+    
+    // Guía de Debate
+    doc.setFillColor(243, 244, 246);
+    doc.rect(15, y, 180, 42, 'F');
+    
+    doc.setTextColor(31, 41, 55);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.text("PREGUNTAS ORIENTADORAS PARA DEBATE EN GRUPOS:", 18, y + 7);
+    y += 12;
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9.5);
+    caso.debateQuestions.forEach((q, idx) => {
+      const qText = doc.splitTextToSize(`${idx + 1}. ${q}`, 170);
+      doc.text(qText, 18, y);
+      y += qText.length * 5 + 1;
+    });
+    
+    doc.setFontSize(8);
+    doc.setTextColor(156, 163, 175);
+    doc.text("Herramienta IAG en clave de ética pedagógica - ANEP / Ceibal / Udelar / FING", 15, 287);
+    doc.text("Recurso evolutivo y abierto para formación docente.", 132, 287);
+
+    doc.save(`Guia_Taller_Caso_${caso.id}.pdf`);
+  } catch (error) {
+    console.error("Error al generar PDF del caso:", error);
+    alert("Hubo un error al generar el PDF.");
+  }
 }

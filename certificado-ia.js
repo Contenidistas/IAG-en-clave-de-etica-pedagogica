@@ -320,6 +320,8 @@ ${obtenerTextoAcuerdoDidactico()}`;
 
 if (elements.restartBtn) {
   elements.restartBtn.addEventListener('click', () => {
+    state.isLaboratorioMode = false;
+    document.body.classList.remove('laboratorio-active');
     state.profile = null;
     state.name = '';
     state.currentId = null;
@@ -358,8 +360,8 @@ if (elements.restartBtn) {
     }
 
     updateStartButtonState();
-    updateCarousel();
     showScreen('intro');
+    updateCarousel();
     window.scrollTo(0, 0);
   });
 }
