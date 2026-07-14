@@ -7513,3 +7513,94 @@ body.quiz-active #neuralNetCanvas,
 body.result-active #neuralNetCanvas {
   opacity: 0.18;
 }
+
+/* Estilos modernos y premium para la selección de perfil */
+.profile-choice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 0.65rem;
+}
+
+.profile-choice-icon-bg {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(99, 102, 241, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  transition: all 0.2s ease;
+}
+
+.profile-choice.active .profile-choice-icon-bg,
+.profile-choice.selected .profile-choice-icon-bg {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.profile-choice-check {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.profile-choice.active .profile-choice-check,
+.profile-choice.selected .profile-choice-check {
+  background: #10b981;
+  border-color: #10b981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+.profile-choice.active .profile-choice-check::after,
+.profile-choice.selected .profile-choice-check::after {
+  content: '✓';
+  color: white;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.profile-choice-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 0.2rem;
+  transition: color 0.18s ease;
+}
+
+.profile-choice.active .profile-choice-title,
+.profile-choice.selected .profile-choice-title {
+  color: #ffffff;
+}
+
+.profile-choice-desc {
+  font-size: 0.8rem !important;
+  line-height: 1.4 !important;
+  color: var(--text-secondary) !important;
+  transition: color 0.18s ease;
+}
+
+.profile-choice.active .profile-choice-desc,
+.profile-choice.selected .profile-choice-desc {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* Modificar padding y alturas para centrado móvil */
+@media (max-width: 768px) {
+  .profile-choice-grid {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+  .profile-choice {
+    min-height: auto;
+    padding: 1.25rem !important;
+  }
+}

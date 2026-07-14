@@ -1124,28 +1124,28 @@ const CASOS_LABORATORIO = [
     dilemma: '¿Cómo puede utilizarse la IA generativa para personalizar la enseñanza y favorecer la inclusión sin comprometer la protección de datos, la dignidad de los estudiantes ni el juicio pedagógico?',
     options: {
       A: {
-        text: 'Utilizar las adaptaciones obtentas, dado que se eliminaron los nombres y el propósito es puramente pedagógico.',
-        feedback: '<strong>Análisis de la opción A (Riesgosa):</strong> Aunque no se ingresaron nombres propios, las descripciones minuciosas del historial de aprendizaje y diagnósticos médicos pueden constituir datos reidentificables. El uso de plataformas comerciales abiertas expone información sensible que pasa a formar parte del entrenamiento del modelo.'
+        text: 'Utilizar las adaptaciones obtenidas, dado que se eliminaron los nombres y el propósito es puramente pedagógico.',
+        feedback: '<strong>Análisis de la opción A (Riesgosa):</strong> Aunque no hay nombres, los informes psicopedagógicos contienen datos extremadamente sensibles. Según los <em>Lineamientos de ANEP</em> y la <em>Guía de Ética de la UNESCO</em>, la combinación de diagnósticos específicos crea un perfil reidentificable y vulnera la privacidad de los menores al alimentar modelos comerciales.'
       },
       B: {
         text: 'Usar la IA solo para generar ideas de consignas generales, evitando ingresar descripciones detalladas de informes de estudiantes.',
-        feedback: '<strong>Análisis de la opción B (Prudente):</strong> Limita la fuga de información sensible. Utiliza la IA para lo que destaca (torbellino de ideas y estructuras conceptuales), dejando la especificación, el ajuste y el análisis particular en manos del juicio del docente.'
+        feedback: '<strong>Análisis de la opción B (Prudente):</strong> Se alinea con los criterios de minimización de datos de <em>Ceibal</em>. Al no exponer descripciones particulares de los estudiantes, el docente actúa de manera preventiva, reservando el análisis pedagógico individual para su propio criterio profesional.'
       },
       C: {
         text: 'Describir las barreras pedagógicas y apoyos de manera genérica en la consulta, sin ingresar perfiles individualizados de estudiantes.',
-        feedback: '<strong>Análisis de la opción C (Pedagógicamente sólida / Enfoque DUA):</strong> Se alinea con el Diseño Universal para el Aprendizaje. En lugar de segmentar el grupo etiquetando a estudiantes individuales en el algoritmo, busca flexibilizar la propuesta para que el entorno y los materiales beneficien a toda la diversidad del grupo.'
+        feedback: '<strong>Análisis de la opción C (Pedagógicamente sólida / Enfoque DUA):</strong> Promueve la inclusión activa bajo el enfoque de <em>Diseño Universal para el Aprendizaje (DUA)</em>. Alinear la consulta a barreras genéricas evita el etiquetado algorítmico y asegura que las flexibilizaciones beneficien a todo el grupo por igual.'
       },
       D: {
         text: 'Utilizarla bajo condiciones explícitas de minimización de datos en el prompt, revisión crítica de las propuestas generadas y consentimiento informado.',
-        feedback: '<strong>Análisis de la opción D (Integral / Institucional):</strong> Reconoce que personalizar con IA exige una gobernanza ética. Implica evaluar las condiciones de privacidad de la herramienta, acordar criterios con la institución y sostener una mirada crítica frente a las sugerencias de la máquina.'
+        feedback: '<strong>Análisis de la opción D (Integral / Institucional):</strong> Sigue las recomendaciones de gobernanza de la <em>UNESCO</em>. Exige verificar las políticas de privacidad del software (evitando el reentrenamiento del modelo) y coordinar institucionalmente las prácticas antes de ingresar datos del estudiantado.'
       }
     },
     giro: 'Al revisar las adaptaciones generadas por la IA, el docente nota que el sistema propone para los estudiantes con dislexia y TDAH únicamente tareas repetitivas, mecánicas y de menor complejidad cognitiva (como completar palabras o realizar sopas de letras), mientras reserva las tareas de investigación, argumentación y creación para el resto del grupo.',
-    analysis: 'Este dilema ilustra el riesgo de delegar el diseño curricular en sistemas algorítmicos. La IA tiende a reproducir sesgos capacitistas, reduciendo la expectativa de logro para los estudiantes etiquetados. La personalización con IA debe enfocarse en diversificar las vías de acceso y expresión de los aprendizajes, y nunca en empobrecer el desafío cognitivo.',
+    analysis: 'Este dilema expone los riesgos del sesgo algorítmico capacitista advertido por la <em>UNESCO</em> y <em>Ceibal</em>. Delegar la personalización sin mediación crítica en la IA tiende a empobrecer las expectativas de logro de los estudiantes. Los marcos de referencia exigen que el docente actúe como filtro crítico, asegurando que la IA diversifique los accesos al aprendizaje sin comprometer la complejidad cognitiva ni la dignidad del estudiante.',
     debateQuestions: [
-      '¿Eliminar el nombre de un estudiante es suficiente para considerar que la información es anónima?',
-      '¿De qué manera las adaptaciones generadas por la IA pueden terminar etiquetando o limitando el potencial del estudiante en lugar de potenciarlo?',
-      '¿Qué acuerdos institucionales o de centro deberían existir antes de utilizar datos educativos de estudiantes en plataformas externas?'
+      '¿Eliminar el nombre de un estudiante es suficiente para cumplir con la Ley de Protección de Datos Personales en entornos de IA?',
+      '¿De qué manera los materiales diferenciados por IA pueden consolidar etiquetas y reducir la expectativa de logro del estudiante en formación?',
+      '¿Qué directrices claras establece ANEP respecto al ingreso de información de desempeño estudiantil en plataformas externas de IA?'
     ],
     stats: { A: 12, B: 38, C: 32, D: 18 }
   },
@@ -1160,27 +1160,27 @@ const CASOS_LABORATORIO = [
     options: {
       A: {
         text: 'Aceptar el primer programa generado porque incluye autores reconocidos y acelera el trabajo de planificación.',
-        feedback: '<strong>Análisis de la opción A (Inadecuada):</strong> Valora la eficiencia por encima de la justicia curricular. Al delegar la curaduría crítica en la IA sin verificar, se consolidan y repiten sesgos de género e invisibilización geográfica históricos.'
+        feedback: '<strong>Análisis de la opción A (Inadecuada):</strong> Reproduce de manera pasiva el sesgo de representatividad que la <em>UNESCO</em> y <em>ANEP</em> señalan como un problema crítico de los modelos entrenados con corpus web mayoritarios, invisibilizando la diversidad cultural e identitaria regional.'
       },
       B: {
         text: 'Usar la lista inicial y complementarla manualmente investigando en bibliotecas digitales y catálogos académicos.',
-        feedback: '<strong>Análisis de la opción B (Correcta):</strong> Combina la rapidez de la IA con la responsabilidad intelectual del docente, quien interviene activamente para balancear y enriquecer el programa con criterio académico propio.'
+        feedback: '<strong>Análisis de la opción B (Correcta):</strong> Concuerda con las pautas de curaduría crítica docente. Se utiliza la IA como disparador inicial, pero la soberanía curricular y el rigor metodológico descansan en el docente mediante la contrastación con bibliotecas reales.'
       },
       C: {
         text: 'Insistir a la IA que equilibre la lista pero comprobar y contrastar de manera estricta cada nombre y libro sugerido antes de incluirlos.',
-        feedback: '<strong>Análisis de la opción C (Necesaria y crítica):</strong> Muestra comprensión del fenómeno de la alucinación. Evita divulgar fuentes inventadas por la máquina mediante una verificación sistemática del material en motores de búsqueda reales.'
+        feedback: '<strong>Análisis de la opción C (Necesaria y crítica):</strong> Muestra un entendimiento claro sobre las alucinaciones algorítmicas descritas por <em>Ceibal</em>. Reconoce que las IAs generativas operan por probabilidad y no por veracidad, por lo que toda sugerencia debe validarse con fuentes externas.'
       },
       D: {
         text: 'Analizar la lista sesgada y las alucinaciones del modelo junto con los estudiantes para discutir de forma crítica el sesgo en los algoritmos.',
-        feedback: '<strong>Análisis de la opción D (Didácticamente potente):</strong> Transforma el límite técnico del software en un objeto de estudio pedagógico. Fomenta el pensamiento crítico y la alfabetización de datos entre los estudiantes.'
+        feedback: '<strong>Análisis de la opción D (Didácticamente potente):</strong> Convierte el límite tecnológico en una oportunidad didáctica. Se alinea con los objetivos de ciudadanía digital y pensamiento crítico promovidos por el <em>Marco Curricular Nacional de ANEP</em> y la <em>alfabetización en IA de Ceibal</em>.'
       }
     },
     giro: 'Al realizar una búsqueda rápida en internet, el docente descubre que tres de las autoras recomendadas en la segunda vuelta y presentadas por la IA como pioneras del realismo mágico son ficticias y que las citas de sus obras presentadas por el modelo son inventadas.',
-    analysis: 'Los modelos de lenguaje no son enciclopedias fiables; funcionan asociando palabras de forma estadística. Por ello, tienden a repetir los sesgos mayoritarios de internet (como el predominio masculino) y a inventar datos para satisfacer la solicitud del usuario de forma coherente y creíble.',
+    analysis: 'Este dilema muestra las limitaciones epistemológicas de las IAs. Como señalan las guías de <em>Ceibal</em> y la <em>UNESCO</em>, las alucinaciones no son fallos aleatorios, sino intrínsecas a la naturaleza probabilística de los modelos de lenguaje. La justicia curricular y la soberanía pedagógica requieren que el docente contraste activamente los resultados para no diseminar conocimientos falsos o sesgados en el aula.',
     debateQuestions: [
-      '¿Cuáles son las consecuencias pedagógicas de enseñar utilizando fuentes inventadas o sesgadas por un software?',
-      '¿Cómo podemos educar a los estudiantes para que identifiquen y mitiguen sesgos en las respuestas de la IA generativa?',
-      '¿Qué papel juega la soberanía cultural y pedagógica de cada docente al planificar con herramientas entrenadas mayoritariamente en contextos ajenos?'
+      '¿Por qué los modelos de IA tienden a reproducir sesgos históricos y de género en sus recomendaciones curriculares?',
+      '¿Cómo podemos diseñar actividades en las que las alucinaciones de la IA sirvan para enseñar verificación de fuentes a los estudiantes?',
+      '¿Qué nos dicen los marcos de ANEP y Ceibal sobre el desarrollo del pensamiento crítico frente a la información automatizada?'
     ],
     stats: { A: 8, B: 24, C: 42, D: 26 }
   },
@@ -1195,23 +1195,23 @@ const CASOS_LABORATORIO = [
     options: {
       A: {
         text: 'Mantener la nota de la IA para respetar el protocolo del centro y asegurar la consistencia del sistema.',
-        feedback: '<strong>Análisis de la opción A (Riesgosa):</strong> Subordina el juicio humano y el valor de la creatividad al control de una máquina. Desincentiva el pensamiento original y puede generar frustración en estudiantes destacados.'
+        feedback: '<strong>Análisis de la opción A (Riesgosa):</strong> Vulnerar el principio fundamental de <em>"Supervisión Humana" de la UNESCO</em> y las pautas de evaluación de <em>ANEP</em>, que prohíben delegar calificaciones finales a sistemas automatizados para evitar desincentivar el pensamiento heurístico y original.'
       },
       B: {
         text: 'Modificar manualmente la nota en la libreta del docente sin informar al sistema ni a los coordinadores para evitar conflictos.',
-        feedback: '<strong>Análisis de la opción B (Evasiva):</strong> Resuelve la injusticia puntual de forma individual, pero no problematiza a nivel institucional el uso inadecuada de la herramienta ni propicia cambios en los protocolos.'
+        feedback: '<strong>Análisis de la opción B (Evasiva):</strong> Resuelve el caso particular pero esquiva la discusión pedagógica e institucional. Los lineamientos de <em>Udelar / FING</em> destacan la importancia de auditar el comportamiento de herramientas automáticas y transparentar sus límites para mejorar las prácticas.'
       },
       C: {
         text: 'Explicar el error del algoritmo al estudiante, reevaluar manualmente y elevar un informe técnico/pedagógico a la dirección escolar.',
-        feedback: '<strong>Análisis de la opción C (Responsable):</strong> Ejerce la supervisión humana de forma activa y promueve la mejora del sistema mediante canales institucionales, resguardando el juicio pedagógico del docente.'
+        feedback: '<strong>Análisis de la opción C (Responsable):</strong> Ejerce la autonomía profesional que promueven <em>ANEP</em> y <em>Ceibal</em>. Sitúa al docente como garante ético de la evaluación y genera retroalimentación institucional para ajustar el software.'
       },
       D: {
         text: 'Realizar un espacio de debate en la clase para contrastar la lógica rígida de la máquina con el pensamiento heurístico y libre de las personas.',
-        feedback: '<strong>Análisis de la opción D (Formativa):</strong> Utiliza el incidente para enriquecer la comprensión sobre cómo piensan los sistemas artificiales en comparación con las mentes humanas, potenciando la metacognición del grupo.'
+        feedback: '<strong>Análisis de la opción D (Formativa):</strong> Excelente propuesta didáctica. Desarrolla la metacognición y la comprensión técnica del estudiantado, mostrando los límites lógicos de la computación frente al ingenio humano, alinear con las directrices de <em>Ceibal</em>.'
       }
     },
     giro: 'La dirección del centro le advierte al docente que anular la decisión del software reduce el porcentaje de fiabilidad reportado en el panel administrativo que se envía trimestralmente a las familias.',
-    analysis: 'La automatización de la evaluación en base a IA puede socabar el valor humano del acompañamiento y la valoración integral del proceso de aprendizaje. Las herramientas son apoyos; la responsabilidad pedagógica, legal y ética de la evaluación debe seguir residiendo en los profesionales humanos.',
+    analysis: 'Como establecen la <em>UNESCO</em>, <em>ANEP</em> y la <em>Udelar</em>, la evaluación educativa es un acto intrínsecamente humano, ético y contextual. Las plataformas digitales actúan como herramientas de asistencia, pero nunca pueden sustituir el juicio profesional del docente. Priorizar métricas algorítmicas por encima de la creatividad matemática restringe el pensamiento libre y distorsiona el propósito pedagógico del centro.',
     debateQuestions: [
       '¿Qué dimensiones de la evaluación formativa e integral son completamente indelegables en un software de IA?',
       '¿Cómo afecta a la autonomía docente y a la motivación estudiantil la imposición de métricas de rendimiento estandarizadas basadas en datos algorítmicos?',
@@ -1230,27 +1230,27 @@ const CASOS_LABORATORIO = [
     options: {
       A: {
         text: 'Aplicar el reglamento directamente basándose en la sospecha visual y penalizar la entrega.',
-        feedback: '<strong>Análisis de la opción A (Poco recomendable):</strong> Puede cometer una injusticia severa debido a que la sospecha no es una prueba concluyente. Quiebra la confianza del estudiante en el docente y en la institución.'
+        feedback: '<strong>Análisis de la opción A (Poco recomendable):</strong> Vulnerar el principio de presunción de inocencia pedagógica. Los lineamientos de <em>Ceibal</em> y <em>ANEP</em> recalcan que las sospechas visuales sin diálogo previo deterioran el clima del aula y quiebran el vínculo de confianza.'
       },
       B: {
         text: 'Pasar la entrega por detectores de IA online y aplicar la sanción si el porcentaje de probabilidad supera el 80%.',
-        feedback: '<strong>Análisis de la opción B (Inadecuada):</strong> Otorga validez a herramientas de detección de plagio que científicamente han demostrado ser sesgadas, poco fiables y fáciles de burlar mediante simples parafraseos.'
+        feedback: '<strong>Análisis de la opción B (Inadecuada):</strong> Los detectores de IA arrojan abundantes falsos positivos. Su uso como prueba probatoria es desaconsejado de forma categórica por la <em>UNESCO</em>, <em>Ceibal</em> y <em>Udelar / FING</em> debido a su falta de rigor científico y su sesgo hacia textos escritos por estudiantes de lenguas no nativas.'
       },
       C: {
         text: 'Citar a la estudiante a una tutoría de retroalimentación para conversar sobre su proceso de escritura y pedirle que explique la estructuración y términos clave.',
-        feedback: '<strong>Análisis de la opción C (Formativa y justa):</strong> Utiliza la mediación y el diálogo pedagógico para evaluar la comprensión real. Permite al docente indagar en el proceso y ayuda a la estudiante a defender su trabajo.'
+        feedback: '<strong>Análisis de la opción C (Formativa y justa):</strong> Utiliza la mediación didáctica recomendada por <em>ANEP</em>. Centra la evaluación en la defensa oral de la comprensión conceptual, permitiendo que la estudiante evidencie su apropiación de los conceptos.'
       },
       D: {
         text: 'Proponer una segunda entrega donde se requiera documentar el proceso a través de borradores, historial de cambios o una bitácora de prompts.',
-        feedback: '<strong>Análisis de la opción D (Pedagógicamente sólida / Basada en acuerdos):</strong> Introduce la cultura de la trazabilidad. Reorienta la evaluación para valorar el camino recorrido del pensamiento y no solo el producto acabado.'
+        feedback: '<strong>Análisis de la opción D (Pedagógicamente sólida / Basada en acuerdos):</strong> Se enfoca en la "trazabilidad del proceso" promovida por los criterios éticos de <em>Ceibal</em>. Convierte la entrega en un acuerdo didáctico donde el valor radica en el desarrollo reflexivo y no solo en el producto.'
       }
     },
     giro: 'Durante la entrevista personal, la estudiante se quiebra emocionalmente y confiesa que utilizó la IA porque sufre de un fuerte bloqueo de escritura por ansiedad y temía fracasar en la entrega, revelando que el uso de la máquina fue un síntoma de un problema socioafectivo.',
-    analysis: 'El "plagio" con IA suele ocultar necesidades de apoyo que los estudiantes no saben resolver solos. Enfocar la situación desde la sanción o la sospecha tecnológica no atiende la causa educativa. Promover acuerdos claros de transparencia (bitácoras, citas del nivel de ayuda de la IA) y cambiar los métodos de evaluación hacia procesos reduce estas tensiones.',
+    analysis: 'Este caso evidencia que la sospecha punitiva desatiende las dimensiones humanas del aprendizaje. Las directrices de <em>Ceibal</em> e <em>Integración de IA de ANEP</em> recomiendan pasar de un enfoque de detección y castigo a uno de transparencia declarada (p. ej., definir qué porcentaje de apoyo de la IA se utilizó y cómo se contrastó). Fomentar la evaluación de procesos y acordar bitácoras de diseño mitiga la ansiedad y resguarda la integridad académica.',
     debateQuestions: [
-      '¿Por qué las herramientas detectoras de IA no son instrumentos éticos ni técnicamente fiables para calificar a los estudiantes?',
-      '¿Cómo podemos enseñar a los estudiantes a declarar el uso asistido de IA en sus trabajos (transparencia de proceso) en lugar de ocultarlo?',
-      '¿De qué manera los métodos de evaluación tradicionales incentivan la copia con IA y qué alternativas evaluativas basadas en procesos podemos implementar?'
+      '¿Por qué las principales guías internacionales y locales (UNESCO, Ceibal, Udelar) prohíben catalogar un detector de IA como prueba fehaciente de fraude?',
+      '¿Cómo podemos promover en el reglamento del centro el uso transparente (declaración de uso y roles) en lugar de la prohibición absoluta?',
+      '¿De qué manera las evaluaciones basadas en productos cerrados incentivan la copia con IA y cómo podemos rediseñarlas hacia el seguimiento de procesos?'
     ],
     stats: { A: 28, B: 22, C: 34, D: 16 }
   },
@@ -1265,27 +1265,27 @@ const CASOS_LABORATORIO = [
     options: {
       A: {
         text: 'Evaluar el resultado visual final por igual, dado que el acceso a herramientas mejores forma parte del contexto real.',
-        feedback: '<strong>Análisis de la opción A (Injusta):</strong> Convalida la desigualdad socioeconómica traduciéndola directamente en una ventaja en la calificación. Penaliza indirectamente a los estudiantes de menor nivel de ingresos.'
+        feedback: '<strong>Análisis de la opción A (Injusta):</strong> Convalida la brecha digital de suscripción, penalizando indirectamente la falta de recursos económicos. Esto atenta directamente contra los principios de equidad y justicia educativa consagrados en el <em>Plan de Desarrollo Educativo de ANEP</em>.'
       },
       B: {
         text: 'Centrar la rúbrica y la evaluación en la coherencia de la narrativa y la justificación técnica del guion, no en la calidad estética de la IA.',
-        feedback: '<strong>Análisis de la opción B (Equitativa):</strong> Neutraliza la brecha de licencias. Valora el esfuerzo intelectual, el diseño metodológico y las competencias conceptuales del alumno.'
+        feedback: '<strong>Análisis de la opción B (Equitativa):</strong> Neutraliza la desigualdad tecnológica. De acuerdo con las orientaciones de <em>Ceibal</em>, evalúa los procesos metacognitivos, la creatividad narrativa y el dominio conceptual, no la capacidad computacional de la licencia contratada.'
       },
       C: {
         text: 'Permitir realizar el trabajo utilizando técnicas de ilustración analógicas o repositorios de imágenes libres para quienes no deseen o no puedan usar IA.',
-        feedback: '<strong>Análisis de la opción C (Inclusiva):</strong> Asegura que nadie quede excluido de la actividad por cuestiones tecnológicas o éticas, aunque exige diversificar las rúbricas para que sigan siendo justas.'
+        feedback: '<strong>Análisis de la opción C (Inclusiva):</strong> Protege la pluralidad metodológica recomendada por la <em>UNESCO</em>. Garantiza que el acceso a tecnologías de IA no sea obligatorio cuando genera exclusión digital o tensiones éticas individuales.'
       },
       D: {
         text: 'Restringir el uso de IA únicamente a aquellas herramientas gratuitas que el centro escolar garantice o prohibir el uso de versiones premium en la entrega.',
-        feedback: '<strong>Análisis de la opción D (Niveladora):</strong> Establece una base común de juego para todo el grupo para evitar privilegios en la entrega, priorizando la equidad grupal por sobre el uso individual de tecnología avanzada.'
+        feedback: '<strong>Análisis de la opción D (Niveladora):</strong> Asegura condiciones equitativas para el grupo (piso común de herramientas) tal como recomiendan las directrices de <em>ANEP</em>, evitando que las ventajas de versiones de pago sesguen las dinámicas académicas del grupo.'
       }
     },
-    giro: 'Las calificaciones de la entrega muestran que los proyectos realizados con la IA de pago obtuvieron mayoritariamente notas excelentes debido a que el impacto visual influyó en la percepción general del jurado evaluador, a pesar de tener una planificación narrativa más débil.',
-    analysis: 'El "efecto halo" del impacto visual de las imágenes generadas por IA de pago puede distorsionar el juicio evaluativo. La introducción de la IA en clase exige revisar si no estamos introduciendo nuevas formas de exclusión digital. La evaluación debe medir el proceso cognitivo del estudiante y no la calidad de renderizado del servidor de la IA.',
+    giro: 'Las calificaciones de la entrega muestran que los proyectos realizados con la IA de pago obtuvieron mayoritariamente notas excelentes debido a que el impacto visual influyeron en la percepción general del jurado evaluador, a pesar de tener una planificación narrativa más débil.',
+    analysis: 'La brecha de las licencias representa una dimensión crítica de la inequidad educativa digital señalada por la <em>UNESCO</em>, <em>Ceibal</em> y <em>ANEP</em>. La introducción de tecnologías emergentes en la educación pública exige que los criterios evaluativos aíslen el "impacto estético automático" del software y midan estrictamente las competencias de diseño y toma de decisiones pedagógicas del estudiante, protegiendo el acceso democrático y la justicia social en el aula.',
     debateQuestions: [
-      '¿Qué responsabilidades tienen los centros educativos antes de proponer tareas que requieren suscripciones o recursos digitales personales?',
-      '¿Cómo construir rúbricas de evaluación robustas que premien las habilidades intelectuales del estudiante por sobre la potencia tecnológica del software?',
-      '¿De qué manera podemos atenuar la brecha digital generacional y económica en el uso crítico de tecnologías avanzadas dentro de las aulas?'
+      '¿Qué lineamientos de equidad establece ANEP para garantizar que el uso de tecnologías de pago no cree nuevas brechas en los aprendizajes?',
+      '¿Cómo podemos diseñar rúbricas que aíslen el efecto estético generado por el algoritmo de pago y premien las decisiones originales del estudiante?',
+      '¿Qué alternativas viables existen para que los centros educativos brinden acceso equitativo e institucional a recursos avanzados de IA?'
     ],
     stats: { A: 15, B: 55, C: 20, D: 10 }
   }
