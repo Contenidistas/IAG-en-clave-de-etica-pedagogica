@@ -1373,6 +1373,7 @@ if (homeBtn) {
             state.path = [];
             state.evidence = 0;
             state.currentSlide = 0;
+            state.onboardingStep = 0;
             state.country = 'Uruguay';
             state.nivelEducativo = '';
             state.familiaridadInicial = '';
