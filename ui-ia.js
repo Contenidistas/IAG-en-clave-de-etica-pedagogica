@@ -1435,7 +1435,7 @@ if (btnVerAutores) {
             <img src="icons/perfil.png" alt="Santiago Hernández" class="team-member-photo" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);">
             <div class="team-member-info">
               <h4 style="margin: 0 0 0.25rem; font-weight: 700; color: var(--text-primary); font-family: var(--font-header);">Prof. Esp. Santiago Hernández</h4>
-              <p style="margin: 0 0 0.5rem; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">Creador y desarrollador de la app, investigador y docente de Informática</p>
+              <p style="margin: 0 0 0.5rem; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">Creador y desarrollador de la app, Investigador y divulgador. Prof. de Informática Especializado en Tecnología Educativa.</p>
               <div class="links-autores" style="display: flex; gap: 0.75rem; font-size: 0.82rem;">
                 <a href="https://orcid.org/0009-0001-9086-1490" target="_blank" rel="noopener noreferrer" style="color: var(--primary); text-decoration: none; font-weight: 600;">🔗 ORCID</a>
                 <a href="https://exportcvuy.anii.org.uy/cv/?8242b38f35c3b4fc9b8d3442700f810e" target="_blank" rel="noopener noreferrer" style="color: var(--primary); text-decoration: none; font-weight: 600;">📄 CVUY</a>
@@ -1449,7 +1449,7 @@ if (btnVerAutores) {
             <img src="icons/Diego.jpeg" alt="Diego Daluz" class="team-member-photo" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);">
             <div class="team-member-info">
               <h4 style="margin: 0 0 0.25rem; font-weight: 700; color: var(--text-primary); font-family: var(--font-header);">Prof. Mag. Diego Daluz</h4>
-              <p style="margin: 0 0 0.5rem; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">Investigador y colaborador académico en ética e innovación pedagógica</p>
+              <p style="margin: 0 0 0.5rem; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">Investigador, colaborador pedagógico, Prof. de Informática.</p>
               <div class="links-autores" style="display: flex; gap: 0.75rem; font-size: 0.82rem;">
                 <a href="https://orcid.org/0009-0007-3089-6652" target="_blank" rel="noopener noreferrer" style="color: var(--primary); text-decoration: none; font-weight: 600;">🔗 ORCID</a>
                 <a href="https://exportcvuy.anii.org.uy//cv/?45f1c3470336379350b15d2c38a19738" target="_blank" rel="noopener noreferrer" style="color: var(--primary); text-decoration: none; font-weight: 600;">📄 CVUY</a>
