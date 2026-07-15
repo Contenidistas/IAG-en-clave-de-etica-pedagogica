@@ -761,42 +761,30 @@ const ONBOARDING_STEP_META = {
     target: 'profile',
     isValid: () => !!state.profile
   },
-  nivel: {
-    title: 'Contexto educativo',
-    target: 'nivel',
-    isValid: () => !(state.profile === 'docente' || state.profile === 'estudiante')
-      || (elements.nivelEducativo && elements.nivelEducativo.value.trim() !== '')
-  },
   contexto: {
-    title: 'Datos de contexto',
+    title: 'Tu contexto',
     target: 'contexto',
-    isValid: () => true
-  },
-  familiaridad: {
-    title: 'Experiencia previa',
-    target: 'familiaridad',
-    isValid: () => elements.familiaridadInicial && elements.familiaridadInicial.value.trim() !== ''
-  },
-  recursos: {
-    title: 'Recursos similares',
-    target: 'recursos',
-    isValid: () => elements.recursosSimilaresRadios
-      && Array.from(elements.recursosSimilaresRadios).some(r => r.checked)
+    isValid: () => {
+      const levelOk = !(state.profile === 'docente' || state.profile === 'estudiante')
+        || (elements.nivelEducativo && elements.nivelEducativo.value.trim() !== '');
+      const countryOk = (elements.countrySelect && elements.countrySelect.value.trim() !== '');
+      return levelOk && countryOk;
+    }
   },
   cierre: {
-    title: 'Privacidad y cierre',
+    title: 'Uso y Privacidad',
     target: 'start',
-    isValid: () => true
+    isValid: () => {
+      const famOk = elements.familiaridadInicial && elements.familiaridadInicial.value.trim() !== '';
+      const recsOk = elements.recursosSimilaresRadios
+        && Array.from(elements.recursosSimilaresRadios).some(r => r.checked);
+      return famOk && recsOk;
+    }
   }
 };
 
 function getOnboardingStepKeys() {
-  const keys = ['profile'];
-  if (state.profile === 'docente' || state.profile === 'estudiante') {
-    keys.push('nivel');
-  }
-  keys.push('contexto', 'familiaridad', 'recursos', 'cierre');
-  return keys;
+  return ['profile', 'contexto', 'cierre'];
 }
 
 function syncOnboardingStepBounds() {
@@ -1025,7 +1013,19 @@ if (elements.startGuidance) {
   elements.startGuidance.addEventListener('click', (event) => {
     const button = event.target.closest('[data-guide-target]');
     if (!button) return;
-    focusInitialField(button.dataset.guideTarget);
+    
+    const target = button.dataset.guideTarget;
+    let targetStepIndex = -1;
+    if (target === 'profile') targetStepIndex = 0;
+    else if (target === 'nivel' || target === 'contexto') targetStepIndex = 1;
+    else if (target === 'familiaridad' || target === 'recursos' || target === 'cierre' || target === 'start') targetStepIndex = 2;
+    
+    if (targetStepIndex >= 0) {
+      state.onboardingStep = targetStepIndex;
+      updateOnboardingUI();
+    }
+    
+    focusInitialField(target);
   });
 }
 

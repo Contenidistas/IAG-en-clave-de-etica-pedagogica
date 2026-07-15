@@ -1020,6 +1020,13 @@ function mostrarResultados() {
   showScreen('result');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
+  // Ocultar sección de casos si el perfil es estudiante
+  const situatedCasesSection = document.getElementById('situatedCasesSection');
+  if (situatedCasesSection) {
+    const isEstudiante = state.profile && state.profile.startsWith('estudiante');
+    situatedCasesSection.style.display = isEstudiante ? 'none' : 'block';
+  }
+
   const nivel = CONFIG.likert.find(
     l => state.evidence >= l.min && l.max >= state.evidence
   ) || CONFIG.likert[0];
@@ -1328,11 +1335,11 @@ function abrirLaboratorioCasos() {
           state.profile = 'docente';
           state.profileKey = 'docente';
           state.country = 'Uruguay';
-          state.consentTracking = true;
+          state.consentTracking = false;
           state.nivelEducativo = 'Secundaria';
           
           const consentCheckbox = document.getElementById('consentTracking');
-          if (consentCheckbox) consentCheckbox.checked = true;
+          if (consentCheckbox) consentCheckbox.checked = false;
           
           abrirLaboratorioCasos();
         });

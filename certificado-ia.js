@@ -331,7 +331,7 @@ if (elements.restartBtn) {
     state.country = 'Uruguay';
     state.familiaridadInicial = '';
     state.recursosSimilares = '';
-    state.consentTracking = true;
+    state.consentTracking = false;
 
     elements.chips.forEach(c => c.classList.remove('active'));
     elements.playerName.value = '';
@@ -345,7 +345,7 @@ if (elements.restartBtn) {
     if (elements.recursosSimilaresRadios && elements.recursosSimilaresRadios.length) {
       elements.recursosSimilaresRadios.forEach(r => { r.checked = false; });
     }
-    if (elements.consentTracking) elements.consentTracking.checked = true;
+    if (elements.consentTracking) elements.consentTracking.checked = false;
     if (elements.toolRatingRadios && elements.toolRatingRadios.length) {
       elements.toolRatingRadios.forEach(r => { r.checked = false; });
     }
