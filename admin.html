@@ -80,6 +80,7 @@
           <div class="tabs" role="tablist" aria-label="Vistas">
             <button class="tab active" type="button" role="tab" aria-selected="true" data-tab="completions">Recorridos</button>
             <button class="tab" type="button" role="tab" aria-selected="false" data-tab="feedback">Valoraciones</button>
+            <button class="tab" type="button" role="tab" aria-selected="false" data-tab="labFeedback">Laboratorio</button>
           </div>
           <label class="sr-only" for="searchInput">Buscar en registros</label>
           <input id="searchInput" class="input" type="search" placeholder="Buscar...">
@@ -114,6 +115,7 @@
           <button id="exportCutZipBtn" class="btn primary" type="button">ZIP corte datos</button>
           <button id="exportCompletionsBtn" class="btn" type="button">CSV recorridos filtrados</button>
           <button id="exportFeedbackBtn" class="btn" type="button">CSV valoraciones filtradas</button>
+          <button id="exportLabFeedbackBtn" class="btn" type="button">CSV laboratorio filtrado</button>
           <button id="exportAnswersBtn" class="btn" type="button">CSV respuestas filtradas</button>
         </div>
 
@@ -146,6 +148,24 @@
               <p class="muted">Selecciona un recorrido para ver sus respuestas.</p>
             </div>
           </aside>
+        </div>
+
+        <div id="labFeedbackView" class="table-wrap hidden">
+          <table>
+            <thead>
+              <tr>
+                <th><input id="selectAllLabFeedback" type="checkbox" aria-label="Seleccionar sugerencias del laboratorio visibles"></th>
+                <th>Fecha</th>
+                <th>Caso</th>
+                <th>Tipo</th>
+                <th>Sugerencia / Decisión</th>
+                <th>Perfil</th>
+                <th>Nivel educativo</th>
+                <th>País</th>
+              </tr>
+            </thead>
+            <tbody id="labFeedbackBody"></tbody>
+          </table>
         </div>
 
         <div id="feedbackView" class="table-wrap hidden">

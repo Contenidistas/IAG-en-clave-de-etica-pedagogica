@@ -25,6 +25,10 @@
       updatedAt: document.getElementById('updatedAt'),
       completionsView: document.getElementById('completionsView'),
       feedbackView: document.getElementById('feedbackView'),
+      labFeedbackView: document.getElementById('labFeedbackView'),
+      labFeedbackBody: document.getElementById('labFeedbackBody'),
+      selectAllLabFeedback: document.getElementById('selectAllLabFeedback'),
+      exportLabFeedbackBtn: document.getElementById('exportLabFeedbackBtn'),
       completionsBody: document.getElementById('completionsBody'),
       feedbackBody: document.getElementById('feedbackBody'),
       selectAllCompletions: document.getElementById('selectAllCompletions'),
@@ -249,6 +253,8 @@
         const profile = els.profileFilter.value;
         const education = els.educationFilter.value;
         const country = els.countryFilter.value;
+        // Omitir sugerencias de casos
+        if (row.suggestion && (row.suggestion.startsWith('[Caso:') || row.suggestion.startsWith('=CHOICE='))) return false;
         const haystack = normalizeText(Object.values(row).join(' '));
         if (query && !haystack.includes(query)) return false;
         if (profile && row.profileKey !== profile && row.profile !== profile) return false;
@@ -270,8 +276,27 @@
       return state.selectedCompletions.size + state.selectedFeedback.size;
     }
 
+        function filteredLabFeedback() {
+      return state.feedback.filter(row => {
+        const isCase = row.suggestion && (row.suggestion.startsWith('[Caso:') || row.suggestion.startsWith('=CHOICE='));
+        if (!isCase) return false;
+
+        const query = normalizeText(els.searchInput.value);
+        const profile = els.profileFilter.value;
+        const education = els.educationFilter.value;
+        const country = els.countryFilter.value;
+        const haystack = normalizeText(Object.values(row).join(' '));
+        if (query && !haystack.includes(query)) return false;
+        if (profile && row.profileKey !== profile && row.profile !== profile) return false;
+        if (education && row.nivelEducativo !== education) return false;
+        if (country && row.country !== country) return false;
+        if (!dateInRange(row.timestamp)) return false;
+        return true;
+      });
+    }
+
     function currentVisibleSelectionState() {
-      const rows = state.tab === 'completions' ? filteredCompletions() : filteredFeedback();
+      const rows = state.tab === 'completions' ? filteredCompletions() : (state.tab === 'labFeedback' ? filteredLabFeedback() : filteredFeedback());
       const target = state.tab === 'completions' ? state.selectedCompletions : state.selectedFeedback;
       const ids = rows.map(row => String(row.id));
       const selected = ids.filter(id => target.has(id)).length;
@@ -286,10 +311,13 @@
     function syncSelectionControls() {
       const completionRows = filteredCompletions();
       const feedbackRows = filteredFeedback();
+      const labFeedbackRows = filteredLabFeedback();
       const visibleCompletionIds = completionRows.map(row => String(row.id));
       const visibleFeedbackIds = feedbackRows.map(row => String(row.id));
+      const visibleLabFeedbackIds = labFeedbackRows.map(row => String(row.id));
       const checkedCompletions = visibleCompletionIds.filter(id => state.selectedCompletions.has(id)).length;
       const checkedFeedback = visibleFeedbackIds.filter(id => state.selectedFeedback.has(id)).length;
+      const checkedLabFeedback = visibleLabFeedbackIds.filter(id => state.selectedFeedback.has(id)).length;
       const totalSelected = selectedCount();
       const currentState = currentVisibleSelectionState();
 
@@ -302,6 +330,10 @@
       els.selectAllCompletions.indeterminate = checkedCompletions > 0 && checkedCompletions < visibleCompletionIds.length;
       els.selectAllFeedback.checked = visibleFeedbackIds.length > 0 && checkedFeedback === visibleFeedbackIds.length;
       els.selectAllFeedback.indeterminate = checkedFeedback > 0 && checkedFeedback < visibleFeedbackIds.length;
+      if (els.selectAllLabFeedback) {
+        els.selectAllLabFeedback.checked = visibleLabFeedbackIds.length > 0 && checkedLabFeedback === visibleLabFeedbackIds.length;
+        els.selectAllLabFeedback.indeterminate = checkedLabFeedback > 0 && checkedLabFeedback < visibleLabFeedbackIds.length;
+      }
     }
 
     function renderCompletions() {
@@ -373,20 +405,87 @@
     }
 
     function renderCurrentTab() {
-      const showingCompletions = state.tab === 'completions';
-      els.completionsView.classList.toggle('hidden', !showingCompletions);
-      els.feedbackView.classList.toggle('hidden', showingCompletions);
-      els.levelFilter.classList.toggle('hidden', !showingCompletions);
-      els.familiarityFilter.classList.toggle('hidden', !showingCompletions);
-      els.resourcesFilter.classList.toggle('hidden', !showingCompletions);
-      els.tabs.forEach(tab => {
-        const active = tab.dataset.tab === state.tab;
-        tab.classList.toggle('active', active);
-        tab.setAttribute('aria-selected', String(active));
+      const tab = state.tab;
+      els.completionsView.classList.toggle('hidden', tab !== 'completions');
+      els.feedbackView.classList.toggle('hidden', tab !== 'feedback');
+      els.labFeedbackView.classList.toggle('hidden', tab !== 'labFeedback');
+      els.levelFilter.classList.toggle('hidden', tab !== 'completions');
+      els.familiarityFilter.classList.toggle('hidden', tab !== 'completions');
+      els.resourcesFilter.classList.toggle('hidden', tab !== 'completions');
+      els.exportCompletionsBtn.classList.toggle('hidden', tab !== 'completions');
+      els.exportAnswersBtn.classList.toggle('hidden', tab !== 'completions');
+      els.exportFeedbackBtn.classList.toggle('hidden', tab !== 'feedback');
+      els.exportLabFeedbackBtn.classList.toggle('hidden', tab !== 'labFeedback');
+      els.tabs.forEach(t => {
+        const active = t.dataset.tab === tab;
+        t.classList.toggle('active', active);
+        t.setAttribute('aria-selected', String(active));
       });
 
-      if (showingCompletions) renderCompletions();
-      else renderFeedback();
+      if (tab === 'completions') renderCompletions();
+      else if (tab === 'feedback') renderFeedback();
+      else if (tab === 'labFeedback') renderLabFeedback();
+    }
+
+        function renderLabFeedback() {
+      const rows = filteredLabFeedback();
+
+      if (!rows.length) {
+        els.labFeedbackBody.innerHTML = '<tr><td colspan="8" class="empty">No hay sugerencias del laboratorio para mostrar.</td></tr>';
+        return;
+      }
+
+      els.labFeedbackBody.innerHTML = rows.map(row => {
+        let caseTitle = 'General';
+        let type = 'Sugerencia';
+        let displayText = row.suggestion || '';
+
+        if (row.suggestion) {
+          if (row.suggestion.startsWith('=CHOICE=')) {
+            type = 'Decisión';
+            const match = row.suggestion.match(/=CHOICE=\s*\[Caso:\s*([^\]]+)\]\s*(.*)/);
+            if (match) {
+              caseTitle = match[1];
+              displayText = match[2];
+            }
+          } else if (row.suggestion.startsWith('[Caso:')) {
+            type = 'Sugerencia';
+            const match = row.suggestion.match(/\[Caso:\s*([^\]]+)\]\s*(.*)/);
+            if (match) {
+              caseTitle = match[1];
+              displayText = match[2];
+            }
+          }
+        }
+
+        const isChecked = state.selectedFeedback.has(String(row.id));
+        const ratingBadge = row.rating === 4 
+          ? `<span class="badge secondary" style="background:#dbeafe; color:#1e40af; border:1px solid #bfdbfe; padding:0.25rem 0.5rem; border-radius:4px; font-size:0.75rem; font-weight:600;">${escapeHtml(type)}</span>` 
+          : `<span class="badge success" style="background:#d1fae5; color:#065f46; border:1px solid #a7f3d0; padding:0.25rem 0.5rem; border-radius:4px; font-size:0.75rem; font-weight:600;">${escapeHtml(type)}</span>`;
+
+        return `
+          <tr class="${isChecked ? 'selected' : ''}">
+            <td><input type="checkbox" data-select-lab-feedback="${escapeHtml(row.id)}" aria-label="Seleccionar sugerencia" ${isChecked ? 'checked' : ''}></td>
+            <td class="nowrap">${escapeHtml(fmtDate(row.timestamp))}</td>
+            <td style="font-weight:600;">${escapeHtml(caseTitle)}</td>
+            <td>${ratingBadge}</td>
+            <td class="text-left" style="max-width: 450px; word-wrap: break-word; white-space: normal; line-height: 1.4;">
+              ${escapeHtml(displayText)}
+            </td>
+            <td>${escapeHtml(row.profile || 'docente')}</td>
+            <td>${escapeHtml(row.nivelEducativo || 'Secundaria')}</td>
+            <td>${escapeHtml(row.country || 'Uruguay')}</td>
+          </tr>
+        `;
+      }).join('');
+
+      els.labFeedbackBody.querySelectorAll('[data-select-lab-feedback]').forEach(input => {
+        input.addEventListener('change', () => {
+          if (input.checked) state.selectedFeedback.add(String(input.dataset.selectLabFeedback));
+          else state.selectedFeedback.delete(String(input.dataset.selectLabFeedback));
+          renderCurrentTab();
+        });
+      });
     }
 
     async function loadAnswers(eventId) {
@@ -473,6 +572,14 @@
 
       if (type === 'feedback') {
         downloadRowsCsv('valoraciones-filtradas.csv', filteredFeedback(), [
+          'id', 'eventId', 'timestamp', 'sessionId', 'rating', 'suggestion',
+          'profile', 'profileKey', 'country', 'nivelEducativo'
+        ]);
+        return;
+      }
+
+      if (type === 'labFeedback') {
+        downloadRowsCsv('laboratorio-filtrado.csv', filteredLabFeedback(), [
           'id', 'eventId', 'timestamp', 'sessionId', 'rating', 'suggestion',
           'profile', 'profileKey', 'country', 'nivelEducativo'
         ]);
@@ -623,7 +730,7 @@
     }
 
     function toggleVisibleSelection(type, checked) {
-      const rows = type === 'completions' ? filteredCompletions() : filteredFeedback();
+      const rows = type === 'completions' ? filteredCompletions() : (type === 'labFeedback' ? filteredLabFeedback() : filteredFeedback());
       const target = type === 'completions' ? state.selectedCompletions : state.selectedFeedback;
       rows.forEach(row => {
         const id = String(row.id);
@@ -669,9 +776,13 @@
     els.exportCutZipBtn.addEventListener('click', downloadCutZip);
     els.exportCompletionsBtn.addEventListener('click', () => downloadFilteredCsv('completions'));
     els.exportFeedbackBtn.addEventListener('click', () => downloadFilteredCsv('feedback'));
+    els.exportLabFeedbackBtn.addEventListener('click', () => downloadFilteredCsv('labFeedback'));
     els.exportAnswersBtn.addEventListener('click', () => downloadFilteredCsv('answers'));
     els.selectAllCompletions.addEventListener('change', () => toggleVisibleSelection('completions', els.selectAllCompletions.checked));
     els.selectAllFeedback.addEventListener('change', () => toggleVisibleSelection('feedback', els.selectAllFeedback.checked));
+    if (els.selectAllLabFeedback) {
+      els.selectAllLabFeedback.addEventListener('change', () => toggleVisibleSelection('labFeedback', els.selectAllLabFeedback.checked));
+    }
 
     els.tabs.forEach(tab => {
       tab.addEventListener('click', () => {
