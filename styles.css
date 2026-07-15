@@ -7604,3 +7604,212 @@ body.result-active #neuralNetCanvas {
     padding: 1.25rem !important;
   }
 }
+
+/* Subtítulo de Bienvenida Landing */
+.landing-welcome-sub {
+  font-size: 1.15rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  max-width: 780px;
+  margin-bottom: 2rem;
+}
+
+/* Contenedor de las dos tarjetas de acción */
+.landing-welcome-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.landing-action-card {
+  display: flex !important;
+  gap: 1.25rem;
+  padding: 1.5rem !important;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(248, 250, 252, 0.78));
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="dark"] .landing-action-card {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.88), rgba(15, 23, 42, 0.78));
+}
+
+.landing-action-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(99, 102, 241, 0.45);
+  box-shadow: 0 16px 36px rgba(99, 102, 241, 0.12);
+}
+
+.landing-card-icon-bg {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(99, 102, 241, 0.08);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.landing-action-card:hover .landing-card-icon-bg {
+  transform: scale(1.08);
+}
+
+.landing-card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+}
+
+.landing-card-content h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.landing-card-content p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.landing-card-btn {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-top: 0.35rem;
+  transition: transform 0.2s ease;
+}
+
+.landing-action-card:hover .landing-card-btn {
+  transform: translateX(4px);
+}
+
+/* --- STEPPER VISUAL (ESTILO RED NEURONAL) --- */
+.onboarding-progress-dots {
+  position: relative;
+  display: block !important;
+  width: 100%;
+  margin: 1.5rem 0 2rem;
+  padding: 0 1rem;
+}
+
+.neural-stepper-track {
+  position: absolute;
+  top: 14px;
+  left: 2rem;
+  right: 2rem;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  z-index: 1;
+}
+
+.neural-stepper-progress {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  border-radius: 2px;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
+}
+
+.neural-stepper-steps {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  z-index: 2;
+}
+
+.neural-step-node {
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0;
+  outline: none;
+}
+
+.neural-step-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 3px solid var(--border);
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.neural-step-node:hover .neural-step-dot {
+  border-color: rgba(99, 102, 241, 0.6);
+  transform: scale(1.1);
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
+}
+
+.neural-step-node.active .neural-step-dot {
+  border-color: var(--primary);
+  background: var(--primary);
+  transform: scale(1.12);
+  box-shadow: 0 0 12px rgba(79, 70, 229, 0.45);
+}
+
+.neural-step-node.active .neural-step-dot::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+.neural-step-node.completed .neural-step-dot {
+  border-color: var(--secondary);
+  background: var(--secondary);
+}
+
+.neural-step-node.completed .neural-step-dot::after {
+  content: '✓';
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.neural-step-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  transition: color 0.3s ease;
+}
+
+.neural-step-node.active .neural-step-label {
+  color: var(--primary);
+}
+
+.neural-step-node.completed .neural-step-label {
+  color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+  .landing-welcome-actions {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .neural-step-label {
+    display: none; /* Ocultar textos del stepper en móvil para que no se superpongan */
+  }
+}

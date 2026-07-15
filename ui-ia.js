@@ -830,9 +830,39 @@ function updateOnboardingUI() {
   }
   if (elements.onboardingDots) {
     elements.onboardingDots.style.setProperty('--onboarding-steps', keys.length);
-    elements.onboardingDots.innerHTML = keys.map((key, index) => `
-      <button type="button" class="onboarding-dot${index === state.onboardingStep ? ' active' : ''}${ONBOARDING_STEP_META[key]?.isValid() ? ' done' : ''}" data-onboarding-index="${index}" aria-label="Ir al paso ${index + 1}"></button>
-    `).join('');
+    
+    // Nombres cortos para cada paso en la red neuronal
+    const stepNames = {
+      profile: 'Perfil',
+      country: 'País',
+      familiaridad: 'Uso IA',
+      consent: 'Privacidad',
+      cierre: 'Contexto'
+    };
+    
+    elements.onboardingDots.innerHTML = `
+      <div class="neural-stepper-track">
+        <div class="neural-stepper-progress" style="width: ${(state.onboardingStep / (keys.length - 1)) * 100}%"></div>
+      </div>
+      <div class="neural-stepper-steps">
+        ${keys.map((key, index) => {
+          const isActive = index === state.onboardingStep;
+          const isCompleted = index < state.onboardingStep;
+          const isValid = ONBOARDING_STEP_META[key]?.isValid();
+          const stepName = stepNames[key] || 'Paso';
+          
+          return `
+            <button type="button" 
+                    class="neural-step-node${isActive ? ' active' : ''}${isCompleted ? ' completed' : ''}${isValid ? ' is-valid' : ''}" 
+                    data-onboarding-index="${index}" 
+                    aria-label="Ir al paso: ${stepName}">
+              <span class="neural-step-dot"></span>
+              <span class="neural-step-label">${stepName}</span>
+            </button>
+          `;
+        }).join('')}
+      </div>
+    `;
   }
   if (elements.onboardingBackBtn) {
     elements.onboardingBackBtn.disabled = state.onboardingStep === 0;
@@ -957,6 +987,28 @@ function retreatOnboarding() {
   syncOnboardingStepBounds();
   state.onboardingStep = Math.max(0, state.onboardingStep - 1);
   updateOnboardingUI();
+}
+
+const landingGoToDiagnostic = document.getElementById('landingGoToDiagnostic');
+const landingGoToCases = document.getElementById('landingGoToCases');
+
+if (landingGoToDiagnostic) {
+  landingGoToDiagnostic.addEventListener('click', (event) => {
+    event.preventDefault();
+    state.currentSlide = 1;
+    updateCarousel();
+    updateStartButtonState();
+    scrollToDiagnosticStart();
+  });
+}
+
+if (landingGoToCases) {
+  landingGoToCases.addEventListener('click', (event) => {
+    event.preventDefault();
+    if (typeof abrirLaboratorioCasos === 'function') {
+      abrirLaboratorioCasos();
+    }
+  });
 }
 
 if (goToDiagnosticBtn) {
@@ -1373,23 +1425,41 @@ if (homeBtn) {
   });
 }
 const btnVerAutores = document.getElementById('btnVerAutores');
-if (btnVerAutores) btnVerAutores.addEventListener('click', function() {
-    const info = document.getElementById('infoAutores');
-    if (!info) return;
+if (btnVerAutores) {
+  btnVerAutores.addEventListener('click', function() {
+    if (typeof modal !== 'undefined' && typeof modal.show === 'function') {
+      modal.show('¿Quiénes somos? — Autores de la App', `
+        <div class="team-panel-modal" style="display: flex; flex-direction: column; gap: 1.5rem; padding: 0.5rem 0;">
+          <div class="team-member-detail" style="display: flex; align-items: center; gap: 1.25rem; text-align: left;">
+            <img src="icons/perfil.png" alt="Santiago Hernández" class="team-member-photo" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);">
+            <div class="team-member-info">
+              <h4 style="margin: 0 0 0.25rem; font-weight: 700; color: var(--text-primary); font-family: var(--font-header);">Prof. Esp. Santiago Hernández</h4>
+              <p style="margin: 0 0 0.5rem; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">Creador y desarrollador de la app, investigador y docente de Informática</p>
+              <div class="links-autores" style="display: flex; gap: 0.75rem; font-size: 0.82rem;">
+                <a href="https://orcid.org/0009-0001-9086-1490" target="_blank" rel="noopener noreferrer" style="color: var(--primary); text-decoration: none; font-weight: 600;">🔗 ORCID</a>
+                <a href="https://exportcvuy.anii.org.uy/cv/?8242b38f35c3b4fc9b8d3442700f810e" target="_blank" rel="noopener noreferrer" style="color: var(--primary); text-decoration: none; font-weight: 600;">📄 CVUY</a>
+              </div>
+            </div>
+          </div>
 
-    const title = this.querySelector('.btn-academic-title');
-    const icon = this.querySelector('.btn-academic-icon');
-    const isHidden = info.style.display === 'none';
+          <div style="height: 1px; background: var(--border); width: 100%;"></div>
 
-    info.style.display = isHidden ? 'block' : 'none';
-
-    if (title) title.textContent = isHidden ? 'Cerrar información' : '¿Quiénes somos?';
-    if (icon) icon.textContent = isHidden ? '↑' : '👥';
-    if (isHidden) {
-      info.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          <div class="team-member-detail" style="display: flex; align-items: center; gap: 1.25rem; text-align: left;">
+            <img src="icons/Diego.jpeg" alt="Diego Daluz" class="team-member-photo" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);">
+            <div class="team-member-info">
+              <h4 style="margin: 0 0 0.25rem; font-weight: 700; color: var(--text-primary); font-family: var(--font-header);">Prof. Mag. Diego Daluz</h4>
+              <p style="margin: 0 0 0.5rem; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">Investigador y colaborador académico en ética e innovación pedagógica</p>
+              <div class="links-autores" style="display: flex; gap: 0.75rem; font-size: 0.82rem;">
+                <a href="https://orcid.org/0009-0007-3089-6652" target="_blank" rel="noopener noreferrer" style="color: var(--primary); text-decoration: none; font-weight: 600;">🔗 ORCID</a>
+                <a href="https://exportcvuy.anii.org.uy//cv/?45f1c3470336379350b15d2c38a19738" target="_blank" rel="noopener noreferrer" style="color: var(--primary); text-decoration: none; font-weight: 600;">📄 CVUY</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      `);
     }
-    setTimeout(updateCarousel, 0);
-});
+  });
+}
 
 updateFrameworkAudience(state.profile || null);
 
