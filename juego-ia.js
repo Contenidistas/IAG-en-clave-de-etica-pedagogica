@@ -1299,6 +1299,41 @@ const CASOS_LABORATORIO = [
       '¿Qué alternativas viables existen para que los centros educativos brinden acceso equitativo e institucional a recursos avanzados de IA?'
     ],
     stats: { A: 15, B: 55, C: 20, D: 10 }
+  },
+  {
+    id: 'delegacion',
+    title: 'La paradoja del borrador: Agencia humana y delegación cognitiva',
+    axis: 'agencia',
+    axisLabel: 'Agencia y delegación cognitiva',
+    audience: 'Aula / Formación Docente',
+    story: 'En un curso de educación media/terciaria, un docente propone elaborar una monografía o ensayo argumentativo. Para acelerar el trabajo, varios estudiantes le piden a la IA que redacte la estructura completa, la tesis central y las conclusiones. Si bien los estudiantes revisan y editan superficialmente el texto, durante la puesta en común se evidencia que no logran defender ni explicar los conceptos centrales del documento, argumentando que "la IA lo redactó de esa forma y sonaba muy convincente".',
+    dilemma: '¿Cómo gestionar el uso de la IA para promover el aprendizaje crítico sin caer en una delegación cognitiva pasiva que atrofie la autonomía y el pensamiento propio del estudiante?',
+    options: {
+      A: {
+        text: 'Prohibir el uso de IA para la elaboración del esquema y la redacción, exigiendo borradores escritos manualmente en clase sin conectividad.',
+        feedback: '<strong>Análisis de la opción A (Rígida):</strong> Aunque protege la producción propia en el momento, la prohibición absoluta ignora el contexto digital y no enseña al estudiante a autorregular su relación con la IA cuando trabaje fuera del aula.'
+      },
+      B: {
+        text: 'Exigir una bitácora de proceso y defensa oral donde el estudiante declare qué partes asistió la IA y justifique con argumentos propios cada decisión tomada.',
+        feedback: '<strong>Análisis de la opción B (Formativa y pedagógicamente sólida):</strong> Preserva la agencia humana según los lineamientos de la <em>UNESCO</em> y <em>ANEP</em>. Mantiene el control cognitivo en el estudiante al obligarlo a evaluar, contrastar y tomar decisiones fundamentadas sobre el texto.'
+      },
+      C: {
+        text: 'Aceptar el trabajo redactado por IA siempre que el estudiante agregue un apartado final de reflexión personal de una página.',
+        feedback: '<strong>Análisis de la opción C (Insuficiente):</strong> Agregar un anexo al final no garantiza que el proceso previo de ideación y estructuración conceptual haya sido procesado por el estudiante, manteniendo el riesgo de sustitución cognitiva.'
+      },
+      D: {
+        text: 'Utilizar la IA en clase como un "socio de debate" (contra-argumentador), pidiéndole a la máquina que cuestione la tesis del estudiante para que este defienda su postura.',
+        feedback: '<strong>Análisis de la opción D (Potenciadora de la agencia):</strong> Excelente estrategia didáctica según las pautas de <em>Ceibal</em> y <em>UNESCO</em>. Invierte el rol tradicional: la persona piensa y decide, mientras que la IA actúa como provocador cognitivo o andamiaje.'
+      }
+    },
+    giro: 'Al realizar una prueba de lectura comprensiva y defensa sin asistencia digital semanas después, la mayoría de los estudiantes que delegaron la redacción en la IA obtienen un desempeño significativamente menor en la retención de conceptos clave frente a quienes redactaron sus propios borradores iniciales.',
+    analysis: 'Este dilema ilustra el fenómeno de la <strong>delegación cognitiva (cognitive offloading)</strong> advertido por la <em>UNESCO</em> y <em>Ceibal</em>. Cuando el estudiante cede las fases de ideación, síntesis y argumentación a la IA sin un esfuerzo mental activo, se produce una "ilusión de comprensión": el texto parece brillante, pero el esquema mental del alumno no se ha transformado. Defender la agencia humana en la educación implica asegurar que la tecnología amplíe la capacidad reflexiva del sujeto, sin reemplazar el esfuerzo necesario para construir conocimiento.',
+    debateQuestions: [
+      '¿Qué diferencia existe entre utilizar la IA como andamiaje didáctico y caer en una sustitución o atrofia cognitiva?',
+      '¿Cómo podemos diseñar consignas de trabajo que requieran pensamiento propio e imposibiliten la delegación pasiva en el algoritmo?',
+      '¿Qué estrategias pedagógicas según UNESCO y Ceibal permiten evaluar la agencia y la autoría humana más allá del producto escrito final?'
+    ],
+    stats: { A: 16, B: 48, C: 12, D: 24 }
   }
 ];
 
