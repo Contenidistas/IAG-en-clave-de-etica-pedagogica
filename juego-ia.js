@@ -1130,7 +1130,7 @@ const CASOS_LABORATORIO = [
     title: 'Personalizar sin etiquetar ni exponer',
     axis: 'privacidad',
     axisLabel: 'Privacidad y datos',
-    audience: 'Docencia / Inclusión',
+    audience: 'Docencia / inclusión',
     story: 'Un docente de educación media desea adaptar sus materiales para 12 estudiantes con orientaciones de ajustes razonables vinculadas a dislexia y TDAH en un grupo de 35. Para lograrlo, ingresa descripciones de perfiles tomadas directamente de informes psicopedagógicos detallados en un modelo de lenguaje de acceso público. Aunque no incluye nombres ni apellidos, copia descripciones minuciosas de desempeño, problemas de atención y apoyos sugeridos. El sistema le genera materiales adaptados y tareas diferenciadas.',
     dilemma: '¿Cómo puede utilizarse la IA generativa para personalizar la enseñanza y favorecer la inclusión sin comprometer la protección de datos, la dignidad de los estudiantes ni el juicio pedagógico?',
     options: {
@@ -1165,7 +1165,7 @@ const CASOS_LABORATORIO = [
     title: 'La selección invisible de autores',
     axis: 'sesgos',
     axisLabel: 'Sesgos y representatividad',
-    audience: 'Docencia / Didáctica',
+    audience: 'Docencia / didáctica',
     story: 'Un docente de literatura utiliza una IA generativa para diseñar un módulo sobre literatura latinoamericana contemporánea y pedirle recomendaciones de autores. El sistema le genera un programa académico compuesto en un 100% por escritores masculinos del Río de la Plata, ignorando la representatividad regional, de género y de minorías. Al solicitarle que diversifique la lista e incorpore autoras destacadas de otros países de América Latina, la IA comienza a sugerir nombres de escritoras e inventa de manera sumamente convincente sus biografías y libros ficticios (alucinación).',
     dilemma: '¿Cómo podemos garantizar la equidad y representatividad cultural en los materiales de enseñanza frente a los sesgos y las alucinaciones de la IA?',
     options: {
@@ -1200,7 +1200,7 @@ const CASOS_LABORATORIO = [
     title: 'El algoritmo evaluador',
     axis: 'agencia',
     axisLabel: 'Agencia y autonomía',
-    audience: 'Gestión / Evaluación',
+    audience: 'Gestión / evaluación',
     story: 'Un centro educativo adopta una plataforma de tutoría inteligente asistida por IA. El protocolo del centro establece que los docentes deben seguir las rutas de aprendizaje automatizadas y utilizar las calificaciones que el algoritmo asigna. Un docente nota que la IA calificó como "incorrecto" el ejercicio de un estudiante que utilizó un método de resolución matemático muy creativo y no estándar, el cual demostraba una excelente comprensión conceptual del problema, pero difería del patrón de la base de datos de la IA.',
     dilemma: '¿Cómo sostener la autonomía profesional del docente y el derecho de los estudiantes a la creatividad frente a la estandarización y eficiencia de los sistemas de evaluación automáticos?',
     options: {
@@ -1235,7 +1235,7 @@ const CASOS_LABORATORIO = [
     title: 'La entrega bajo sospecha',
     axis: 'transparencia',
     axisLabel: 'Transparencia e integridad',
-    audience: 'Aula / Didáctica',
+    audience: 'Aula / didáctica',
     story: 'Una estudiante entrega una producción que cumple formalmente con todas las consignas pero muestra un vocabulario muy técnico y giros lingüísticos idénticos a los generados por IA. La estudiante niega haber utilizado IA y afirma que es de su autoría. El reglamento institucional cataloga el uso de IA sin citar como un acto de plagio. El docente se enfrenta a la decisión de cómo actuar, sabiendo que las herramientas detectoras de IA son poco fiables y suelen dar falsos positivos (especialmente en estudiantes no nativos o muy formales).',
     dilemma: '¿Cómo abordar la sospecha de uso de IA no declarado de manera formativa, manteniendo la confianza y el diálogo, en lugar de recurrir de forma directa a la penalización?',
     options: {
@@ -1270,7 +1270,7 @@ const CASOS_LABORATORIO = [
     title: 'La brecha de las licencias',
     axis: 'equidad',
     axisLabel: 'Equidad y acceso',
-    audience: 'Aula / Gestión',
+    audience: 'Aula / gestión',
     story: 'Un docente de diseño audiovisual propone un proyecto donde los estudiantes deben utilizar una herramienta de IA generativa de imágenes para ilustrar un guion técnico. El instituto no cuenta con cuentas institucionales de pago para esta herramienta. En la entrega final, se observa que la mitad de los estudiantes usó cuentas familiares premium (obteniendo imágenes de alta calidad en segundos) mientras que el resto utilizó la versión gratuita (que tiene un límite de créditos diario, baja resolución y marcas de agua).',
     dilemma: '¿Cómo diseñar y evaluar tareas basadas en tecnologías de vanguardia garantizando la justicia educativa y la equidad cuando existen diferencias en los recursos socioeconómicos de los estudiantes?',
     options: {
@@ -1302,10 +1302,10 @@ const CASOS_LABORATORIO = [
   },
   {
     id: 'delegacion',
-    title: 'La paradoja del borrador: Agencia humana y delegación cognitiva',
+    title: 'La paradoja del borrador: agencia humana y delegación cognitiva',
     axis: 'agencia',
     axisLabel: 'Agencia y delegación cognitiva',
-    audience: 'Aula / Formación Docente',
+    audience: 'Aula / formación docente',
     story: 'En un curso de educación media/terciaria, un docente propone elaborar una monografía o ensayo argumentativo. Para acelerar el trabajo, varios estudiantes le piden a la IA que redacte la estructura completa, la tesis central y las conclusiones. Si bien los estudiantes revisan y editan superficialmente el texto, durante la puesta en común se evidencia que no logran defender ni explicar los conceptos centrales del documento, argumentando que "la IA lo redactó de esa forma y sonaba muy convincente".',
     dilemma: '¿Cómo gestionar el uso de la IA para promover el aprendizaje crítico sin caer en una delegación cognitiva pasiva que atrofie la autonomía y el pensamiento propio del estudiante?',
     options: {
@@ -1337,10 +1337,10 @@ const CASOS_LABORATORIO = [
   },
   {
     id: 'tfg_docente',
-    title: 'El marco teórico automatizado: Ética en la investigación de grado',
+    title: 'El marco teórico automatizado: ética en la investigación de grado',
     axis: 'autoría',
     axisLabel: 'Autoría y rigor en investigación de grado',
-    audience: 'Formación Docente / Nivel Superior',
+    audience: 'Formación docente / nivel superior',
     story: 'Un estudiante de Formación Docente (Magisterio / Profesorado) presenta el avance de su Trabajo Final de Grado (TFG) sobre inclusión educativa. El tribunal examinador observa que el estado del arte y la revisión bibliográfica están impecablemente estructurados y sintetizan 20 autores clásicos y contemporáneos. Sin embargo, en la entrevista de avance, el estudiante admite haber utilizado una IA generativa para leer, resumir y redactar los capítulos teóricos enteros a partir de apuntes breves, sin haber leído directamente los libros ni las investigaciones originales citadas.',
     dilemma: '¿Cómo regular el uso de la IA en la investigación de grado en formación docente para que constituya un andamiaje válido sin menoscabar la apropiación conceptual, la honestidad académica y la construcción del criterio pedagógico?',
     options: {
@@ -1372,10 +1372,10 @@ const CASOS_LABORATORIO = [
   },
   {
     id: 'coconstruccion_codex',
-    title: 'El artefacto generado: Co-construcción de software y comprensión algorítmica',
+    title: 'El artefacto generado: co-construcción de software y comprensión algorítmica',
     axis: 'agencia',
     axisLabel: 'Agencia técnica y soberanía de código',
-    audience: 'Educación Técnica / Terciaria / Universidad (Informática)',
+    audience: 'Educación técnica / terciaria / universidad (informática)',
     story: 'En una asignatura de programación y desarrollo de software, un equipo de estudiantes entrega un proyecto complejo de aplicación web que funciona a la perfección. Durante la revisión del código fuente, el docente nota el uso de patrones de arquitectura muy avanzados, optimizaciones complejas e integraciones de librerías mediante asistentes de código (Codex / Copilot). Al solicitarles que expliquen el flujo de ejecución de una función crítica o que resuelvan un pequeño fallo introducido intencionalmente durante la evaluación, el equipo demuestra una total incapacidad para depurar o modificar el código generado por la herramienta.',
     dilemma: '¿Cómo integrar asistentes de IA en la enseñanza de la programación (Codex/Copilot) promoviendo la productividad profesional sin sacrificar la comprensión algorítmica y la capacidad de depurar código?',
     options: {

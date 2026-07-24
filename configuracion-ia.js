@@ -596,7 +596,7 @@ const PRINCIPLES_CONTENT = {
     `
   },
 autoria: {
-  title: 'Autoría e Integridad',
+  title: 'Autoría e integridad',
   anep: `<p>ANEP sugiere un espectro de uso donde el docente define el nivel de intervención de la IA.</p>`,
   fing: `
     <p><strong>Marco Fing 2026:</strong></p>

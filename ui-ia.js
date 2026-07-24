@@ -29,13 +29,13 @@ const TRANSLATIONS = {
     card_game_title: "Autodiagnóstico",
     card_game_desc: "Evaluá tus prácticas de aula con base en los marcos ANEP, Ceibal, UNESCO y Udelar.",
     card_game_btn: "Comenzar autodiagnóstico →",
-    card_lab_title: "Laboratorio de Casos",
+    card_lab_title: "Laboratorio de casos",
     card_lab_desc: "Explorá y resolvé de forma interactiva dilemas éticos y situados en formato taller.",
     card_lab_btn: "Abrir modo taller →",
 
     step_perfil: "Perfil",
     step_contexto: "Contexto",
-    step_cierre: "Uso y Privacidad",
+    step_cierre: "Uso y privacidad",
     label_role_question: "¿Desde qué lugar querés hacer el recorrido?",
     role_estudiante_title: "Estudiante",
     role_estudiante_desc: "Uso de IA en estudio, tareas y producción académica en formación inicial.",
@@ -77,7 +77,7 @@ const TRANSLATIONS = {
     btn_download_pdf: "Descargar PDF",
     btn_restart: "Volver al inicio / Reiniciar",
 
-    lab_title: "Laboratorio de Casos Situados",
+    lab_title: "Laboratorio de casos situados",
     lab_subtitle: "Análisis de dilemas éticos y pedagógicos para la toma de decisiones",
     btn_analyze_dilemma: "Analizar dilema",
     btn_download_ficha: "Descargar ficha PDF (Taller)"
@@ -95,13 +95,13 @@ const TRANSLATIONS = {
     card_game_title: "Self-Assessment",
     card_game_desc: "Evaluate your classroom practices based on current ethical frameworks.",
     card_game_btn: "Start self-assessment →",
-    card_lab_title: "Case Laboratory",
+    card_lab_title: "Case laboratory",
     card_lab_desc: "Explore and interactively resolve real ethical dilemmas in workshop format.",
     card_lab_btn: "Open workshop mode →",
 
     step_perfil: "Profile",
     step_contexto: "Context",
-    step_cierre: "Usage & Privacy",
+    step_cierre: "Usage & privacy",
     label_role_question: "Which perspective are you taking today?",
     role_estudiante_title: "Student",
     role_estudiante_desc: "AI usage in studying, assignments, and academic work.",
@@ -161,13 +161,13 @@ const TRANSLATIONS = {
     card_game_title: "Autodiagnóstico",
     card_game_desc: "Avalie suas práticas de sala de aula com base em marcos éticos atuais.",
     card_game_btn: "Iniciar autodiagnóstico →",
-    card_lab_title: "Laboratório de Casos",
+    card_lab_title: "Laboratório de casos",
     card_lab_desc: "Explore e resolva dilemas éticos situados em formato de oficina.",
     card_lab_btn: "Abrir modo oficina →",
 
     step_perfil: "Perfil",
     step_contexto: "Contexto",
-    step_cierre: "Uso e Privacidade",
+    step_cierre: "Uso e privacidade",
     label_role_question: "Com qual perfil você deseja realizar o percurso?",
     role_estudiante_title: "Estudante",
     role_estudiante_desc: "Uso de IA nos estudos, tarefas e produção acadêmica.",
@@ -209,7 +209,7 @@ const TRANSLATIONS = {
     btn_download_pdf: "Baixar PDF",
     btn_restart: "Voltar ao início / Reiniciar",
 
-    lab_title: "Laboratório de Casos Situados",
+    lab_title: "Laboratório de casos situados",
     lab_subtitle: "Análise de dilemas éticos e pedagógicos para a tomada de decisões",
     btn_analyze_dilemma: "Analisar dilema",
     btn_download_ficha: "Baixar ficha PDF (Oficina)"
@@ -227,13 +227,13 @@ const TRANSLATIONS = {
     card_game_title: "Auto-évaluation",
     card_game_desc: "Évaluez vos pratiques de classe sur la base des cadres éthiques actuels.",
     card_game_btn: "Démarrer l'auto-évaluation →",
-    card_lab_title: "Laboratoire de Cas",
+    card_lab_title: "Laboratoire de cas",
     card_lab_desc: "Explorez et résolvez de manière interactive des dilemmes éthiques au format atelier.",
     card_lab_btn: "Ouvrir le mode atelier →",
 
     step_perfil: "Profil",
     step_contexto: "Contexte",
-    step_cierre: "Usage & Confidentialité",
+    step_cierre: "Usage & confidentialité",
     label_role_question: "Sous quel profil souhaitez-vous effectuer le parcours ?",
     role_estudiante_title: "Élève / Étudiant",
     role_estudiante_desc: "Usage de l'IA dans les études, travaux et productions académiques.",
@@ -275,7 +275,7 @@ const TRANSLATIONS = {
     btn_download_pdf: "Télécharger le PDF",
     btn_restart: "Retour au début / Réinitialiser",
 
-    lab_title: "Laboratoire de Cas Situés",
+    lab_title: "Laboratoire de cas situés",
     lab_subtitle: "Analyse de dilemmes éthiques et pédagogiques pour la prise de décision",
     btn_analyze_dilemma: "Analyser le dilemme",
     btn_download_ficha: "Télécharger fiche PDF (Atelier)"
@@ -1744,7 +1744,7 @@ const btnVerAutores = document.getElementById('btnVerAutores');
 if (btnVerAutores) {
   btnVerAutores.addEventListener('click', function() {
     if (typeof modal !== 'undefined' && typeof modal.show === 'function') {
-      modal.show('¿Quiénes somos? — Autores de la App', `
+      modal.show('¿Quiénes somos? — Autores de la app', `
         <div class="team-panel-modal" style="display: flex; flex-direction: column; gap: 1.5rem; padding: 0.5rem 0;">
           <div class="team-member-detail" style="display: flex; align-items: center; gap: 1.25rem; text-align: left;">
             <img src="icons/perfil.png" alt="Santiago Hernández" class="team-member-photo" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);">
