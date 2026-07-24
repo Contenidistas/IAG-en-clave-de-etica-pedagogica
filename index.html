@@ -30,23 +30,23 @@
   <header class="app-header">
     <h1 id="homeBtn" class="home-btn" style="cursor:pointer; display:flex; align-items:center; gap:0.5rem;">
       <div class="logo">AI</div>
-      <span>IAG en clave de ética pedagógica</span>
+      <span data-i18n="app_title">IAG en clave de ética pedagógica</span>
     </h1>
 
     <div class="header-actions">
       <button type="button" class="btn-academic btn-authors" id="btnVerAutores">
         <span class="btn-academic-icon">👥</span>
         <span class="btn-academic-text">
-          <span class="btn-academic-label">Autores</span>
-          <span class="btn-academic-title">¿Quiénes somos?</span>
+          <span class="btn-academic-label" data-i18n="btn_authors_label">Autores</span>
+          <span class="btn-academic-title" data-i18n="btn_authors_title">¿Quiénes somos?</span>
         </span>
       </button>
 
       <a href="fundamentacion.html" class="btn-academic btn-authors">
         <span class="btn-academic-icon">↗</span>
         <span class="btn-academic-text">
-          <span class="btn-academic-label">Base pedagógica</span>
-          <span class="btn-academic-title">Fundamentación</span>
+          <span class="btn-academic-label" data-i18n="btn_foundation_label">Base pedagógica</span>
+          <span class="btn-academic-title" data-i18n="btn_foundation_title">Fundamentación</span>
         </span>
       </a>
       <button type="button" class="btn-academic btn-authors install-app-btn hidden" id="installAppBtn">
@@ -56,6 +56,15 @@
           <span class="btn-academic-title">Instalar</span>
         </span>
       </button>
+      <div class="lang-select-wrapper">
+        <label for="languageSelect" class="sr-only">Idioma / Language</label>
+        <select id="languageSelect" class="lang-select" aria-label="Seleccionar idioma">
+          <option value="es" selected>🌐 ES</option>
+          <option value="en">🌐 EN</option>
+          <option value="pt">🌐 PT</option>
+          <option value="fr">🌐 FR</option>
+        </select>
+      </div>
       <button class="theme-toggle" id="themeToggle" aria-label="Cambiar tema">
         <span id="themeIcon">☾</span>
       </button>
@@ -78,9 +87,9 @@
             <div class="carousel-slide intro-overview-slide">
               <div class="intro-overview">
                 <div class="intro-overview-copy">
-                  <p class="section-kicker">Herramienta educativa</p>
-                  <h2>IAG en clave de ética pedagógica</h2>
-                  <p class="landing-welcome-sub">
+                  <p class="section-kicker" data-i18n="hero_kicker">Herramienta educativa</p>
+                  <h2 data-i18n="hero_title">IAG en clave de ética pedagógica</h2>
+                  <p class="landing-welcome-sub" data-i18n="hero_subtitle">
                     Un espacio de autoevaluación y reflexión ética para revisar tus prácticas docentes e incorporar el uso crítico de la inteligencia artificial generativa de acuerdo a marcos de referencia actuales.
                   </p>
                 </div>
@@ -92,9 +101,9 @@
                       <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" class="landing-card-svg"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                     </div>
                     <div class="landing-card-content">
-                      <h3>Autodiagnóstico</h3>
-                      <p>Evaluá tus prácticas de aula con base en los marcos ANEP, Ceibal, UNESCO y Udelar.</p>
-                      <span class="landing-card-btn">Comenzar autodiagnóstico →</span>
+                      <h3 data-i18n="card_game_title">Autodiagnóstico</h3>
+                      <p data-i18n="card_game_desc">Evaluá tus prácticas de aula con base en los marcos ANEP, Ceibal, UNESCO y Udelar.</p>
+                      <span class="landing-card-btn" data-i18n="card_game_btn">Comenzar autodiagnóstico →</span>
                     </div>
                   </div>
 
@@ -103,9 +112,9 @@
                       <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" class="landing-card-svg"><path d="M10 2v7.51L3.39 19A1 1 0 0 0 4 20.25h16a1 1 0 0 0 .61-1.25L14 9.51V2z"></path><path d="M8.5 11h7"></path></svg>
                     </div>
                     <div class="landing-card-content">
-                      <h3>Laboratorio de Casos</h3>
-                      <p>Explorá y resolvé de forma interactiva dilemas éticos y situados en formato taller.</p>
-                      <span class="landing-card-btn" style="color: #10b981;">Abrir modo taller →</span>
+                      <h3 data-i18n="card_lab_title">Laboratorio de Casos</h3>
+                      <p data-i18n="card_lab_desc">Explorá y resolvé de forma interactiva dilemas éticos y situados en formato taller.</p>
+                      <span class="landing-card-btn" style="color: #10b981;" data-i18n="card_lab_btn">Abrir modo taller →</span>
                     </div>
                   </div>
                 </div>

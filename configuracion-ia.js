@@ -626,6 +626,7 @@ autoria: {
    ======================================== */
 
 const state = {
+  lang: (typeof localStorage !== 'undefined' && localStorage.getItem('app_lang')) || 'es',
   profile: null,        // docente | estudiante | especializado
   profileKey: null,     // docente, estudiante_media, etc.
   name: '',

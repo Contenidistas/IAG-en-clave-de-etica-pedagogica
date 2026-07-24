@@ -7,7 +7,313 @@ const screens = {
   result: document.getElementById('screenResult')
 };
 
+
+/* ========================================
+   🌐 DICCIONARIO DE TRADUCCIÓN (I18N)
+   Español (default), English, Português, Français
+   ======================================== */
+const TRANSLATIONS = {
+  es: {
+    app_title: "IAG en clave de ética pedagógica",
+    btn_authors_label: "Autores",
+    btn_authors_title: "¿Quiénes somos?",
+    btn_foundation_label: "Base pedagógica",
+    btn_foundation_title: "Fundamentación",
+    hero_kicker: "Herramienta educativa",
+    hero_title: "IAG en clave de ética pedagógica",
+    hero_subtitle: "Un espacio de autoevaluación y reflexión ética para revisar tus prácticas docentes e incorporar el uso crítico de la inteligencia artificial generativa de acuerdo a marcos de referencia actuales.",
+    card_game_title: "Autodiagnóstico",
+    card_game_desc: "Evaluá tus prácticas de aula con base en los marcos ANEP, Ceibal, UNESCO y Udelar.",
+    card_game_btn: "Comenzar autodiagnóstico →",
+    card_lab_title: "Laboratorio de Casos",
+    card_lab_desc: "Explorá y resolvé de forma interactiva dilemas éticos y situados en formato taller.",
+    card_lab_btn: "Abrir modo taller →",
+
+    step_perfil: "Perfil",
+    step_contexto: "Contexto",
+    step_cierre: "Uso y Privacidad",
+    label_role_question: "¿Desde qué lugar querés hacer el recorrido?",
+    role_estudiante_title: "Estudiante",
+    role_estudiante_desc: "Uso de IA en estudio, tareas y producción académica en formación inicial.",
+    role_docente_title: "Docente",
+    role_docente_desc: "Planificación, evaluación, decisiones de aula y criterios didácticos.",
+    role_investigador_title: "Docente/investigador/a",
+    role_investigador_desc: "Marcos teóricos, investigación educativa, gestión y criterios compartidos.",
+
+    label_nivel_docente: "En qué nivel trabajás",
+    label_nivel_estudiante: "En qué nivel estudiás",
+    label_name: "Tu nombre (opcional)",
+    placeholder_name: "Ingresá tu nombre o un seudónimo",
+    label_country: "País",
+    label_country_other: "Especificá tu país",
+    placeholder_country_other: "Ingresá tu país",
+    opt_other: "Otro (especificar)",
+
+    label_familiarity: "Antes de comenzar, ¿qué nivel de familiaridad tenés con este tema?",
+    label_resources: "¿Has utilizado recursos o capacitaciones similares sobre Inteligencia Artificial?",
+    opt_yes: "Sí",
+    opt_no: "No",
+    label_consent: "Acepto compartir mis respuestas de forma 100% anónima para fines de investigación educativa y mejora de la herramienta.",
+
+    btn_back: "Atrás",
+    btn_next: "Siguiente",
+    btn_start_game: "Comenzar autodiagnóstico",
+    guidance_title: "Campos pendientes por completar:",
+
+    btn_abort: "Volver al inicio",
+    question_counter: "Pregunta",
+    question_counter_of: "de",
+    btn_not_applicable: "No aplica",
+    help_toggle: "Ayuda pedagógica",
+
+    tab_summary: "Resumen del tránsito",
+    tab_suggestions: "Sugerencias de mejora",
+    tab_proposals: "Propuestas de acción",
+    btn_copy_summary: "Copiar resumen",
+    btn_download_pdf: "Descargar PDF",
+    btn_restart: "Volver al inicio / Reiniciar",
+
+    lab_title: "Laboratorio de Casos Situados",
+    lab_subtitle: "Análisis de dilemas éticos y pedagógicos para la toma de decisiones",
+    btn_analyze_dilemma: "Analizar dilema",
+    btn_download_ficha: "Descargar ficha PDF (Taller)"
+  },
+
+  en: {
+    app_title: "Generative AI in Pedagogical Ethics",
+    btn_authors_label: "Authors",
+    btn_authors_title: "About us",
+    btn_foundation_label: "Pedagogical basis",
+    btn_foundation_title: "Rationale",
+    hero_kicker: "Educational tool",
+    hero_title: "Artificial Intelligence in Pedagogical Ethics",
+    hero_subtitle: "An interactive self-assessment and ethical reflection space to review teaching practices and integrate critical AI usage.",
+    card_game_title: "Self-Assessment",
+    card_game_desc: "Evaluate your classroom practices based on current ethical frameworks.",
+    card_game_btn: "Start self-assessment →",
+    card_lab_title: "Case Laboratory",
+    card_lab_desc: "Explore and interactively resolve real ethical dilemmas in workshop format.",
+    card_lab_btn: "Open workshop mode →",
+
+    step_perfil: "Profile",
+    step_contexto: "Context",
+    step_cierre: "Usage & Privacy",
+    label_role_question: "Which perspective are you taking today?",
+    role_estudiante_title: "Student",
+    role_estudiante_desc: "AI usage in studying, assignments, and academic work.",
+    role_docente_title: "Teacher",
+    role_docente_desc: "Lesson planning, assessment, classroom decisions, and pedagogical criteria.",
+    role_investigador_title: "Teacher / Researcher",
+    role_investigador_desc: "Theoretical frameworks, educational research, and shared criteria.",
+
+    label_nivel_docente: "What level do you teach at?",
+    label_nivel_estudiante: "What level do you study at?",
+    label_name: "Your name (optional)",
+    placeholder_name: "Enter your name or pseudonym",
+    label_country: "Country",
+    label_country_other: "Specify your country",
+    placeholder_country_other: "Enter your country",
+    opt_other: "Other (specify)",
+
+    label_familiarity: "Before starting, what is your level of familiarity with this topic?",
+    label_resources: "Have you used similar resources or training on Artificial Intelligence?",
+    opt_yes: "Yes",
+    opt_no: "No",
+    label_consent: "I agree to share my answers 100% anonymously for educational research and improvement.",
+
+    btn_back: "Back",
+    btn_next: "Next",
+    btn_start_game: "Start self-assessment",
+    guidance_title: "Pending fields to complete:",
+
+    btn_abort: "Return to start",
+    question_counter: "Question",
+    question_counter_of: "of",
+    btn_not_applicable: "Not applicable",
+    help_toggle: "Pedagogical guidance",
+
+    tab_summary: "Journey Summary",
+    tab_suggestions: "Improvement Suggestions",
+    tab_proposals: "Action Proposals",
+    btn_copy_summary: "Copy summary",
+    btn_download_pdf: "Download PDF",
+    btn_restart: "Return to start / Restart",
+
+    lab_title: "Situated Cases Laboratory",
+    lab_subtitle: "Analysis of ethical and pedagogical dilemmas for decision-making",
+    btn_analyze_dilemma: "Analyze dilemma",
+    btn_download_ficha: "Download PDF Worksheet (Workshop)"
+  },
+
+  pt: {
+    app_title: "IAG sob a ótica da ética pedagógica",
+    btn_authors_label: "Autores",
+    btn_authors_title: "Quem somos?",
+    btn_foundation_label: "Base pedagógica",
+    btn_foundation_title: "Fundamentação",
+    hero_kicker: "Ferramenta educativa",
+    hero_title: "Inteligência Artificial sob a ótica da ética pedagógica",
+    hero_subtitle: "Um espaço de autoavaliação e reflexão ética para revisar suas práticas docentes e incorporar o uso crítico da inteligência artificial.",
+    card_game_title: "Autodiagnóstico",
+    card_game_desc: "Avalie suas práticas de sala de aula com base em marcos éticos atuais.",
+    card_game_btn: "Iniciar autodiagnóstico →",
+    card_lab_title: "Laboratório de Casos",
+    card_lab_desc: "Explore e resolva dilemas éticos situados em formato de oficina.",
+    card_lab_btn: "Abrir modo oficina →",
+
+    step_perfil: "Perfil",
+    step_contexto: "Contexto",
+    step_cierre: "Uso e Privacidade",
+    label_role_question: "Com qual perfil você deseja realizar o percurso?",
+    role_estudiante_title: "Estudante",
+    role_estudiante_desc: "Uso de IA nos estudos, tarefas e produção acadêmica.",
+    role_docente_title: "Professor",
+    role_docente_desc: "Planejamento, avaliação, decisões de sala de aula e critérios didáticos.",
+    role_investigador_title: "Professor / Pesquisador",
+    role_investigador_desc: "Marcos teóricos, pesquisa educacional e critérios compartilhados.",
+
+    label_nivel_docente: "Em qual nível você leciona?",
+    label_nivel_estudiante: "Em qual nível você estuda?",
+    label_name: "Seu nome (opcional)",
+    placeholder_name: "Digite seu nome ou pseudônimo",
+    label_country: "País",
+    label_country_other: "Especifique seu país",
+    placeholder_country_other: "Digite seu país",
+    opt_other: "Outro (especificar)",
+
+    label_familiarity: "Antes de começar, qual é o seu nível de familiaridade com este tema?",
+    label_resources: "Você já utilizou recursos ou formações semelhantes sobre Inteligência Artificial?",
+    opt_yes: "Sim",
+    opt_no: "Não",
+    label_consent: "Aceito compartilhar minhas respostas de forma 100% anônima para fins de pesquisa educacional e melhoria da ferramenta.",
+
+    btn_back: "Voltar",
+    btn_next: "Avançar",
+    btn_start_game: "Iniciar autodiagnóstico",
+    guidance_title: "Campos pendentes a preencher:",
+
+    btn_abort: "Voltar ao início",
+    question_counter: "Pergunta",
+    question_counter_of: "de",
+    btn_not_applicable: "Não se aplica",
+    help_toggle: "Orientação pedagógica",
+
+    tab_summary: "Resumo da Jornada",
+    tab_suggestions: "Sugestões de melhoria",
+    tab_proposals: "Propostas de ação",
+    btn_copy_summary: "Copiar resumo",
+    btn_download_pdf: "Baixar PDF",
+    btn_restart: "Voltar ao início / Reiniciar",
+
+    lab_title: "Laboratório de Casos Situados",
+    lab_subtitle: "Análise de dilemas éticos e pedagógicos para a tomada de decisões",
+    btn_analyze_dilemma: "Analisar dilema",
+    btn_download_ficha: "Baixar ficha PDF (Oficina)"
+  },
+
+  fr: {
+    app_title: "IAG sous l'angle de l'éthique pédagogique",
+    btn_authors_label: "Auteurs",
+    btn_authors_title: "Qui sommes-nous ?",
+    btn_foundation_label: "Base pédagogique",
+    btn_foundation_title: "Fondement",
+    hero_kicker: "Outil éducatif",
+    hero_title: "Intelligence Artificielle sous l'angle de l'éthique pédagogique",
+    hero_subtitle: "Un espace d'auto-évaluation et de réflexion éthique pour réviser vos pratiques d'enseignement et intégrer l'IA de manière critique.",
+    card_game_title: "Auto-évaluation",
+    card_game_desc: "Évaluez vos pratiques de classe sur la base des cadres éthiques actuels.",
+    card_game_btn: "Démarrer l'auto-évaluation →",
+    card_lab_title: "Laboratoire de Cas",
+    card_lab_desc: "Explorez et résolvez de manière interactive des dilemmes éthiques au format atelier.",
+    card_lab_btn: "Ouvrir le mode atelier →",
+
+    step_perfil: "Profil",
+    step_contexto: "Contexte",
+    step_cierre: "Usage & Confidentialité",
+    label_role_question: "Sous quel profil souhaitez-vous effectuer le parcours ?",
+    role_estudiante_title: "Élève / Étudiant",
+    role_estudiante_desc: "Usage de l'IA dans les études, travaux et productions académiques.",
+    role_docente_title: "Enseignant",
+    role_docente_desc: "Planification, évaluation, décisions de classe et critères pédagogiques.",
+    role_investigador_title: "Enseignant / Chercheur",
+    role_investigador_desc: "Cadres théoriques, recherche éducative et critères partagés.",
+
+    label_nivel_docente: "À quel niveau enseignez-vous ?",
+    label_nivel_estudiante: "À quel niveau étudiez-vous ?",
+    label_name: "Votre nom (optionnel)",
+    placeholder_name: "Entrez votre nom ou pseudonyme",
+    label_country: "Pays",
+    label_country_other: "Précisez votre pays",
+    placeholder_country_other: "Entrez votre pays",
+    opt_other: "Autre (préciser)",
+
+    label_familiarity: "Avant de commencer, quel est votre niveau de familiarité avec ce sujet ?",
+    label_resources: "Avez-vous utilisé des ressources ou formations similaires sur l'IA ?",
+    opt_yes: "Oui",
+    opt_no: "Non",
+    label_consent: "J'accepte de partager mes réponses de manière 100% anonyme à des fins de recherche éducative et d'amélioration.",
+
+    btn_back: "Retour",
+    btn_next: "Suivant",
+    btn_start_game: "Démarrer l'auto-évaluation",
+    guidance_title: "Champs en attente de complétion :",
+
+    btn_abort: "Retour au début",
+    question_counter: "Question",
+    question_counter_of: "sur",
+    btn_not_applicable: "Non applicable",
+    help_toggle: "Aide pédagogique",
+
+    tab_summary: "Résumé du parcours",
+    tab_suggestions: "Suggestions d'amélioration",
+    tab_proposals: "Propositions d'action",
+    btn_copy_summary: "Copier le résumé",
+    btn_download_pdf: "Télécharger le PDF",
+    btn_restart: "Retour au début / Réinitialiser",
+
+    lab_title: "Laboratoire de Cas Situés",
+    lab_subtitle: "Analyse de dilemmes éthiques et pédagogiques pour la prise de décision",
+    btn_analyze_dilemma: "Analyser le dilemme",
+    btn_download_ficha: "Télécharger fiche PDF (Atelier)"
+  }
+};
+
+function updateAppLanguage(lang = 'es') {
+  const t = TRANSLATIONS[lang] || TRANSLATIONS['es'];
+  document.documentElement.lang = lang;
+
+  // Actualizar textos con atributo data-i18n
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (t[key]) {
+      el.textContent = t[key];
+    }
+  });
+
+  // Actualizar placeholders
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.dataset.i18nPlaceholder;
+    if (t[key]) {
+      el.placeholder = t[key];
+    }
+  });
+
+  // Actualizar títulos de ONBOARDING_STEP_META
+  if (typeof ONBOARDING_STEP_META !== 'undefined' && ONBOARDING_STEP_META) {
+    if (ONBOARDING_STEP_META.perfil) ONBOARDING_STEP_META.perfil.title = t.step_perfil;
+    if (ONBOARDING_STEP_META.contexto) ONBOARDING_STEP_META.contexto.title = t.step_contexto;
+    if (ONBOARDING_STEP_META.cierre) ONBOARDING_STEP_META.cierre.title = t.step_cierre;
+  }
+
+  // Refrescar la interfaz de onboarding
+  if (typeof updateOnboardingUI === 'function') {
+    updateOnboardingUI();
+  }
+}
+
+
 const elements = {
+  languageSelect: document.getElementById('languageSelect'),
   // Carrusel
   carouselTrack: document.getElementById('carouselTrack'),
   carouselDots: document.querySelectorAll('.carousel-dot'),
@@ -2066,7 +2372,17 @@ document.addEventListener('DOMContentLoaded', () => {
   debugLog('Sincronizando estado inicial...');
   
   // Sincronizar país y familiaridad inicial con chips
-  syncSelectWithChips('countrySelect', 'countryChips');
+  // Selector de países en desplegable (sin chips)
+  if (elements.languageSelect) {
+    elements.languageSelect.value = state.lang || 'es';
+    elements.languageSelect.addEventListener('change', (e) => {
+      const newLang = e.target.value;
+      state.lang = newLang;
+      localStorage.setItem('app_lang', newLang);
+      updateAppLanguage(newLang);
+    });
+  }
+  updateAppLanguage(state.lang || 'es');
   syncSelectWithChips('familiaridadInicial', 'familiaridadChips');
   
   // Sincronizar perfil si hay un chip activo
