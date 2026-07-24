@@ -1,3 +1,7 @@
+
+function isForeignCountry() {
+  return typeof window.state !== 'undefined' && window.state.country && window.state.country !== 'Uruguay';
+}
 /* ========================================
    ELEMENTOS DEL DOM (ACTUALIZADO CON NIVEL EDUCATIVO)
    ======================================== */
@@ -941,12 +945,17 @@ const FRAMEWORK_AUDIENCE_COPY = {
 function updateFrameworkAudience(perfil) {
   if (!elements.frameworkCard) return;
   const audience = perfil || 'none';
+  const isForeign = isForeignCountry();
+  const baseTitle = isForeign ? 'Marco Internacional de la UNESCO (IA Generativa en Educación)' : 'Marcos de UNESCO, ANEP, FING, Udelar y Ceibal';
   const copy = FRAMEWORK_AUDIENCE_COPY[audience] || {
-    title: 'Marcos de UNESCO, ANEP, FING, Udelar y Ceibal',
+    title: baseTitle,
     intro: 'Elegí un perfil para adaptar la profundidad de la fundamentación y hacer el recorrido más liviano.',
-    context: 'La herramienta adapta la densidad de los marcos según el lugar desde el que se realiza el recorrido.',
+    context: isForeign ? 'Para países fuera de Uruguay, la herramienta adapta las referencias priorizando las directrices internacionales de la UNESCO.' : 'La herramienta adapta la densidad de los marcos según el lugar desde el que se realiza el recorrido.',
     button: 'Ver marcos'
   };
+  if (isForeign) {
+    copy.title = 'Marco Internacional de la UNESCO';
+  }
 
   elements.frameworkCard.dataset.audience = audience;
   elements.frameworkCard.classList.toggle('framework-expanded', audience === 'especializado');

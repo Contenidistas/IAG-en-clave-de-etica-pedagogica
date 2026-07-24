@@ -1,3 +1,7 @@
+
+function isForeignCountry() {
+  return typeof window.state !== 'undefined' && window.state.country && window.state.country !== 'Uruguay';
+}
 /* ========================================
    GENERADOR DE PDF (jsPDF)
    ======================================== */
@@ -51,7 +55,7 @@ function obtenerPerfilReporte() {
 
 function construirRetroalimentacionMarco(nodo, respuesta) {
   const respuestaTexto = respuesta ? 'La respuesta afirmativa muestra una práctica alineada con los marcos de referencia.' : 'La respuesta negativa señala una oportunidad concreta de mejora y formación.';
-  const referencia = nodo.anepRef || 'ANEP / UNESCO / FING / Udelar / Ceibal';
+  const referencia = isForeignCountry() ? 'UNESCO (Guía para IA Generativa en Educación)' : (nodo.anepRef || 'ANEP / UNESCO / FING / Udelar / Ceibal');
   const titulo = (nodo.title || '').toLowerCase();
   let foco = 'conviene documentar el proceso, contrastar la información generada por IA con fuentes confiables y explicitar qué parte del trabajo corresponde a criterio humano';
 
@@ -71,7 +75,8 @@ function construirRetroalimentacionMarco(nodo, respuesta) {
     foco = 'antes de delegar tareas en la IA, conviene asegurar comprensión conceptual suficiente para evaluar la calidad, pertinencia y límites de la respuesta generada';
   }
 
-  return `${respuestaTexto} Desde ANEP, UNESCO, FING, Udelar y Ceibal, este punto debe leerse en clave de responsabilidad pedagógica: ${foco}. Referencia vinculada: ${referencia}.`;
+  const marcoNombre = isForeignCountry() ? 'las directrices globales de la UNESCO' : 'ANEP, UNESCO, FING, Udelar y Ceibal';
+  return `${respuestaTexto} Desde ${marcoNombre}, este punto debe leerse en clave de responsabilidad pedagógica: ${foco}. Referencia vinculada: ${referencia}.`;
 }
 
 function construirSintesisMarco(nivel) {

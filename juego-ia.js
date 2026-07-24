@@ -1,3 +1,7 @@
+
+function isForeignCountry() {
+  return typeof window.state !== 'undefined' && window.state.country && window.state.country !== 'Uruguay';
+}
 /* ========================================
    UTILIDAD: Normalizar preguntas del perfil
    - Asegura que todas las preguntas empiecen con "¿"
@@ -1865,7 +1869,7 @@ function construirInformeCalidad(nivel) {
       'Aporte humano: decisiones propias, contextualización y revisión final.',
       'Cuidado de datos: ausencia de información sensible o identificable.'
     ],
-    references: 'ANEP, UNESCO, FING, Udelar y Ceibal'
+    references: isForeignCountry() ? 'UNESCO (Guía para IA Generativa en Educación e Investigación)' : 'ANEP, UNESCO, FING, Udelar y Ceibal'
   };
 }
 
