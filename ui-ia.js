@@ -1135,12 +1135,11 @@ function updateOnboardingUI() {
     elements.onboardingDots.style.setProperty('--onboarding-steps', keys.length);
     
     // Nombres cortos para cada paso en la red neuronal
+    const t = TRANSLATIONS[state.lang || 'es'] || TRANSLATIONS['es'];
     const stepNames = {
-      profile: 'Perfil',
-      country: 'País',
-      familiaridad: 'Uso IA',
-      consent: 'Privacidad',
-      cierre: 'Contexto'
+      profile: t.step_perfil || 'Perfil',
+      contexto: t.step_contexto || 'Contexto',
+      cierre: t.step_cierre || 'Uso y privacidad'
     };
     
     elements.onboardingDots.innerHTML = `

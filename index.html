@@ -189,8 +189,8 @@
                       <circle cx="280" cy="180" r="7" class="neuron" />
                     </svg>
                   </div>
-                  <p class="section-kicker">Punto de partida</p>
-                  <h3>¿Desde qué lugar querés hacer el recorrido?</h3>
+                  <p class="section-kicker" data-i18n="step_perfil">Punto de partida</p>
+                  <h3 data-i18n="label_role_question">¿Desde qué lugar querés hacer el recorrido?</h3>
                   <div class="chips-container profile-choice-grid">
                     <div class="chip profile-choice" data-profile="estudiante">
                       <div class="profile-choice-header">
@@ -199,8 +199,8 @@
                         </div>
                         <div class="profile-choice-check"></div>
                       </div>
-                      <span class="profile-choice-title">Estudiante</span>
-                      <small class="profile-choice-desc">Uso de IA en estudio, tareas y producción académica en formación inicial.</small>
+                      <span class="profile-choice-title" data-i18n="role_estudiante_title">Estudiante</span>
+                      <small class="profile-choice-desc" data-i18n="role_estudiante_desc">Uso de IA en estudio, tareas y producción académica en formación inicial.</small>
                     </div>
                     <div class="chip profile-choice" data-profile="docente">
                       <div class="profile-choice-header">
@@ -209,8 +209,8 @@
                         </div>
                         <div class="profile-choice-check"></div>
                       </div>
-                      <span class="profile-choice-title">Docente</span>
-                      <small class="profile-choice-desc">Consignas, evaluación, acompañamiento y acuerdos didácticos de aula.</small>
+                      <span class="profile-choice-title" data-i18n="role_docente_title">Docente</span>
+                      <small class="profile-choice-desc" data-i18n="role_docente_desc">Consignas, evaluación, acompañamiento y acuerdos didácticos de aula.</small>
                     </div>
                     <div class="chip profile-choice" data-profile="especializado">
                       <div class="profile-choice-header">
@@ -219,8 +219,8 @@
                         </div>
                         <div class="profile-choice-check"></div>
                       </div>
-                      <span class="profile-choice-title">Docente/investigador/a</span>
-                      <small class="profile-choice-desc">Marcos teóricos, investigación educativa, gestión y criterios compartidos.</small>
+                      <span class="profile-choice-title" data-i18n="role_investigador_title">Docente/investigador/a</span>
+                      <small class="profile-choice-desc" data-i18n="role_investigador_desc">Marcos teóricos, investigación educativa, gestión y criterios compartidos.</small>
                     </div>
                   </div>
                 </div>
@@ -240,8 +240,8 @@
 
                 <!-- Campo de nombre (opcional) -->
                 <div id="identityWrapper" class="onboarding-step" data-onboarding-step="contexto" style="max-width: 400px; margin: 1.5rem auto 1rem auto;">
-                  <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Tu nombre (opcional)</label>
-                  <input type="text" id="playerName" class="input" placeholder="Ingresá tu nombre o un seudónimo" />
+                  <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;" data-i18n="label_name">Tu nombre (opcional)</label>
+                  <input type="text" id="playerName" class="input" placeholder="Ingresá tu nombre o un seudónimo" data-i18n-placeholder="placeholder_name" />
                 </div>
 
                 <!-- Selector de país -->
@@ -273,8 +273,8 @@
 
                 <!-- Campo "Otro país" (aparece si selecciona "Otro") -->
                 <div id="countryOtherWrapper" class="onboarding-step" data-onboarding-step="contexto" style="max-width: 400px; margin: 0 auto 1rem auto; display:none;">
-                  <label for="countryOther" style="display:block; margin-bottom:0.5rem; font-weight:600;">Especificá tu país</label>
-                  <input type="text" id="countryOther" class="input" placeholder="Ingresá tu país" />
+                  <label for="countryOther" style="display:block; margin-bottom:0.5rem; font-weight:600;" data-i18n="label_country_other">Especificá tu país</label>
+                  <input type="text" id="countryOther" class="input" placeholder="Ingresá tu país" data-i18n-placeholder="placeholder_country_other" />
                 </div>
 
                 <!-- Campo oculto para guardar el país final -->
@@ -337,13 +337,13 @@
                 </div>
 
                 <div class="onboarding-controls" id="onboardingControls">
-                  <button type="button" class="btn btn-outline" id="onboardingBackBtn">Anterior</button>
+                  <button type="button" class="btn btn-outline" id="onboardingBackBtn" data-i18n="btn_back">Anterior</button>
                   <label for="consentTracking" class="btn btn-primary consent-action-label" style="cursor:pointer; line-height:1.4; font-weight:500;">
                     <input type="checkbox" id="consentTracking" style="margin-top:0.15rem; cursor:pointer;" />
                     <span class="consent-unchecked">Acepto registro anónimo</span>
                     <span class="consent-checked">Registro anónimo aceptado</span>
                   </label>
-                  <button type="button" class="btn btn-primary" id="onboardingNextBtn">Siguiente</button>
+                  <button type="button" class="btn btn-primary" id="onboardingNextBtn" data-i18n="btn_next">Siguiente</button>
                 </div>
 
               </div>
