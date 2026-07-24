@@ -427,6 +427,12 @@ body.quiz-active .app-header {
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
 
+.select-country-dropdown option {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  padding: 0.5rem;
+}
+
 /* ========== 4) CONTENEDOR PRINCIPAL ========== */
 .container {
   max-width: 1200px;
