@@ -1334,6 +1334,76 @@ const CASOS_LABORATORIO = [
       '¿Qué estrategias pedagógicas según UNESCO y Ceibal permiten evaluar la agencia y la autoría humana más allá del producto escrito final?'
     ],
     stats: { A: 16, B: 48, C: 12, D: 24 }
+  },
+  {
+    id: 'tfg_docente',
+    title: 'El marco teórico automatizado: Ética en la investigación de grado',
+    axis: 'autoría',
+    axisLabel: 'Autoría y rigor en investigación de grado',
+    audience: 'Formación Docente / Nivel Superior',
+    story: 'Un estudiante de Formación Docente (Magisterio / Profesorado) presenta el avance de su Trabajo Final de Grado (TFG) sobre inclusión educativa. El tribunal examinador observa que el estado del arte y la revisión bibliográfica están impecablemente estructurados y sintetizan 20 autores clásicos y contemporáneos. Sin embargo, en la entrevista de avance, el estudiante admite haber utilizado una IA generativa para leer, resumir y redactar los capítulos teóricos enteros a partir de apuntes breves, sin haber leído directamente los libros ni las investigaciones originales citadas.',
+    dilemma: '¿Cómo regular el uso de la IA en la investigación de grado en formación docente para que constituya un andamiaje válido sin menoscabar la apropiación conceptual, la honestidad académica y la construcción del criterio pedagógico?',
+    options: {
+      A: {
+        text: 'Anular el avance del trabajo y exigir la reescritura total del marco teórico sin ningún tipo de asistencia digital.',
+        feedback: '<strong>Análisis de la opción A (Sancionadora/Rígida):</strong> Aunque busca resguardar la honestidad intelectual, la anulación punitiva no enseña al futuro docente a utilizar críticamente la IA como herramienta de investigación profesional.'
+      },
+      B: {
+        text: 'Aceptar el texto generado siempre que las citas bibliográficas existan verdaderamente en la literatura académica.',
+        feedback: '<strong>Análisis de la opción B (Insuficiente):</strong> La existencia real de las citas no garantiza la comprensión del estudiante. En la formación de formadores, la lectura directa y la interpretación de los autores son indispensables para construir criterio pedagógico.'
+      },
+      C: {
+        text: 'Exigir la entrega del diario de lectura (fichaje directo de fuentes primarias) y una reestructuración donde el estudiante explicite su posición teórica crítica frente a las síntesis de la IA.',
+        feedback: '<strong>Análisis de la opción C (Formativa y rigurosa):</strong> Restablece la agencia humana y la apropiación conceptual recomendadas por los marcos de Udelar y UNESCO. Obliga al futuro docente a dialogar con los autores y defender su postura.'
+      },
+      D: {
+        text: 'Implementar un seminario de defensa donde el tribunal evalúe la capacidad del tesista para argumentar, contrastar y aplicar los conceptos a situaciones de aula reales.',
+        feedback: '<strong>Análisis de la opción D (Evaluación de proceso e integración):</strong> Alineada con la evaluación por competencias de ANEP y Udelar. Traslada el eje evaluativo del "producto escrito" a la capacidad docente del estudiante para responder éticamente en la práctica.'
+      }
+    },
+    giro: 'Durante la defensa intermedia del TFG, el tribunal le pide al estudiante que relacione una de las citas teóricas del marco generado por la IA con una observación de su práctica docente de aula. El estudiante no logra vincular la teoría con la realidad del aula porque nunca analizó la profundidad del texto original.',
+    analysis: 'El Trabajo Final de Grado en carreras docentes no es un mero trámite de escritura, sino el hito donde se consolida la identidad pedagógica y la capacidad de articular teoría y práctica. De acuerdo con las orientaciones de la <em>Udelar</em>, <em>ANEP</em> y la <em>UNESCO</em>, sustituir la lectura directa de fuentes por síntesis de IA empobrece el marco epistemológico del educador. La asistencia algorítmica debe declararse y limitarse a la organización de ideas, asegurando que el docente en formación lea, problematice y haga suya la teoría que sostendrá su práctica pedagógica.',
+    debateQuestions: [
+      '¿Qué límites éticos deben establecer los tribunales de TFG frente a la síntesis y redacción bibliográfica asistida por IA?',
+      '¿Cómo afecta a la futura práctica docente delegar la lectura primaria de los marcos pedagógicos en un modelo de lenguaje?',
+      '¿Qué herramientas de trazabilidad (bitácoras de lectura, fichaje, defensa oral) permiten garantizar la apropiación teórica sin prohibir la tecnología?'
+    ],
+    stats: { A: 18, B: 22, C: 42, D: 18 }
+  },
+  {
+    id: 'coconstruccion_codex',
+    title: 'El artefacto generado: Co-construcción de software y comprensión algorítmica',
+    axis: 'agencia',
+    axisLabel: 'Agencia técnica y soberanía de código',
+    audience: 'Educación Técnica / Terciaria / Universidad (Informática)',
+    story: 'En una asignatura de programación y desarrollo de software, un equipo de estudiantes entrega un proyecto complejo de aplicación web que funciona a la perfección. Durante la revisión del código fuente, el docente nota el uso de patrones de arquitectura muy avanzados, optimizaciones complejas e integraciones de librerías mediante asistentes de código (Codex / Copilot). Al solicitarles que expliquen el flujo de ejecución de una función crítica o que resuelvan un pequeño fallo introducido intencionalmente durante la evaluación, el equipo demuestra una total incapacidad para depurar o modificar el código generado por la herramienta.',
+    dilemma: '¿Cómo integrar asistentes de IA en la enseñanza de la programación (Codex/Copilot) promoviendo la productividad profesional sin sacrificar la comprensión algorítmica y la capacidad de depurar código?',
+    options: {
+      A: {
+        text: 'Descalificar la entrega por considerar que el código no fue escrito manualmente por los estudiantes.',
+        feedback: '<strong>Análisis de la opción A (Desconectada de la industria):</strong> Ignora que el uso de asistentes de código (AI-pair programming) es una competencia estándar en la industria del software. Sancionar su uso dificulta la formación profesional actualizada.'
+      },
+      B: {
+        text: 'Aprobar el proyecto si cumple con todos los test de integración y requerimientos funcionales, sin evaluar la lectura del código.',
+        feedback: '<strong>Análisis de la opción B (Inadecuada):</strong> Promueve el "desarrollo caja negra". La Guía de la FING-Udelar advierte que un profesional debe ser capaz de justificar, auditar y mantener cualquier código entregado.'
+      },
+      C: {
+        text: 'Establecer como requisito obligatorio la documentación de los prompts y una sesión de "Code Review" (revisión oral de código) donde los estudiantes defiendan línea por línea la lógica del software.',
+        feedback: '<strong>Análisis de la opción C (Formativa y profesional):</strong> Alineada con las pautas de la FING-Udelar y Ceibal. Mantiene la soberanía técnica del estudiante, exigiendo que comprenda y pueda modificar la solución propuesta por la IA.'
+      },
+      D: {
+        text: 'Requerir que los estudiantes diseñen pruebas unitarias (unit testing) y diagramas de arquitectura antes de solicitar sugerencias de código a la IA.',
+        feedback: '<strong>Análisis de la opción D (Metodológicamente sólida):</strong> Invierte el ciclo de desarrollo: el estudiante define la arquitectura, las restricciones y las pruebas (agencia humana), dejando a la IA únicamente la escritura del código repetitivo.'
+      }
+    },
+    giro: 'Semanas después, se produce un cambio menor en la API externa que consume la aplicación. El equipo es incapaz de adaptar el software porque no comprende la estructura interna del código generado por Codex y la herramienta no logra resolver el problema de forma automática.',
+    analysis: 'Este dilema expone la diferencia entre la "eficiencia de generación" y la "comprensión computacional". Como destacan las directrices de la <em>FING (Udelar)</em> y <em>Ceibal</em>, la co-construcción de software con IA exige formar profesionales que no sean meros "copiadores de código" (<em>copy-paste</em>), sino arquitectos capaces de auditar, depurar y responder por la seguridad y calidad del sistema. La agencia técnica radica en mantener el control conceptual sobre la arquitectura y la lógica de programación.',
+    debateQuestions: [
+      '¿De qué manera el uso de asistentes como Codex o Copilot debe transformar la enseñanza y evaluación de la programación en la educación técnica?',
+      '¿Por qué la capacidad de depuración (debugging) y la revisión de código se vuelven más importantes que la memorización de sintaxis en la era de la IA?',
+      '¿Qué acuerdos explícitos deben exigirse en la entrega de proyectos de software sobre la declaración y auditoría de código asistido por IA?'
+    ],
+    stats: { A: 10, B: 15, C: 45, D: 30 }
   }
 ];
 
