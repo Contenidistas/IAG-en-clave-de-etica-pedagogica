@@ -1,4 +1,4 @@
-const CACHE_NAME = 'iag-etica-pedagogica-v12';
+const CACHE_NAME = 'iag-etica-pedagogica-v13';
 
 const CORE_ASSETS = [
   './',

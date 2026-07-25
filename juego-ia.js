@@ -2080,13 +2080,15 @@ function cargarCasoInteractivo(caseId) {
       </div>
       
       <div style="display:flex; flex-direction: column; gap: 1rem; margin-top:2.5rem; max-width: 500px; margin-left: auto; margin-right: auto;">
-        <button type="button" class="btn btn-primary" id="btnFinishCase" style="width: 100%; font-weight: 600;">Volver a la lista de dilemas</button>
+        <button type="button" class="btn btn-primary" id="btnFinishCase" style="width: 100%; font-weight: 600;">${t.btn_back_to_dilemmas || t.player_btn_finish || 'Volver a la lista de dilemas'}</button>
       </div>
     `;
     
     // Renderizar estadísticas de la comunidad
     const statsContainer = resArea.querySelector('#caseCommunityStatsBars');
     if (statsContainer && caso.stats) {
+      const optWord = t.option_word || 'Opción';
+      const userChoiceTag = t.your_final_decision ? ` 👈 (${t.your_final_decision})` : ' 👈 (Tu decisión final)';
       statsContainer.innerHTML = Object.entries(caso.options).map(([key, opt]) => {
         const percentage = caso.stats[key] || 0;
         const isUserChoice = decisionFinal === key;
@@ -2094,7 +2096,7 @@ function cargarCasoInteractivo(caseId) {
           <div class="stats-bar-row" style="margin-bottom: 1rem;">
             <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.35rem;">
               <span style="${isUserChoice ? 'font-weight: 700; color: var(--primary);' : 'color: var(--text-primary);'}">
-                <strong>Opción ${key}</strong> ${isUserChoice ? ' 👈 (Tu decisión final)' : ''}
+                <strong>${optWord} ${key}</strong> ${isUserChoice ? userChoiceTag : ''}
               </span>
               <span style="font-weight: 700; color: var(--text-primary);">${percentage}%</span>
             </div>
@@ -2121,6 +2123,7 @@ function cargarCasoInteractivo(caseId) {
           const caseComments = opinions.filter(op => op.suggestion && op.suggestion.includes(prefix));
           
           if (caseComments.length > 0) {
+            const colleagueWord = t.colleague_word || 'Colega';
             commentsSection.style.display = 'block';
             commentsList.innerHTML = caseComments.map(op => {
               const cleanText = op.suggestion.replace(prefix, '').trim();
@@ -2128,7 +2131,7 @@ function cargarCasoInteractivo(caseId) {
                 <div style="background: var(--bg-main); padding: 0.75rem 1rem; border-radius: 8px; border-left: 4px solid var(--primary); border: 1px solid var(--border); border-left-width: 4px; border-left-color: var(--primary);">
                   <p style="margin: 0; line-height: 1.5; font-style: italic;">"${cleanText}"</p>
                   <small style="color: var(--text-secondary); display: block; margin-top: 0.35rem; font-size: 0.75rem; font-weight: 600;">
-                    — Colega (${op.nivelEducativo || 'Docente'})
+                    — ${colleagueWord} (${op.nivelEducativo || 'Docente'})
                   </small>
                 </div>
               `;
