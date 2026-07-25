@@ -18,6 +18,10 @@ const screens = {
    ======================================== */
 const TRANSLATIONS = {
   es: {
+    diag_kicker: "Diagnóstico guiado",
+    diag_title: "Comenzar el proceso de reflexión crítica de mis prácticas",
+    diag_subtitle: "Este cuestionario interactivo te ayudará a evaluar tu práctica y recibir recomendaciones personalizadas.",
+    step_word: "Paso",
     app_title: "IAG en clave de ética pedagógica",
     btn_authors_label: "Autores",
     btn_authors_title: "¿Quiénes somos?",
@@ -102,6 +106,10 @@ const TRANSLATIONS = {
   },
 
   en: {
+    diag_kicker: "Guided Assessment",
+    diag_title: "Begin the critical reflection process on your practices",
+    diag_subtitle: "This interactive questionnaire will help you evaluate your practice and receive personalized recommendations.",
+    step_word: "Step",
     app_title: "Generative AI in Pedagogical Ethics",
     btn_authors_label: "Authors",
     btn_authors_title: "About us",
@@ -186,6 +194,10 @@ const TRANSLATIONS = {
   },
 
   pt: {
+    diag_kicker: "Diagnóstico guiado",
+    diag_title: "Iniciar o processo de reflexão crítica sobre minhas práticas",
+    diag_subtitle: "Este questionário interativo ajudará você a avaliar sua prática e receber recomendações personalizadas.",
+    step_word: "Passo",
     app_title: "IAG sob a ótica da ética pedagógica",
     btn_authors_label: "Autores",
     btn_authors_title: "Quem somos?",
@@ -270,6 +282,10 @@ const TRANSLATIONS = {
   },
 
   fr: {
+    diag_kicker: "Diagnostic guidé",
+    diag_title: "Commencer le processus de réflexion critique sur mes pratiques",
+    diag_subtitle: "Ce questionnaire interactif vous aidera à évaluer votre pratique et à recevoir des recommandations personnalisées.",
+    step_word: "Étape",
     app_title: "IAG sous l'angle de l'éthique pédagogique",
     btn_authors_label: "Auteurs",
     btn_authors_title: "Qui sommes-nous ?",
@@ -392,6 +408,10 @@ function updateAppLanguage(lang = 'es') {
   if (prevBtn) prevBtn.textContent = t.btn_prev_question || 'Anterior';
   const nextBtn = document.getElementById('nextQuestionBtn');
   if (nextBtn) nextBtn.textContent = t.btn_next_question || 'Siguiente';
+  const onboardingNextBtn = document.getElementById('onboardingNextBtn');
+  if (onboardingNextBtn) onboardingNextBtn.textContent = t.btn_next || 'Siguiente';
+  const onboardingBackBtn = document.getElementById('onboardingBackBtn');
+  if (onboardingBackBtn) onboardingBackBtn.textContent = t.btn_back || 'Anterior';
 
   // 4. Pestañas y acciones de resultados
   const tabSummary = document.getElementById('tabSummary');
@@ -1294,11 +1314,16 @@ function updateOnboardingUI() {
     step.classList.toggle('active', isActive && (!isCountryOther || isCountryOtherVisible()));
   });
 
+  const lang = (window.state && window.state.lang) || 'es';
+  const t = TRANSLATIONS[lang] || TRANSLATIONS['es'];
+
   if (elements.onboardingStepCounter) {
-    elements.onboardingStepCounter.textContent = `Paso ${state.onboardingStep + 1} de ${keys.length}`;
+    const stepWord = t.step_word || 'Paso';
+    const ofWord = t.question_counter_of || 'de';
+    elements.onboardingStepCounter.textContent = `${stepWord} ${state.onboardingStep + 1} ${ofWord} ${keys.length}`;
   }
   if (elements.onboardingStepTitle) {
-    elements.onboardingStepTitle.textContent = ONBOARDING_STEP_META[activeKey]?.title || 'Inicio guiado';
+    elements.onboardingStepTitle.textContent = t[`step_${activeKey}`] || ONBOARDING_STEP_META[activeKey]?.title || 'Punto de partida';
   }
   if (elements.onboardingDots) {
     elements.onboardingDots.style.setProperty('--onboarding-steps', keys.length);
