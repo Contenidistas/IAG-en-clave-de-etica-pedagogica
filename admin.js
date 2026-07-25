@@ -54,6 +54,19 @@
       exportCompletionsBtn: document.getElementById('exportCompletionsBtn'),
       exportFeedbackBtn: document.getElementById('exportFeedbackBtn'),
       exportAnswersBtn: document.getElementById('exportAnswersBtn'),
+      exportComparativeCsvBtn: document.getElementById('exportComparativeCsvBtn'),
+      comparativeView: document.getElementById('comparativeView'),
+      comparativeTableBody: document.getElementById('comparativeTableBody'),
+      compUyCount: document.getElementById('compUyCount'),
+      compUyScore: document.getElementById('compUyScore'),
+      compUyProfiles: document.getElementById('compUyProfiles'),
+      compCaCount: document.getElementById('compCaCount'),
+      compCaScore: document.getElementById('compCaScore'),
+      compCaProfiles: document.getElementById('compCaProfiles'),
+      compOtherCount: document.getElementById('compOtherCount'),
+      compOtherScore: document.getElementById('compOtherScore'),
+      compOtherCountries: document.getElementById('compOtherCountries'),
+      comparativeInsightText: document.getElementById('comparativeInsightText'),
       exportCutZipBtn: document.getElementById('exportCutZipBtn'),
     };
 
@@ -416,6 +429,12 @@
       els.exportAnswersBtn.classList.toggle('hidden', tab !== 'completions');
       els.exportFeedbackBtn.classList.toggle('hidden', tab !== 'feedback');
       els.exportLabFeedbackBtn.classList.toggle('hidden', tab !== 'labFeedback');
+      if (els.exportComparativeCsvBtn) {
+        els.exportComparativeCsvBtn.classList.toggle('hidden', tab !== 'comparative');
+      }
+      if (els.comparativeView) {
+        els.comparativeView.classList.toggle('hidden', tab !== 'comparative');
+      }
       els.tabs.forEach(t => {
         const active = t.dataset.tab === tab;
         t.classList.toggle('active', active);
@@ -425,6 +444,7 @@
       if (tab === 'completions') renderCompletions();
       else if (tab === 'feedback') renderFeedback();
       else if (tab === 'labFeedback') renderLabFeedback();
+      else if (tab === 'comparative') renderComparative();
     }
 
         function renderLabFeedback() {
@@ -549,7 +569,7 @@
     function downloadRowsCsv(filename, rows, columns) {
       const header = columns.join(',');
       const lines = rows.map(row => columns.map(column => csvCell(row[column])).join(','));
-      const blob = new Blob([[header, ...lines].join('\r\n')], { type: 'text/csv;charset=utf-8' });
+      const blob = new Blob(['\uFEFF' + [header, ...lines].join('\r\n')], { type: 'text/csv;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -778,6 +798,9 @@
     els.exportFeedbackBtn.addEventListener('click', () => downloadFilteredCsv('feedback'));
     els.exportLabFeedbackBtn.addEventListener('click', () => downloadFilteredCsv('labFeedback'));
     els.exportAnswersBtn.addEventListener('click', () => downloadFilteredCsv('answers'));
+      if (els.exportComparativeCsvBtn) {
+        els.exportComparativeCsvBtn.addEventListener('click', downloadComparativeCsv);
+      }
     els.selectAllCompletions.addEventListener('change', () => toggleVisibleSelection('completions', els.selectAllCompletions.checked));
     els.selectAllFeedback.addEventListener('change', () => toggleVisibleSelection('feedback', els.selectAllFeedback.checked));
     if (els.selectAllLabFeedback) {
@@ -795,4 +818,119 @@
       loadAll();
     } else {
       els.login.classList.remove('hidden');
+    }
+
+
+    function renderComparative() {
+      if (!els.comparativeTableBody) return;
+
+      const uyRows = state.completions.filter(r => (r.country || 'Uruguay') === 'Uruguay');
+      const caRows = state.completions.filter(r => r.country === 'Canadá');
+      const otherRows = state.completions.filter(r => r.country && r.country !== 'Uruguay' && r.country !== 'Canadá');
+
+      const calcStats = (rows) => {
+        const count = rows.length;
+        if (!count) return { count: 0, avgScore: 0, docentesPct: 0, estudiantesPct: 0, topLevel: 'Sin datos' };
+        const totalScore = rows.reduce((acc, r) => acc + Number(r.evidence || 0), 0);
+        const docentes = rows.filter(r => (r.profileKey || r.profile) === 'docente').length;
+        const estudiantes = rows.filter(r => (r.profileKey || r.profile) === 'estudiante').length;
+        
+        const levelsCount = {};
+        rows.forEach(r => {
+          const l = r.likertLevel || 'Sin dato';
+          levelsCount[l] = (levelsCount[l] || 0) + 1;
+        });
+        const topLevel = Object.keys(levelsCount).sort((a, b) => levelsCount[b] - levelsCount[a])[0] || 'Sin dato';
+
+        return {
+          count,
+          avgScore: Math.round(totalScore / count),
+          docentesPct: Math.round((docentes / count) * 100),
+          estudiantesPct: Math.round((estudiantes / count) * 100),
+          topLevel
+        };
+      };
+
+      const uyStats = calcStats(uyRows);
+      const caStats = calcStats(caRows);
+      const otherStats = calcStats(otherRows);
+
+      if (els.compUyCount) els.compUyCount.textContent = uyStats.count;
+      if (els.compUyScore) els.compUyScore.textContent = uyStats.avgScore;
+      if (els.compUyProfiles) els.compUyProfiles.textContent = `${uyStats.docentesPct}% Docentes / ${uyStats.estudiantesPct}% Estudiantes`;
+
+      if (els.compCaCount) els.compCaCount.textContent = caStats.count;
+      if (els.compCaScore) els.compCaScore.textContent = caStats.avgScore;
+      if (els.compCaProfiles) els.compCaProfiles.textContent = `${caStats.docentesPct}% Docentes / ${caStats.estudiantesPct}% Estudiantes`;
+
+      if (els.compOtherCount) els.compOtherCount.textContent = otherStats.count;
+      if (els.compOtherScore) els.compOtherScore.textContent = otherStats.avgScore;
+      
+      const otherCountriesList = Array.from(new Set(otherRows.map(r => r.country))).filter(Boolean).join(', ') || 'Ninguno';
+      if (els.compOtherCountries) els.compOtherCountries.textContent = otherCountriesList;
+
+      // Actualizar insight de investigación
+      if (els.comparativeInsightText) {
+        if (!uyStats.count && !caStats.count) {
+          els.comparativeInsightText.textContent = 'Aún no hay registros suficientes acumulados para generar la lectura comparativa. Los datos se actualizarán automáticamente a medida que docentes y estudiantes de Uruguay y Canadá completen la herramienta.';
+        } else {
+          els.comparativeInsightText.textContent = `Muestra procesada: Uruguay (N=${uyStats.count}, Puntaje promedio: ${uyStats.avgScore}/100) | Canadá (N=${caStats.count}, Puntaje promedio: ${caStats.avgScore}/100). Este panel permite contrastar la madurez de apropiación ética entre ambos sistemas educativos para la redacción de publicaciones científicas.`;
+        }
+      }
+
+      // Renderizar tabla comparativa
+      const labUyCount = state.feedback.filter(r => (r.country || 'Uruguay') === 'Uruguay' && r.suggestion && r.suggestion.startsWith('=CHOICE=')).length;
+      const labCaCount = state.feedback.filter(r => r.country === 'Canadá' && r.suggestion && r.suggestion.startsWith('=CHOICE=')).length;
+      const labOtherCount = state.feedback.filter(r => r.country && r.country !== 'Uruguay' && r.country !== 'Canadá' && r.suggestion && r.suggestion.startsWith('=CHOICE=')).length;
+
+      els.comparativeTableBody.innerHTML = `
+        <tr>
+          <td><strong>🇺🇾 Uruguay</strong></td>
+          <td>${uyStats.count}</td>
+          <td>${uyStats.docentesPct}%</td>
+          <td>${uyStats.estudiantesPct}%</td>
+          <td><span class="badge ok">${uyStats.avgScore}/100</span></td>
+          <td>${escapeHtml(uyStats.topLevel)}</td>
+          <td>${labUyCount}</td>
+        </tr>
+        <tr>
+          <td><strong>🇨🇦 Canadá</strong></td>
+          <td>${caStats.count}</td>
+          <td>${caStats.docentesPct}%</td>
+          <td>${caStats.estudiantesPct}%</td>
+          <td><span class="badge ok">${caStats.avgScore}/100</span></td>
+          <td>${escapeHtml(caStats.topLevel)}</td>
+          <td>${labCaCount}</td>
+        </tr>
+        <tr>
+          <td><strong>🌐 Resto del Mundo</strong></td>
+          <td>${otherStats.count}</td>
+          <td>${otherStats.docentesPct}%</td>
+          <td>${otherStats.estudiantesPct}%</td>
+          <td><span class="badge warn">${otherStats.avgScore}/100</span></td>
+          <td>${escapeHtml(otherStats.topLevel)}</td>
+          <td>${labOtherCount}</td>
+        </tr>
+      `;
+    }
+
+    function downloadComparativeCsv() {
+      const rows = state.completions.map(r => ({
+        id: r.id,
+        timestamp: r.timestamp,
+        country: r.country || 'Uruguay',
+        countryStandardized: r.country === 'Uruguay' ? 'UY' : (r.country === 'Canadá' ? 'CA' : 'OTHER'),
+        profileKey: r.profileKey || r.profile,
+        nivelEducativo: r.nivelEducativo || '',
+        familiaridadInicial: r.familiaridadInicial || '',
+        recursosSimilares: r.recursosSimilares || '',
+        evidenceScore: r.evidence ?? 0,
+        likertLevel: r.likertLevel || '',
+        answersCount: r.answersCount || 0
+      }));
+
+      downloadRowsCsv('dataset_investigacion_comparativa_uy_ca.csv', rows, [
+        'id', 'timestamp', 'country', 'countryStandardized', 'profileKey', 'nivelEducativo',
+        'familiaridadInicial', 'recursosSimilares', 'evidenceScore', 'likertLevel', 'answersCount'
+      ]);
     }
