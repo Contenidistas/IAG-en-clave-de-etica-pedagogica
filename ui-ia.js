@@ -64,6 +64,12 @@ const TRANSLATIONS = {
     btn_start_game: "Comenzar autodiagnóstico",
     guidance_title: "Campos pendientes por completar:",
 
+    btn_yes: "Sí",
+    btn_sometimes: "A veces",
+    btn_no: "No",
+    btn_na: "No aplica",
+    btn_prev_question: "Anterior",
+    btn_next_question: "Siguiente",
     btn_abort: "Volver al inicio",
     question_counter: "Pregunta",
     question_counter_of: "de",
@@ -76,11 +82,23 @@ const TRANSLATIONS = {
     btn_copy_summary: "Copiar resumen",
     btn_download_pdf: "Descargar PDF",
     btn_restart: "Volver al inicio / Reiniciar",
+    cases_section_title: "Laboratorio de casos / Dilemas para debatir",
 
     lab_title: "Laboratorio de casos situados",
     lab_subtitle: "Análisis de dilemas éticos y pedagógicos para la toma de decisiones",
     btn_analyze_dilemma: "Analizar dilema",
-    btn_download_ficha: "Descargar ficha PDF (Taller)"
+    btn_download_ficha: "Descargar ficha PDF (Taller)",
+
+    level_primaria: "Primaria",
+    level_media_basica: "Enseñanza Media Básica",
+    level_media_superior: "Enseñanza Media Superior",
+    level_formacion_docente: "Formación Docente",
+    level_universitaria: "Universitaria",
+    level_terciaria_tecnica: "Educación Terciaria Técnica",
+
+    modal_authors_title: "¿Quiénes somos? — Autores de la app",
+    author_santi_role: "Creador y desarrollador de la app. Investigador y divulgador. Prof. de Informática especializado en Tecnología Educativa.",
+    author_diego_role: "Investigador y colaborador pedagógico. Prof. de Informática."
   },
 
   en: {
@@ -130,6 +148,12 @@ const TRANSLATIONS = {
     btn_start_game: "Start self-assessment",
     guidance_title: "Pending fields to complete:",
 
+    btn_yes: "Yes",
+    btn_sometimes: "Sometimes",
+    btn_no: "No",
+    btn_na: "Not applicable",
+    btn_prev_question: "Previous",
+    btn_next_question: "Next",
     btn_abort: "Return to start",
     question_counter: "Question",
     question_counter_of: "of",
@@ -142,11 +166,23 @@ const TRANSLATIONS = {
     btn_copy_summary: "Copy summary",
     btn_download_pdf: "Download PDF",
     btn_restart: "Return to start / Restart",
+    cases_section_title: "Case Laboratory / Dilemmas for debate",
 
     lab_title: "Situated Cases Laboratory",
     lab_subtitle: "Analysis of ethical and pedagogical dilemmas for decision-making",
     btn_analyze_dilemma: "Analyze dilemma",
-    btn_download_ficha: "Download PDF Worksheet (Workshop)"
+    btn_download_ficha: "Download PDF Worksheet (Workshop)",
+
+    level_primaria: "Primary Education",
+    level_media_basica: "Lower Secondary Education",
+    level_media_superior: "Upper Secondary / High School",
+    level_formacion_docente: "Teacher Education",
+    level_universitaria: "University / Higher Education",
+    level_terciaria_tecnica: "Technical Higher Education",
+
+    modal_authors_title: "About us — App authors",
+    author_santi_role: "App creator and developer. Researcher and communicator. Computer Science Professor specialized in Educational Technology.",
+    author_diego_role: "Researcher and pedagogical collaborator. Computer Science Professor."
   },
 
   pt: {
@@ -196,6 +232,12 @@ const TRANSLATIONS = {
     btn_start_game: "Iniciar autodiagnóstico",
     guidance_title: "Campos pendentes a preencher:",
 
+    btn_yes: "Sim",
+    btn_sometimes: "Às vezes",
+    btn_no: "Não",
+    btn_na: "Não se aplica",
+    btn_prev_question: "Anterior",
+    btn_next_question: "Avançar",
     btn_abort: "Voltar ao início",
     question_counter: "Pergunta",
     question_counter_of: "de",
@@ -208,11 +250,23 @@ const TRANSLATIONS = {
     btn_copy_summary: "Copiar resumo",
     btn_download_pdf: "Baixar PDF",
     btn_restart: "Voltar ao início / Reiniciar",
+    cases_section_title: "Laboratório de casos / Dilemas para debater",
 
     lab_title: "Laboratório de casos situados",
     lab_subtitle: "Análise de dilemas éticos e pedagógicos para a tomada de decisões",
     btn_analyze_dilemma: "Analisar dilema",
-    btn_download_ficha: "Baixar ficha PDF (Oficina)"
+    btn_download_ficha: "Baixar ficha PDF (Oficina)",
+
+    level_primaria: "Ensino Fundamental I",
+    level_media_basica: "Ensino Fundamental II",
+    level_media_superior: "Ensino Médio",
+    level_formacion_docente: "Formação Docente / Licenciatura",
+    level_universitaria: "Ensino Superior / Universidade",
+    level_terciaria_tecnica: "Educação Terciária Técnica",
+
+    modal_authors_title: "Quem somos? — Autores do aplicativo",
+    author_santi_role: "Criador e desenvolvedor do aplicativo. Pesquisador e divulgador. Prof. de Informática especializado em Tecnologia Educacional.",
+    author_diego_role: "Pesquisador e colaborador pedagógico. Prof. de Informática."
   },
 
   fr: {
@@ -262,6 +316,12 @@ const TRANSLATIONS = {
     btn_start_game: "Démarrer l'auto-évaluation",
     guidance_title: "Champs en attente de complétion :",
 
+    btn_yes: "Oui",
+    btn_sometimes: "Parfois",
+    btn_no: "Non",
+    btn_na: "Non applicable",
+    btn_prev_question: "Précédent",
+    btn_next_question: "Suivant",
     btn_abort: "Retour au début",
     question_counter: "Question",
     question_counter_of: "sur",
@@ -274,19 +334,32 @@ const TRANSLATIONS = {
     btn_copy_summary: "Copier le résumé",
     btn_download_pdf: "Télécharger le PDF",
     btn_restart: "Retour au début / Réinitialiser",
+    cases_section_title: "Laboratoire de cas / Dilemmes à débattre",
 
     lab_title: "Laboratoire de cas situés",
     lab_subtitle: "Analyse de dilemmes éthiques et pédagogiques pour la prise de décision",
     btn_analyze_dilemma: "Analyser le dilemme",
-    btn_download_ficha: "Télécharger fiche PDF (Atelier)"
+    btn_download_ficha: "Télécharger fiche PDF (Atelier)",
+
+    level_primaria: "École Élémentaire",
+    level_media_basica: "Collège (Enseignement Secondaire Inférieur)",
+    level_media_superior: "Lycée (Enseignement Secondaire Supérieur)",
+    level_formacion_docente: "Formation Enseignante (INSPE)",
+    level_universitaria: "Enseignement Supérieur / Université",
+    level_terciaria_tecnica: "Enseignement Supérieur Technique",
+
+    modal_authors_title: "Qui sommes-nous ? — Auteurs de l'application",
+    author_santi_role: "Créateur et développeur de l'application. Chercheur et vulgarisateur. Prof. d'Informatique spécialisé en Technologie Éducative.",
+    author_diego_role: "Chercheur et colaborador pédagogique. Prof. d'Informatique."
   }
 };
 
 function updateAppLanguage(lang = 'es') {
   const t = TRANSLATIONS[lang] || TRANSLATIONS['es'];
   document.documentElement.lang = lang;
+  if (window.state) window.state.lang = lang;
 
-  // Actualizar textos con atributo data-i18n
+  // 1. Elementos con data-i18n
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.dataset.i18n;
     if (t[key]) {
@@ -294,7 +367,7 @@ function updateAppLanguage(lang = 'es') {
     }
   });
 
-  // Actualizar placeholders
+  // 2. Placeholders con data-i18n-placeholder
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     const key = el.dataset.i18nPlaceholder;
     if (t[key]) {
@@ -302,16 +375,60 @@ function updateAppLanguage(lang = 'es') {
     }
   });
 
-  // Actualizar títulos de ONBOARDING_STEP_META
+  // 3. Botones del juego
+  const yesBtn = document.getElementById('yesBtn');
+  if (yesBtn) yesBtn.textContent = t.btn_yes || 'Sí';
+  const sometimesBtn = document.getElementById('sometimesBtn');
+  if (sometimesBtn) sometimesBtn.textContent = t.btn_sometimes || 'A veces';
+  const noBtn = document.getElementById('noBtn');
+  if (noBtn) noBtn.textContent = t.btn_no || 'No';
+  const naBtn = document.getElementById('notApplicableBtn');
+  if (naBtn) naBtn.textContent = t.btn_na || 'No aplica';
+  const abortBtn = document.getElementById('btnAbortGame');
+  if (abortBtn) abortBtn.textContent = t.btn_abort || 'Volver al inicio';
+  const helpBtn = document.getElementById('toggleHelpBtn');
+  if (helpBtn) helpBtn.textContent = t.help_toggle || 'Ayuda pedagógica';
+  const prevBtn = document.getElementById('prevQuestionBtn');
+  if (prevBtn) prevBtn.textContent = t.btn_prev_question || 'Anterior';
+  const nextBtn = document.getElementById('nextQuestionBtn');
+  if (nextBtn) nextBtn.textContent = t.btn_next_question || 'Siguiente';
+
+  // 4. Pestañas y acciones de resultados
+  const tabSummary = document.getElementById('tabSummary');
+  if (tabSummary) tabSummary.textContent = t.tab_summary || 'Resumen del tránsito';
+  const tabSuggestions = document.getElementById('tabSuggestions');
+  if (tabSuggestions) tabSuggestions.textContent = t.tab_suggestions || 'Sugerencias de mejora';
+  const tabProposals = document.getElementById('tabProposals');
+  if (tabProposals) tabProposals.textContent = t.tab_proposals || 'Propuestas de acción';
+  const copyBtn = document.getElementById('copySummaryBtn');
+  if (copyBtn) copyBtn.textContent = t.btn_copy_summary || 'Copiar resumen';
+  const downloadBtn = document.getElementById('downloadPdfBtn');
+  if (downloadBtn) downloadBtn.textContent = t.btn_download_pdf || 'Descargar PDF';
+  const restartBtn = document.getElementById('restartBtn');
+  if (restartBtn) restartBtn.textContent = t.btn_restart || 'Volver al inicio / Reiniciar';
+
+  // 5. Laboratorio de casos
+  const casesTitle = document.getElementById('situatedCasesTitle');
+  if (casesTitle) casesTitle.textContent = t.cases_section_title || 'Laboratorio de casos / Dilemas para debatir';
+  const labSub = document.getElementById('labSubtitle');
+  if (labSub) labSub.textContent = t.lab_subtitle || 'Análisis de dilemas éticos y pedagógicos para la toma de decisiones';
+
+  // 6. Títulos de ONBOARDING_STEP_META
   if (typeof ONBOARDING_STEP_META !== 'undefined' && ONBOARDING_STEP_META) {
     if (ONBOARDING_STEP_META.perfil) ONBOARDING_STEP_META.perfil.title = t.step_perfil;
     if (ONBOARDING_STEP_META.contexto) ONBOARDING_STEP_META.contexto.title = t.step_contexto;
     if (ONBOARDING_STEP_META.cierre) ONBOARDING_STEP_META.cierre.title = t.step_cierre;
   }
 
-  // Refrescar la interfaz de onboarding
+  // 7. Refrescar UI de onboarding y niveles si están activos
   if (typeof updateOnboardingUI === 'function') {
     updateOnboardingUI();
+  }
+  if (window.state && window.state.profile && typeof updateNivelEducativo === 'function') {
+    updateNivelEducativo(window.state.profile);
+  }
+  if (typeof updateProgress === 'function' && window.state && window.state.currentQuestion) {
+    updateProgress();
   }
 }
 
@@ -465,17 +582,18 @@ const elements = {
    ======================================== */
 const NIVELES_EDUCATIVOS = {
   docente: [
-    'Primaria',
-    'Enseñanza Media Básica',
-    'Enseñanza Media Superior',
-    'Formación Docente',
-    'Universitaria'
+    { key: 'level_primaria', default: 'Primaria' },
+    { key: 'level_media_basica', default: 'Enseñanza Media Básica' },
+    { key: 'level_media_superior', default: 'Enseñanza Media Superior' },
+    { key: 'level_formacion_docente', default: 'Formación Docente' },
+    { key: 'level_universitaria', default: 'Universitaria' }
   ],
   estudiante: [
-    'Enseñanza Media Básica',
-    'Enseñanza Media Superior',
-    'Formación Docente',
-    'Universitaria'
+    { key: 'level_media_basica', default: 'Enseñanza Media Básica' },
+    { key: 'level_media_superior', default: 'Enseñanza Media Superior' },
+    { key: 'level_terciaria_tecnica', default: 'Educación Terciaria Técnica' },
+    { key: 'level_formacion_docente', default: 'Formación Docente' },
+    { key: 'level_universitaria', default: 'Universitaria' }
   ]
 };
 
@@ -741,7 +859,11 @@ function updateNivelEducativo(perfil) {
   elements.nivelEducativo.innerHTML = '<option value="">Seleccioná una opción</option>';
 
   // Cargar opciones según perfil
-  const niveles = NIVELES_EDUCATIVOS[perfil] || [];
+  const lang = (window.state && window.state.lang) || 'es';
+  const t = TRANSLATIONS[lang] || TRANSLATIONS['es'];
+  const nivelesObj = NIVELES_EDUCATIVOS[perfil] || [];
+  const niveles = nivelesObj.map(item => t[item.key] || item.default);
+  
   niveles.forEach(nivel => {
     const option = document.createElement('option');
     option.value = nivel;
