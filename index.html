@@ -1004,18 +1004,18 @@
       <div class="card mt-3 feedback-survey" id="toolFeedbackCard">
         <div class="feedback-survey-header">
           <div>
-            <p class="section-kicker">Mejora continua</p>
-            <h3>Valorá esta herramienta</h3>
+            <p class="section-kicker" data-i18n="rating_kicker">Mejora continua</p>
+            <h3 data-i18n="rating_title">Valorá esta herramienta</h3>
           </div>
-          <span class="feedback-survey-badge">Anónimo</span>
+          <span class="feedback-survey-badge" data-i18n="rating_badge">Anónimo</span>
         </div>
 
-        <p class="feedback-survey-copy">
+        <p class="feedback-survey-copy" data-i18n="rating_copy">
           Tu valoración y tus sugerencias nos ayudan a ajustar la herramienta desde la experiencia real de quienes la usan. Los comentarios pueden mostrarse de forma anónima en el inicio.
         </p>
 
         <div class="feedback-survey-field">
-          <span class="feedback-survey-label">Valoración general</span>
+          <span class="feedback-survey-label" data-i18n="rating_label">Valoración general</span>
           <div class="rating-options" role="radiogroup" aria-label="Valoración de la herramienta">
             <label class="rating-option">
               <input type="radio" name="toolRating" value="1">
@@ -1041,12 +1041,12 @@
         </div>
 
         <div class="feedback-survey-field">
-          <label for="toolSuggestion" class="feedback-survey-label">Sugerencias, comentarios o aspectos a mejorar</label>
-          <textarea id="toolSuggestion" class="input feedback-textarea" rows="4" maxlength="800" placeholder="Escribí aquí tu sugerencia..."></textarea>
+          <label for="toolSuggestion" class="feedback-survey-label" data-i18n="rating_comments_label">Sugerencias, comentarios o aspectos a mejorar</label>
+          <textarea id="toolSuggestion" class="input feedback-textarea" rows="4" maxlength="800" data-i18n-placeholder="rating_placeholder" placeholder="Escribí aquí tu sugerencia..."></textarea>
         </div>
 
         <div class="feedback-survey-actions">
-          <button class="btn btn-primary" id="sendToolFeedbackBtn" type="button">Enviar valoración</button>
+          <button class="btn btn-primary" id="sendToolFeedbackBtn" type="button" data-i18n="btn_send_rating">Enviar valoración</button>
           <p id="toolFeedbackStatus" class="feedback-survey-status" aria-live="polite"></p>
         </div>
       </div>

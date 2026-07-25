@@ -1517,6 +1517,288 @@ function abrirLaboratorioCasos() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+const CASOS_CONTENT_TRANSLATIONS = {
+  en: {
+    privacidad: {
+      story: "A secondary school teacher wants to adapt materials for 12 students with reasonable adjustments related to dyslexia and ADHD in a class of 35. To do this, they input detailed psychopedagogical profile descriptions taken directly from reports into a public LLM without names.",
+      dilemma: "How can generative AI be used to personalize teaching and foster inclusion without compromising data protection, student dignity, or pedagogical judgment?",
+      options: {
+        A: { text: "Use the generated adaptations, since names were removed and the purpose is purely pedagogical.", feedback: "<strong>Analysis of option A (Risky):</strong> Although names are removed, psychopedagogical reports contain sensitive data. Specific diagnostic combinations create re-identifiable profiles and violate minors' privacy when feeding commercial models." },
+        B: { text: "Use AI only to generate general activity ideas, avoiding inputting detailed student report descriptions.", feedback: "<strong>Analysis of option B (Prudent):</strong> Aligns with data minimization criteria. By not exposing individual student descriptions, the teacher acts preventively, reserving individual pedagogical analysis for their professional judgment." },
+        C: { text: "Describe pedagogical barriers and supports generically in the prompt, without inputting individualized student profiles.", feedback: "<strong>Analysis of option C (Pedagogically sound / UDL Approach):</strong> Promotes active inclusion under Universal Design for Learning (UDL). Aligning queries with generic barriers avoids algorithmic labeling and ensures accommodations benefit the whole group equally." },
+        D: { text: "Use it under explicit data minimization prompt conditions, critical review of proposals, and informed consent.", feedback: "<strong>Analysis of option D (Comprehensive / Institutional):</strong> Follows governance recommendations. Requires verifying software privacy policies (preventing model retraining) and institutionally coordinating practices." }
+      }
+    },
+    sesgos: {
+      story: "A literature teacher uses generative AI to design a module on contemporary Latin American literature and ask for author recommendations. The system generates a curriculum consisting 100% of male writers from the Río de la Plata region. When asked to diversify the list with female authors from other Latin American countries, the AI invents names, biographies, and fictitious books.",
+      dilemma: "How can we guarantee equity and cultural representation in teaching materials against AI biases and hallucinations?",
+      options: {
+        A: { text: "Accept the first generated syllabus because it includes recognized authors and speeds up planning work.", feedback: "<strong>Analysis of option A (Inadequate):</strong> Passively reproduces representation bias that experts highlight as a critical issue in models trained on majority web corpora." },
+        B: { text: "Use the initial list and manually complement it by researching digital libraries and academic catalogs.", feedback: "<strong>Analysis of option B (Correct):</strong> Agrees with teacher critical curation guidelines. AI is used as an initial trigger, but curricular sovereignty and methodological rigor rest with the teacher." },
+        C: { text: "Insist that the AI balance the list but strictly check and verify every suggested name and book before including them.", feedback: "<strong>Analysis of option C (Necessary and critical):</strong> Shows clear understanding of algorithmic hallucinations. Generative AIs operate on probability, not truth, so every suggestion must be validated." },
+        D: { text: "Analyze the biased list and model hallucinations with students to critically discuss bias in algorithms.", feedback: "<strong>Analysis of option D (Pedagogically powerful):</strong> Turns a technological limitation into a learning opportunity. Aligns with digital citizenship and critical thinking goals." }
+      }
+    },
+    agencia: {
+      story: "A school adopts an AI-assisted intelligent tutoring platform. The protocol establishes that teachers must follow automated learning paths and use grades assigned by the algorithm. A teacher notices that the AI graded as 'incorrect' a student's creative mathematical exercise that demonstrated excellent conceptual understanding.",
+      dilemma: "How can teacher professional autonomy and students' right to creativity be sustained against the standardization and efficiency of automatic evaluation systems?",
+      options: {
+        A: { text: "Keep the AI grade to comply with school protocol and ensure system consistency.", feedback: "<strong>Analysis of option A (Risky):</strong> Violates the principle of Human Oversight and evaluation guidelines that prohibit delegating final grades to automated systems." },
+        B: { text: "Manually modify the grade in the gradebook without informing the system or coordinators to avoid conflicts.", feedback: "<strong>Analysis of option B (Evasive):</strong> Resolves the individual case but avoids necessary pedagogical and institutional discussion." },
+        C: { text: "Explain the algorithm error to the student, manually re-evaluate, and submit a technical/pedagogical report to school management.", feedback: "<strong>Analysis of option C (Responsible):</strong> Exercises professional autonomy. Positions the teacher as ethical guarantor of evaluation and generates institutional feedback." },
+        D: { text: "Host a debate in class to contrast rigid machine logic with human heuristic and free thinking.", feedback: "<strong>Analysis of option D (Formative):</strong> Excellent educational proposal. Develops metacognition and technical understanding of the student body." }
+      }
+    },
+    transparencia: {
+      story: "A student submits an assignment that formally meets all requirements but uses technical vocabulary and phrasing identical to AI outputs. The student denies using AI and claims full authorship. School rules classify uncited AI use as plagiarism. The teacher knows AI detectors are unreliable and yield false positives.",
+      dilemma: "How to address suspected undeclared AI use formatively, maintaining trust and dialogue, instead of resorting directly to penalization?",
+      options: {
+        A: { text: "Apply regulations directly based on visual suspicion and penalize the assignment.", feedback: "<strong>Analysis of option A (Not recommended):</strong> Violates the principle of pedagogical innocence. Visual suspicion without dialogue damages classroom trust." },
+        B: { text: "Run the assignment through online AI detectors and penalize if probability exceeds 80%.", feedback: "<strong>Analysis of option B (Inadequate):</strong> AI detectors yield abundant false positives. Their use as proof is strongly discouraged due to lack of scientific rigor." },
+        C: { text: "Invite the student to a feedback session to discuss their writing process and explain key concepts orally.", feedback: "<strong>Analysis of option C (Formative and fair):</strong> Uses pedagogical mediation. Focuses assessment on oral defense of conceptual understanding." },
+        D: { text: "Propose a resubmission requiring process documentation via drafts, edit history, or a prompt log.", feedback: "<strong>Analysis of option D (Pedagogically sound):</strong> Focuses on process traceability, turning submission into an agreement where reflection holds value." }
+      }
+    },
+    equidad: {
+      story: "A media design teacher proposes a project using image generative AI to illustrate a technical script. The institute lacks paid institutional accounts. Half the students use premium family accounts (obtaining high-res images in seconds), while the rest use free accounts with daily credit limits and watermarks.",
+      dilemma: "How to design and evaluate tasks based on cutting-edge technologies while guaranteeing educational justice and equity across socioeconomic differences?",
+      options: {
+        A: { text: "Evaluate the final visual output equally, since access to better tools is part of the real-world context.", feedback: "<strong>Analysis of option A (Unfair):</strong> Validates the digital subscription gap, indirectly penalizing lack of financial resources." },
+        B: { text: "Focus rubric and evaluation on narrative consistency and technical script justification, not AI aesthetic quality.", feedback: "<strong>Analysis of option B (Equitable):</strong> Neutralizes technological inequality by evaluating metacognitive processes, narrative creativity, and conceptual mastery." },
+        C: { text: "Allow traditional illustration or free image repositories for students who cannot or do not wish to use AI.", feedback: "<strong>Analysis of option C (Inclusive):</strong> Protects methodological plurality, ensuring AI access is not mandatory when it creates digital exclusion." },
+        D: { text: "Restrict AI use to free tools guaranteed by the school or prohibit premium versions in submissions.", feedback: "<strong>Analysis of option D (Leveling):</strong> Ensures equitable conditions for the group, preventing paid software advantages from skewing academic dynamics." }
+      }
+    },
+    delegacion: {
+      story: "In a high school/college course, a teacher assigns an argumentative essay. To speed up work, several students ask AI to write the full structure, thesis, and conclusions. Students review text superficially, but during oral presentations, they fail to explain or defend key concepts, stating 'the AI wrote it that way and sounded convincing'.",
+      dilemma: "How to manage AI use to promote critical learning without falling into passive cognitive offloading that atrophies student autonomy and independent thinking?",
+      options: {
+        A: { text: "Ban AI for outlining and writing, requiring handwritten class drafts without internet.", feedback: "<strong>Analysis of option A (Rigid):</strong> Protects immediate work, but absolute bans ignore digital context and fail to teach self-regulation." },
+        B: { text: "Require a process log and oral defense where students declare AI-assisted parts and justify decisions.", feedback: "<strong>Analysis of option B (Formative & Sound):</strong> Preserves human agency by keeping cognitive control with the student to evaluate and contrast text." },
+        C: { text: "Accept AI-written work as long as the student adds a one-page personal reflection annex at the end.", feedback: "<strong>Analysis of option C (Insufficient):</strong> Adding an annex does not guarantee conceptual processing prior to submission." },
+        D: { text: "Use AI in class as a 'debate partner' (counter-arguer), asking the machine to challenge student theses.", feedback: "<strong>Analysis of option D (Agency-enhancing):</strong> Excellent didactic strategy. Reverses traditional roles: the human thinks and decides while AI acts as cognitive provocateur." }
+      }
+    },
+    tfg_docente: {
+      story: "A student teacher submits a thesis proposal on inclusive education. The committee notes state-of-the-art literature review is impeccably structured. However, the student admits using generative AI to read, summarize, and write entire theoretical chapters from brief notes without reading original books.",
+      dilemma: "How to regulate AI use in teacher training thesis research so it acts as valid scaffolding without undermining conceptual ownership and academic honesty?",
+      options: {
+        A: { text: "Cancel project progress and demand full theoretical framework rewrite without digital assistance.", feedback: "<strong>Analysis of option A (Punitive):</strong> Punitive cancellation fails to teach future educators how to critically use AI as a professional tool." },
+        B: { text: "Accept generated text as long as bibliographic citations truly exist in academic literature.", feedback: "<strong>Analysis of option B (Insufficient):</strong> Existing citations do not guarantee student comprehension or pedagogical criteria building." },
+        C: { text: "Require primary source reading logs and restructuring where the student explicitly states their critical position.", feedback: "<strong>Analysis of option C (Formative & Rigorous):</strong> Restores human agency and conceptual appropriation recommended by guidelines." },
+        D: { text: "Implement a defense seminar evaluating the candidate's ability to apply concepts to real classroom situations.", feedback: "<strong>Analysis of option D (Process evaluation):</strong> Aligns with competency assessment, shifting focus from written product to ethical practical capability." }
+      }
+    },
+    coconstruccion_codex: {
+      story: "In a software development course, students submit a web app that works perfectly. During code review, the instructor notices advanced architectural patterns generated by code assistants (Copilot/Codex). When asked to explain execution flow or fix a small intentional bug, the team is unable to debug or modify the code.",
+      dilemma: "How to integrate AI coding assistants in programming education while promoting productivity without sacrificing algorithmic understanding and debugging ability?",
+      options: {
+        A: { text: "Fail the submission, considering code was not manually written by students.", feedback: "<strong>Analysis of option A (Disconnected from industry):</strong> Ignores that AI pair-programming is a standard industry skill." },
+        B: { text: "Pass the project if it meets integration tests, without evaluating code reading comprehension.", feedback: "<strong>Analysis of option B (Inadequate):</strong> Promotes black-box development. Professionals must be able to audit and maintain delivered code." },
+        C: { text: "Mandate prompt documentation and an oral Code Review where students defend code logic line by line.", feedback: "<strong>Analysis of option C (Formative & Professional):</strong> Maintains student technical sovereignty, requiring them to understand and modify AI solutions." },
+        D: { text: "Require unit tests and architecture diagrams before requesting AI code suggestions.", feedback: "<strong>Analysis of option D (Methodologically sound):</strong> Reverses development cycle: human defines architecture and tests, AI writes repetitive code." }
+      }
+    }
+  },
+  pt: {
+    privacidad: {
+      story: "Um professor do ensino médio deseja adaptar seus materiais para 12 estudantes com orientações de ajustes razoáveis vinculadas a dislexia e TDAH em uma turma de 35. Para isso, insere descrições de perfis retiradas de relatórios psicopedagógicos detalhados em um modelo de linguagem público sem nomes.",
+      dilemma: "Como a IA generativa pode ser usada para personalizar o ensino e favorecer a inclusão sem comprometer a proteção de dados, a dignidade dos estudantes nem o julgamento pedagógico?",
+      options: {
+        A: { text: "Usar as adaptações obtidas, já que os nomes foram removidos e o propósito é puramente pedagógico.", feedback: "<strong>Análise da opção A (Arriscada):</strong> Embora não haja nomes, os relatórios contêm dados sensíveis. Combinações diagnósticas criam perfis reidentificáveis e violam a privacidade." },
+        B: { text: "Usar a IA apenas para gerar ideias de atividades gerais, evitando inserir descrições detalhadas de estudantes.", feedback: "<strong>Análise da opção B (Prudente):</strong> Alinha-se aos critérios de minimização de dados, atuando preventivamente e reservando a análise pedagógica para o critério docente." },
+        C: { text: "Descrever as barreiras pedagógicas e apoios de forma genérica no prompt, sem inserir perfis individualizados de estudantes.", feedback: "<strong>Análise da opção C (Pedagogicamente sólida / Abordagem DUA):</strong> Promove a inclusão ativa sob o Desenho Universal para a Aprendizagem (DUA), evitando rotulagem algorítmica." },
+        D: { text: "Utilizá-la sob condições explícitas de minimização de dados no prompt, revisão crítica das propostas e consentimento informado.", feedback: "<strong>Análise da opção D (Integral / Institucional):</strong> Segue recomendações de governança, exigindo verificar políticas de privacidade do software antes do uso." }
+      }
+    },
+    sesgos: {
+      story: "Um professor de literatura utiliza IA generativa para planejar um módulo sobre literatura latino-americana contemporânea. O sistema gera um programa composto 100% por escritores masculinos da região do Rio da Prata. Ao solicitar a inclusão de autoras de outros países, a IA inventa nomes, biografias e livros fictícios.",
+      dilemma: "Como podemos garantir equidade e representatividade cultural nos materiais de ensino diante dos vieses e alucinações da IA?",
+      options: {
+        A: { text: "Aceitar o primeiro programa gerado porque inclui autores reconhecidos e acelera o trabalho de planejamento.", feedback: "<strong>Análise da opção A (Inadequada):</strong> Reproduz passivamente o viés de representatividade de modelos treinados com corpora maioritários." },
+        B: { text: "Usar a lista inicial e complementá-la manualmente pesquisando em bibliotecas digitais e catálogos acadêmicos.", feedback: "<strong>Análise da opção B (Correta):</strong> Concorda com a curadoria crítica docente. A IA é ponto de partida, mas a soberania curricular descansa no professor." },
+        C: { text: "Insistir para que a IA equilibre a lista, mas checar e contrastar rigorosamente cada nome e livro sugerido antes de incluí-los.", feedback: "<strong>Análise da opção C (Necessária e crítica):</strong> Demonstra compreensão sobre as alucinações algorítmicas. IAs operam por probabilidade e tudo deve ser validado." },
+        D: { text: "Analisar a lista com viés e as alucinações do modelo junto com os estudantes para discutir criticamente o viés nos algoritmos.", feedback: "<strong>Análise da opção D (Pedagogicamente potente):</strong> Transforma uma limitação tecnológica em oportunidade didática para cidadania digital." }
+      }
+    },
+    agencia: {
+      story: "Uma escola adota uma plataforma de tutoria inteligente assistida por IA. O protocolo estabelece que os professores devem seguir as rotas automatizadas e as notas do algoritmo. Um professor nota que a IA classificou como 'incorreto' o exercício criativo de um aluno que demonstrava excelente compreensão conceitual.",
+      dilemma: "Como sustentar a autonomia profissional do professor e o direito dos alunos à criatividade diante da padronização de sistemas automáticos de avaliação?",
+      options: {
+        A: { text: "Manter a nota da IA para respeitar o protocolo do centro e garantir a consistência do sistema.", feedback: "<strong>Análise da opção A (Arriscada):</strong> Viola o princípio de Supervisão Humana que proíbe delegar notas finais a sistemas automatizados." },
+        B: { text: "Modificar manualmente a nota na caderneta do professor sem informar o sistema nem os coordenadores.", feedback: "<strong>Análise da opção B (Evasiva):</strong> Resolve o caso individual, mas esquiva a discussão pedagógica e institucional necessária." },
+        C: { text: "Explicar o erro do algoritmo ao aluno, reavaliar manualmente e enviar um relatório técnico/pedagógico à direção.", feedback: "<strong>Análise da opção C (Responsável):</strong> Exerce a autonomia profissional. Situa o professor como garante ético da avaliação." },
+        D: { text: "Realizar um debate em sala de aula para contrastar a lógica rígida da máquina com o pensamento heurístico humano.", feedback: "<strong>Análise da opção D (Formativa):</strong> Excelente proposta didática. Desenvolve a metacognição e a compreensão dos limites computacionais." }
+      }
+    },
+    transparencia: {
+      story: "Uma aluna entrega um trabalho que cumpre as instruções, mas usa vocabulário técnico idêntico às saídas de IA. A aluna nega ter usado IA e afirma ser a autora. Os regulamentos classificam o uso não citado como plágio. O professor sabe que detectores de IA produzem falsos positivos.",
+      dilemma: "Como abordar a suspeita de uso não declarado de IA de forma formativa e mantendo a confiança em vez de recorrer à punição direta?",
+      options: {
+        A: { text: "Aplicar o regulamento diretamente com base na suspeita visual e penalizar a entrega.", feedback: "<strong>Análise da opção A (Pouco recomendável):</strong> Viola a presunção de inocência pedagógica. Suspeitas sem diálogo deterioram o clima escolar." },
+        B: { text: "Passar o trabalho por detectores de IA online e aplicar sanção se a probabilidade ultrapassar 80%.", feedback: "<strong>Análise da opção B (Inadequada):</strong> Detectores de IA geram abundantes falsos positivos e seu uso como prova é desaconselhado." },
+        C: { text: "Convidar a aluna para uma conversa de feedback para discutir o processo de escrita e explicar conceitos orais.", feedback: "<strong>Análise da opção C (Formativa e justa):</strong> Utiliza a mediação didática, focando a avaliação na defesa oral da compreensão." },
+        D: { text: "Propor uma reentrega exigindo a documentação do processo por meio de rascunhos, histórico ou registro de prompts.", feedback: "<strong>Análise da opção D (Pedagogicamente sólida):</strong> Foca na rastreabilidade do processo, transformando a entrega em um acordo pedagógico." }
+      }
+    },
+    equidad: {
+      story: "Um professor de audiovisual propõe um projeto usando IA de imagens para ilustrar um roteiro. A instituição não possui contas pagas. Metade dos alunos usou contas familiares premium (obtendo imagens em alta resolução), enquanto os demais usaram a versão gratuita (com limite de créditos e marca d'água).",
+      dilemma: "Como planejar e avaliar tarefas com tecnologias de ponta garantindo a justiça educativa quando existem desigualdades socioeconômicas entre os alunos?",
+      options: {
+        A: { text: "Avaliar o resultado visual final da mesma forma, já que o acesso a ferramentas melhores faz parte do contexto real.", feedback: "<strong>Análise da opção A (Injusta):</strong> Valida a lacuna de assinatura digital, penalizando indiretamente a falta de recursos econômicos." },
+        B: { text: "Focar a rubrica na coerência narrativa e na justificativa técnica do roteiro, não na qualidade estética da IA.", feedback: "<strong>Análise da opção B (Equitativa):</strong> Neutraliza a desigualdade tecnológica avaliando processos metacognitivos e criatividade narrativa." },
+        C: { text: "Permitir ilustração tradicional ou repositórios livres para quem não quiser ou não puder usar IA.", feedback: "<strong>Análise da opção C (Inclusiva):</strong> Protege a pluralidade metodológica, garantindo que a IA não seja obrigatória quando gera exclusão." },
+        D: { text: "Restringir o uso de IA apenas às ferramentas gratuitas garantidas pela escola ou proibir versões premium.", feedback: "<strong>Análise da opção D (Niveladora):</strong> Assegura condições equitativas para o grupo, evitando que vantagens financeiras distorçam a avaliação." }
+      }
+    },
+    delegacion: {
+      story: "Em um curso do ensino médio/superior, o professor pede um ensaio argumentativo. Vários alunos pedem à IA para redigir a estrutura, tese e conclusões. Embora editem superficialmente o texto, na apresentação oral não conseguem explicar os conceitos, alegando que 'a IA escreveu assim e soava convincente'.",
+      dilemma: "Como gerenciar o uso da IA para promover a aprendizagem crítica sem cair na delegação cognitiva passiva que atrofia a autonomia do estudante?",
+      options: {
+        A: { text: "Proibir a IA para estrutura e redação, exigindo rascunhos feitos à mão em sala de aula sem internet.", feedback: "<strong>Análise da opção A (Rígida):</strong> Protege a produção imediata, mas proibições absolutas ignoram o contexto digital e não ensinam a autorregulação." },
+        B: { text: "Exigir um registro do processo e defesa oral declarando quais partes a IA auxiliou e justificando escolhas.", feedback: "<strong>Análise da opção B (Formativa & Sólida):</strong> Preserva a agência humana ao manter o controle cognitivo com o estudante." },
+        C: { text: "Aceitar o trabalho da IA desde que o aluno adicione um anexo final de reflexão pessoal de uma página.", feedback: "<strong>Análise da opção C (Insuficiente):</strong> Adicionar um anexo ao final não garante que o processo de ideação tenha sido processado pelo aluno." },
+        D: { text: "Usar a IA em sala como 'parceira de debate' (contra-argumentadora), pedindo à máquina para questionar a tese do aluno.", feedback: "<strong>Análise da opção D (Potencializadora):</strong> Excelente estratégia didática. Inverte o papel tradicional: o humano pensa e a IA atua como provocador." }
+      }
+    },
+    tfg_docente: {
+      story: "Um estudante de licenciatura apresenta o avanço do Trabalho Conclusivo de Curso (TCC). A banca nota que a revisão bibliográfica está impecavelmente estruturada, mas o aluno admite ter usado IA generativa para redigir capítulos inteiros a partir de anotações curtas, sem ler as obras originais citadas.",
+      dilemma: "Como regular o uso da IA na pesquisa de graduação em formação docente para que seja um andaime válido sem prejudicar a apropriação conceitual e a honestidade acadêmica?",
+      options: {
+        A: { text: "Anular o avanço do trabalho e exigir reescrita total do referencial teórico sem assistência digital.", feedback: "<strong>Análise da opção A (Punitiva):</strong> A anulação punitiva não ensina o futuro docente a usar criticamente a IA no trabalho profissional." },
+        B: { text: "Aceitar o texto gerado desde que as citações bibliográficas realmente existam na literatura acadêmica.", feedback: "<strong>Análise da opção B (Insuficiente):</strong> Citações reais não garantem a compreensão do aluno nem a construção de critério pedagógico." },
+        C: { text: "Exigir fichamento de fontes primárias e reestruturação onde o estudante explicite sua posição crítica.", feedback: "<strong>Análise da opção C (Formativa e Rigorosa):</strong> Restabelece a agência humana e a apropriação conceitual recomendadas por diretrizes." },
+        D: { text: "Realizar uma banca de defesa para avaliar a capacidade do aluno de aplicar conceitos a situações reais de sala de aula.", feedback: "<strong>Análise da opção D (Avaliação de processo):</strong> Alinha-se à avaliação por competências, deslocando o foco do produto escrito para a prática." }
+      }
+    },
+    coconstruccion_codex: {
+      story: "Em uma disciplina de programação, alunos entregam um sistema web funcional. Ao revisar o código, o professor nota padrões avançados gerados por assistentes de IA (Copilot/Codex). Ao pedir para explicarem uma função crítica ou corrigir um pequeno erro induzido, a equipe se mostra incapaz de depurar o código.",
+      dilemma: "Como integrar assistentes de IA no ensino de programação promovendo produtividade sem sacrificar a compreensão algorítmica e a capacidade de depuração?",
+      options: {
+        A: { text: "Reprovar o projeto por considerar que o código não foi escrito manualmente pelos alunos.", feedback: "<strong>Análise da opção A (Desconectada da indústria):</strong> Ignora que o uso de assistentes de IA é uma competência padrão no mercado." },
+        B: { text: "Aprovar o projeto se cumprir os testes de integração, sem avaliar a leitura e compreensão do código.", feedback: "<strong>Análise da opção B (Inadequada):</strong> Promove o desenvolvimento caixa-preta. Profissionais devem saber justificar e auditar todo código." },
+        C: { text: "Tornar obrigatória a documentação dos prompts e uma sessão de Code Review onde defendam a lógica linha por linha.", feedback: "<strong>Análise da opção C (Formativa & Profissional):</strong> Mantém a soberania técnica do aluno, exigindo que ele compreenda e modifique a IA." },
+        D: { text: "Exigir testes unitários e diagramas de arquitetura antes de pedir sugestões de código à IA.", feedback: "<strong>Análise da opção D (Metodologicamente sólida):</strong> Inverte o ciclo: o humano define arquitetura e testes, a IA escreve código repetitivo." }
+      }
+    }
+  },
+  fr: {
+    privacidad: {
+      story: "Un enseignant du secondaire souhaite adapter ses supports pour 12 élèves nécessitant des aménagements raisonnables liés à la dyslexie et au TDAH dans une classe de 35. Pour ce faire, il saisit des descriptions de profils issues de rapports psychopédagogiques détaillés dans un LLM public sans noms.",
+      dilemma: "Comment l'IA générative peut-elle être utilisée pour personnaliser l'enseignement et favoriser l'inclusion sans compromettre la protection des données, la dignité des élèves ni le jugement pédagogique ?",
+      options: {
+        A: { text: "Utiliser les adaptations obtenues, puisque les noms ont été supprimés et que l'objectif est purement pédagogique.", feedback: "<strong>Analyse de l'option A (Risquée) :</strong> Bien qu'il n'y ait pas de noms, les rapports contiennent des données très sensibles. Des combinaisons de diagnostics créent des profils réidentifiables." },
+        B: { text: "Utiliser l'IA uniquement pour générer des idées de consignes générales, en évitant de saisir des descriptions détaillées d'élèves.", feedback: "<strong>Analyse de l'option B (Prudente) :</strong> S'aligne sur les critères de minimisation des données, en réservant l'analyse pédagogique au jugement professionnel." },
+        C: { text: "Décrire les obstacles pédagogiques et les supports de manière générique, sans saisir de profils d'élèves individualisés.", feedback: "<strong>Analyse de l'option C (Pédagogiquement solide / Approche UDL) :</strong> Favorise l'inclusion active sous la Conception Universelle de l'Apprentissage (CUA)." },
+        D: { text: "L'utiliser sous des conditions explicites de minimisation des données dans le prompt, d'examen critique et de consentement éclairé.", feedback: "<strong>Analyse de l'option D (Intégrale / Institutionnelle) :</strong> Suit les recommandations de gouvernance, exigeant la vérification préalable des politiques de confidentialité." }
+      }
+    },
+    sesgos: {
+      story: "Un enseignant de littérature utilise une IA générative pour concevoir un module sur la littérature latino-américaine contemporaine. Le système génère un programme composé à 100% d'écrivains hommes de la région du Rio de la Plata. Lorsqu'on lui demande d'inclure des autrices d'autres pays, l'IA invente des noms, biographies et livres fictifs.",
+      dilemma: "Comment pouvons-nous garantir l'équité et la représentativité culturelle dans le matériel pédagogique face aux biais et hallucinations de l'IA ?",
+      options: {
+        A: { text: "Accepter le premier programme généré car il inclut des auteurs reconnus et accélère le travail de planification.", feedback: "<strong>Analyse de l'option A (Inadéquate) :</strong> Reproduit passivement le biais de représentativité issu de modèles entraînés sur du texte web prioritaire." },
+        B: { text: "Utiliser la liste initiale et la compléter manuellement en recherchant dans des bibliothèques numériques et catalogues académiques.", feedback: "<strong>Analyse de l'option B (Correcte) :</strong> Conforme aux directives de curation critique. L'IA sert d'élément déclencheur, mais la rigueur repose sur l'enseignant." },
+        C: { text: "Insister pour que l'IA équilibre la liste, mais vérifier rigoureusement chaque nom et livre suggéré avant de l'inclure.", feedback: "<strong>Analyse de l'option C (Nécessaire et critique) :</strong> Montre une compréhension claire des hallucinations algorithmiques. Les IA opèrent par probabilité et doivent être vérifiées." },
+        D: { text: "Analyser la liste biaisée et les hallucinations avec les élèves pour débattre du biais dans les algorithmes.", feedback: "<strong>Analyse de l'option D (Pédagogiquement puissante) :</strong> Transforme une limite technologique en opportunité didactique pour la citoyenneté numérique." }
+      }
+    },
+    agencia: {
+      story: "Un établissement adopte une plateforme de tutorat intelligent assistée par IA. Le protocole stipule que les enseignants doivent suivre les parcours automatisés et les notes attribuées par l'algorithme. Un enseignant remarque que l'IA a noté 'incorrect' l'exercice créatif d'un élève qui démontrait une excellente compréhension.",
+      dilemma: "Comment soutenir l'autonomie professionnelle de l'enseignant et le droit des élèves à la créativité face à la standardisation des systèmes automatiques d'évaluation ?",
+      options: {
+        A: { text: "Conserver la note de l'IA pour respecter le protocole de l'école et assurer la cohérence du système.", feedback: "<strong>Analyse de l'option A (Risquée) :</strong> Viole le principe de Supervision Humaine qui interdit de déléguer les notes finales à des systèmes automatisés." },
+        B: { text: "Modifier manuellement la note dans le carnet de l'enseignant sans en informer le système ni la direction.", feedback: "<strong>Analyse de l'option B (Évasive) :</strong> Résout le cas particulier mais évite la discussion pédagogique et institutionnelle nécessaire." },
+        C: { text: "Expliquer l'erreur de l'algorithme à l'élève, réévaluer manuellement et soumettre un rapport technique/pédagogique à la direction.", feedback: "<strong>Analyse de l'option C (Responsable) :</strong> Exerce l'autonomie professionnelle. Positionne l'enseignant comme garant éthique de l'évaluation." },
+        D: { text: "Organiser un débat en classe pour opposer la logique rigide de la machine à la pensée heuristique et libre humaine.", feedback: "<strong>Analyse de l'option D (Formative) :</strong> Excellente proposition didactique. Développe la métacognition et la compréhension des limites informatiques." }
+      }
+    },
+    transparencia: {
+      story: "Une élève rend un devoir conforme aux instructions, mais utilisant un vocabulaire technique identique aux sorties d'IA. L'élève nie avoir utilisé l'IA et affirme en être l'auteure. Le règlement qualifie l'usage non cité de plagiat. L'enseignant sait que les détecteurs d'IA manquent de fiabilité.",
+      dilemma: "Comment aborder le soupçon d'utilisation non déclarée d'IA de manière formative et confiante au lieu de recourir à la sanction directe ?",
+      options: {
+        A: { text: "Appliquer le règlement directement sur la base du soupçon visuel et sanctionner le devoir.", feedback: "<strong>Analyse de l'option A (Peu recommandée) :</strong> Viole le principe de présomption d'innocence pédagogique. Les soupçons sans dialogue détériorent le climat de classe." },
+        B: { text: "Passer le devoir dans des détecteurs d'IA en ligne et sanctionner si la probabilité dépasse 80%.", feedback: "<strong>Analyse de l'option B (Inadéquate) :</strong> Les détecteurs d'IA produisent de nombreux faux positifs et leur usage comme preuve est fortement déconseillé." },
+        C: { text: "Inviter l'élève à un entretien de rétroaction pour discuter de son processus d'écriture et expliquer oralement les concepts.", feedback: "<strong>Analyse de l'option C (Formative et juste) :</strong> Utilise la médiation didactique, en centrant l'évaluation sur la défense orale de la compréhension." },
+        D: { text: "Proposer un nouveau rendu exigeant la documentation du processus via des brouillons, un historique ou un journal de prompts.", feedback: "<strong>Analyse de l'option D (Pédagogiquement solide) :</strong> Se concentre sur la traçabilité du processus, faisant du rendu un contrat pédagogique." }
+      }
+    },
+    equidad: {
+      story: "Un enseignant en audiovisuel propose un projet utilisant une IA d'images pour illustrer un scénario. L'établissement ne dispose pas de comptes payants. La moitié des élèves utilise des comptes familiaux premium (images haute résolution en quelques secondes), l'autre la version gratuite (crédits limités, filigranes).",
+      dilemma: "Comment concevoir et évaluer des tâches basées sur des technologies de pointe en garantissant la justice éducative et l'équité face aux inégalités socio-économiques ?",
+      options: {
+        A: { text: "Évaluer le rendu visuel final de la même manière, l'accès à de meilleurs outils faisant partie du contexte réel.", feedback: "<strong>Analyse de l'option A (Injuste) :</strong> Valide la fracture numérique d'abonnement, en pénalisant indirectement le manque de ressources financières." },
+        B: { text: "Centrer la grille d'évaluation sur la cohérence narrative et la justification du scénario, non sur l'esthétique de l'IA.", feedback: "<strong>Analyse de l'option B (Équitable) :</strong> Neutralise l'inégalité technologique en évaluant les processus métacognitifs et la créativité." },
+        C: { text: "Autoriser l'illustration traditionnelle ou des banques d'images libres pour ceux qui ne souhaitent pas ou ne peuvent pas utiliser l'IA.", feedback: "<strong>Analyse de l'option C (Inclusive) :</strong> Protège la pluralité méthodologique, garantissant que l'IA ne soit pas obligatoire si elle crée une exclusion." },
+        D: { text: "Restreindre l'usage de l'IA aux seuls outils gratuits garantis par l'établissement ou interdire les versions premium.", feedback: "<strong>Analyse de l'option D (Nivelante) :</strong> Assure des conditions équitables pour le groupe, évitant que des avantages financiers ne biaisent l'évaluation." }
+      }
+    },
+    delegacion: {
+      story: "Dans un cours du secondaire/supérieur, l'enseignant demande un essai argumentatif. Plusieurs élèves demandent à l'IA de rédiger la structure, la thèse et les conclusions. Bien qu'ils révisent le texte en surface, lors de la présentation orale, ils échouent à défendre les concepts, disant 'l'IA a rédigé ainsi et c'était convaincant'.",
+      dilemma: "Comment gérer l'usage de l'IA pour promouvoir un apprentissage critique sans tomber dans la délégation cognitive passive qui atrophie l'autonomie de l'élève ?",
+      options: {
+        A: { text: "Interdire l'IA pour le plan et la rédaction, en exigeant des brouillons manuscrits en classe sans connexion.", feedback: "<strong>Analyse de l'option A (Rigide) :</strong> Protège le travail immédiat, mais les interdictions absolues ignorent le contexte numérique et n'enseignent pas l'autorégulation." },
+        B: { text: "Exiger un journal de bord du processus et une défense orale déclarant les parties assistées par l'IA et justifiant les choix.", feedback: "<strong>Analyse de l'option B (Formative & Solide) :</strong> Préserve l'agentivité humaine en maintenant le contrôle cognitif chez l'élève." },
+        C: { text: "Accepter le travail rédigé par l'IA à condition que l'élève ajoute une annexe finale d'une page de réflexion personnelle.", feedback: "<strong>Analyse de l'option C (Insuffisante) :</strong> Ajouter une annexe à la fin ne garantit pas que le processus d'idéation ait été assimilé par l'élève." },
+        D: { text: "Utiliser l'IA en classe comme 'partenaire de débat' (contre-argumenteur), en demandant à la machine de contester la thèse de l'élève.", feedback: "<strong>Analyse de l'option D (Renforçant l'agentivité) :</strong> Inverse le rôle traditionnel : l'humain pense et l'IA stimule." }
+      }
+    },
+    tfg_docente: {
+      story: "Un étudiant en formation enseignante présente l'avancement de son mémoire. Le jury note que la revue de littérature est impeccablement structurée, mais l'étudiant admet avoir utilisé une IA générative pour rédiger des chapitres entiers à partir de notes courtes, sans lire les ouvrages cités.",
+      dilemma: "Comment réguler l'usage de l'IA dans la recherche de mémoire en formation enseignante pour qu'elle constitue un étayage valide sans nuire à l'appropriation conceptuelle ?",
+      options: {
+        A: { text: "Annuler l'avancement du mémoire et exiger la réécriture complète du cadre théorique sans assistance numérique.", feedback: "<strong>Analyse de l'option A (Punitive) :</strong> L'annulation punitive n'apprend pas au futur enseignant à utiliser l'IA de manière critique dans sa pratique." },
+        B: { text: "Accepter le texte généré à condition que les citations bibliographiques existent réellement dans la littérature académique.", feedback: "<strong>Analyse de l'option B (Insuffisante) :</strong> L'existence de citations réelles ne garantit pas la compréhension de l'étudiant ni la construction d'un jugement." },
+        C: { text: "Exiger des fiches de lecture des sources primaires et une restructuration où l'étudiant explicite sa position critique.", feedback: "<strong>Analyse de l'option C (Formative & Rigoureuse) :</strong> Rétablit l'agentivité humaine et l'appropriation conceptuelle recommandées par les cadres." },
+        D: { text: "Organiser un séminaire de défense pour évaluer la capacité de l'étudiant à appliquer les concepts à des situations de classe réelles.", feedback: "<strong>Analyse de l'option D (Évaluation de processus) :</strong> S'aligne sur l'évaluation par compétences, déplaçant l'attention du produit écrit vers la pratique." }
+      }
+    },
+    coconstruccion_codex: {
+      story: "Dans un cours de programmation, des étudiants rendent une application web fonctionnelle. En révisant le code, l'enseignant remarque des patrons avancés générés par des assistants d'IA (Copilot/Codex). Lorsqu'on leur demande de d'expliquer une fonction critique, l'équipe est incapable de déboguer.",
+      dilemma: "Comment intégrer des assistants d'IA dans l'enseignement de la programmation en favorisant la productivité sans sacrifier la compréhension algorithmique ?",
+      options: {
+        A: { text: "Recaler le projet au motif que le code n'a pas été écrit manuellement par les étudiants.", feedback: "<strong>Analyse de l'option A (Déconnectée du secteur) :</strong> Ignore que la programmation assistée par IA est une compétence standard de l'industrie." },
+        B: { text: "Valider le projet s'il réussit les tests d'intégration, sans évaluer la lecture et la compréhension du code.", feedback: "<strong>Analyse de l'option B (Inadéquate) :</strong> Favorise le développement boîte noire. Un professionnel doit savoir justifier et maintenir tout code rendu." },
+        C: { text: "Rendre obligatoire la documentation des prompts et une séance de Code Review orale où les étudiants défendent la logique ligne par ligne.", feedback: "<strong>Analyse de l'option C (Formative & Professionnelle) :</strong> Maintient la souveraineté technique de l'étudiant, en lui exigeant de comprendre l'IA." },
+        D: { text: "Exiger des tests unitaires et des schémas d'architecture avant de solliciter des suggestions de code à l'IA.", feedback: "<strong>Analyse de l'option D (Méthodologiquement solide) :</strong> Inverse le cycle : l'humain définit l'architecture et les tests, l'IA écrit le code répétitif." }
+      }
+    }
+  }
+};
+
+function getCaseFullTranslation(caso, lang) {
+  const l = lang || (window.state && window.state.lang) || localStorage.getItem('app_lang') || 'es';
+  const meta = getCaseMetaTranslation(caso, l);
+
+  if (l === 'es' || !CASOS_CONTENT_TRANSLATIONS[l] || !CASOS_CONTENT_TRANSLATIONS[l][caso.id]) {
+    return {
+      ...caso,
+      axisLabel: meta.axisLabel,
+      audience: meta.audience,
+      title: meta.title
+    };
+  }
+
+  const trans = CASOS_CONTENT_TRANSLATIONS[l][caso.id];
+
+  return {
+    ...caso,
+    axisLabel: meta.axisLabel,
+    audience: meta.audience,
+    title: meta.title,
+    story: trans.story || caso.story,
+    dilemma: trans.dilemma || caso.dilemma,
+    options: {
+      A: { text: trans.options?.A?.text || caso.options.A.text, feedback: trans.options?.A?.feedback || caso.options.A.feedback },
+      B: { text: trans.options?.B?.text || caso.options.B.text, feedback: trans.options?.B?.feedback || caso.options.B.feedback },
+      C: { text: trans.options?.C?.text || caso.options.C.text, feedback: trans.options?.C?.feedback || caso.options.C.feedback },
+      D: { text: trans.options?.D?.text || caso.options.D.text, feedback: trans.options?.D?.feedback || caso.options.D.feedback }
+    },
+    giro: trans.giro || caso.giro,
+    analysis: trans.analysis || caso.analysis,
+  };
+}
+
 function getCaseMetaTranslation(caso, lang) {
   const l = lang || (window.state && window.state.lang) || localStorage.getItem('app_lang') || 'es';
   
@@ -1580,18 +1862,18 @@ function renderizarCasosSituados() {
   const listGrid = document.createElement('div');
   listGrid.className = 'cases-list-grid';
   
-  CASOS_LABORATORIO.forEach(caso => {
+  CASOS_LABORATORIO.forEach(rawCaso => {
+    const caso = getCaseFullTranslation(rawCaso, lang);
     const card = document.createElement('article');
     card.className = 'case-summary-card';
     const btnLabel = t.btn_analyze_dilemma || 'Analizar dilema';
-    const meta = getCaseMetaTranslation(caso, lang);
     
     card.innerHTML = `
       <div class="case-badge-row">
-        <span class="case-badge case-badge-${caso.axis}">${meta.axisLabel}</span>
-        <span class="case-audience-badge">${meta.audience}</span>
+        <span class="case-badge case-badge-${caso.axis}">${caso.axisLabel}</span>
+        <span class="case-audience-badge">${caso.audience}</span>
       </div>
-      <h4>${meta.title}</h4>
+      <h4>${caso.title}</h4>
       <p>${caso.story.substring(0, 120)}...</p>
       <button type="button" class="btn btn-primary btn-play-case" data-case-id="${caso.id}">${btnLabel}</button>
     `;
@@ -1611,12 +1893,12 @@ window.renderizarCasosSituados = renderizarCasosSituados;
 
 function cargarCasoInteractivo(caseId) {
   if (!elements.situatedCases) return;
-  const caso = CASOS_LABORATORIO.find(c => c.id === caseId);
-  if (!caso) return;
+  const rawCaso = CASOS_LABORATORIO.find(c => c.id === caseId);
+  if (!rawCaso) return;
 
   const lang = (window.state && window.state.lang) || localStorage.getItem('app_lang') || 'es';
   const t = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[lang]) ? TRANSLATIONS[lang] : {};
-  const meta = getCaseMetaTranslation(caso, lang);
+  const caso = getCaseFullTranslation(rawCaso, lang);
   
   let decisionInicial = null;
   let decisionFinal = null;
