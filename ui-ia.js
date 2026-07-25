@@ -230,7 +230,44 @@ const TRANSLATIONS = {
 
     modal_authors_title: "¿Quiénes somos? — Autores de la app",
     author_santi_role: "Creador y desarrollador de la app. Investigador y divulgador. Prof. de Informática especializado en Tecnología Educativa.",
-    author_diego_role: "Investigador y colaborador pedagógico. Prof. de Informática."
+    author_diego_role: "Investigador y colaborador pedagógico. Prof. de Informática.",
+
+    modal_lab_access_title: "Acceso al Laboratorio de Casos",
+    modal_lab_access_desc: "El **Laboratorio de Casos (Modo Taller)** es una herramienta diseñada para el perfil **Docente** para la deliberación y el trabajo ético situado.",
+    modal_lab_access_confirm_q: "¿Deseás configurar tu perfil como Docente ahora para ingresar?",
+    modal_lab_access_yes: "✅ Sí, configurar e ingresar",
+    modal_lab_access_cancel: "Cancelar",
+
+    modal_confirm_exit_title: "Confirmar salida",
+    modal_confirm_exit_desc: "¿Deseás volver al inicio?",
+    modal_confirm_exit_warn: "Perderás el progreso actual de la recorrida.",
+    modal_confirm_exit_cancel: "Cancelar",
+    modal_confirm_exit_ok: "Aceptar",
+
+    modal_info_title: "Marcos sobre IA en Educación",
+    modal_info_desc: "Este cuestionario está basado en documentos y orientaciones de UNESCO, ANEP, FING, Udelar y Ceibal sobre el uso de IAG contextualizado a la educación.",
+    modal_info_principles: "Principios clave:",
+    modal_info_p1: "Verificación de información con fuentes confiables",
+    modal_info_p2: "Transparencia en autoría y uso de IA",
+    modal_info_p3: "Conciencia y mitigación de sesgos",
+    modal_info_p4: "Valor agregado pedagógico humano",
+    modal_info_p5: "Protección de datos y privacidad",
+    modal_info_p6: "Desarrollo de pensamiento crítico",
+
+    history_score_label: "Puntaje",
+    history_focus_label: "Foco",
+    history_no_items: "Todavía no hay diagnósticos guardados en este dispositivo.",
+    history_profile_unknown: "Perfil no indicado",
+    history_result_default: "Resultado",
+    history_summary_default: "Diagnóstico guardado localmente.",
+    history_clear_confirm: "¿Querés limpiar el historial guardado en este dispositivo?",
+
+    profile_docente_label: "Docente",
+    profile_estudiante_label: "Estudiante",
+    profile_especializado_label: "Docente/investigador/a",
+
+    loading_starting: "Iniciando recorrido...",
+    loading_no_init: "No se pudo iniciar. Recargá la página e intentá de nuevo."
   },
 
   en: {
@@ -446,7 +483,44 @@ const TRANSLATIONS = {
 
     modal_authors_title: "About us — App authors",
     author_santi_role: "App creator and developer. Researcher and communicator. Computer Science Professor specialized in Educational Technology.",
-    author_diego_role: "Researcher and pedagogical collaborator. Computer Science Professor."
+    author_diego_role: "Researcher and pedagogical collaborator. Computer Science Professor.",
+
+    modal_lab_access_title: "Access to the Cases Laboratory",
+    modal_lab_access_desc: "The **Cases Laboratory (Workshop Mode)** is a tool designed for the **Teacher** profile for deliberation and situated ethical work.",
+    modal_lab_access_confirm_q: "Do you want to set your profile as Teacher now to enter?",
+    modal_lab_access_yes: "✅ Yes, configure and enter",
+    modal_lab_access_cancel: "Cancel",
+
+    modal_confirm_exit_title: "Confirm exit",
+    modal_confirm_exit_desc: "Do you want to return to the start?",
+    modal_confirm_exit_warn: "You will lose your current journey progress.",
+    modal_confirm_exit_cancel: "Cancel",
+    modal_confirm_exit_ok: "Accept",
+
+    modal_info_title: "AI in Education Frameworks",
+    modal_info_desc: "This questionnaire is based on documents and guidelines from UNESCO, ANEP, FING, Udelar, and Ceibal on the use of GAI in education.",
+    modal_info_principles: "Key principles:",
+    modal_info_p1: "Information verification with reliable sources",
+    modal_info_p2: "Transparency in authorship and AI use",
+    modal_info_p3: "Bias awareness and mitigation",
+    modal_info_p4: "Human pedagogical added value",
+    modal_info_p5: "Data protection and privacy",
+    modal_info_p6: "Development of critical thinking",
+
+    history_score_label: "Score",
+    history_focus_label: "Focus",
+    history_no_items: "No diagnoses saved on this device yet.",
+    history_profile_unknown: "Profile not indicated",
+    history_result_default: "Result",
+    history_summary_default: "Diagnosis saved locally.",
+    history_clear_confirm: "Do you want to clear the history saved on this device?",
+
+    profile_docente_label: "Teacher",
+    profile_estudiante_label: "Student",
+    profile_especializado_label: "Teacher / Researcher",
+
+    loading_starting: "Starting journey...",
+    loading_no_init: "Could not start. Reload the page and try again."
   },
 
   pt: {
@@ -649,7 +723,44 @@ const TRANSLATIONS = {
 
     modal_authors_title: "Quem somos? — Autores do aplicativo",
     author_santi_role: "Criador e desenvolvedor do aplicativo. Pesquisador e divulgador. Prof. de Informática especializado em Tecnologia Educacional.",
-    author_diego_role: "Pesquisador e colaborador pedagógico. Prof. de Informática."
+    author_diego_role: "Pesquisador e colaborador pedagógico. Prof. de Informática.",
+
+    modal_lab_access_title: "Acesso ao Laboratório de Casos",
+    modal_lab_access_desc: "O **Laboratório de Casos (Modo Oficina)** é uma ferramenta projetada para o perfil **Professor** para deliberação e trabalho ético situado.",
+    modal_lab_access_confirm_q: "Deseja configurar seu perfil como Professor agora para entrar?",
+    modal_lab_access_yes: "✅ Sim, configurar e entrar",
+    modal_lab_access_cancel: "Cancelar",
+
+    modal_confirm_exit_title: "Confirmar saída",
+    modal_confirm_exit_desc: "Deseja voltar ao início?",
+    modal_confirm_exit_warn: "Você perderá o progresso atual do percurso.",
+    modal_confirm_exit_cancel: "Cancelar",
+    modal_confirm_exit_ok: "Aceitar",
+
+    modal_info_title: "Marcos sobre IA na Educação",
+    modal_info_desc: "Este questionário é baseado em documentos e orientações da UNESCO, ANEP, FING, Udelar e Ceibal sobre o uso de IAG na educação.",
+    modal_info_principles: "Princípios-chave:",
+    modal_info_p1: "Verificação de informações com fontes confiáveis",
+    modal_info_p2: "Transparência na autoria e uso de IA",
+    modal_info_p3: "Consciência e mitigação de vieses",
+    modal_info_p4: "Valor pedagógico humano agregado",
+    modal_info_p5: "Proteção de dados e privacidade",
+    modal_info_p6: "Desenvolvimento do pensamento crítico",
+
+    history_score_label: "Pontuação",
+    history_focus_label: "Foco",
+    history_no_items: "Ainda não há diagnósticos salvos neste dispositivo.",
+    history_profile_unknown: "Perfil não indicado",
+    history_result_default: "Resultado",
+    history_summary_default: "Diagnóstico salvo localmente.",
+    history_clear_confirm: "Deseja limpar o histórico salvo neste dispositivo?",
+
+    profile_docente_label: "Professor",
+    profile_estudiante_label: "Estudante",
+    profile_especializado_label: "Professor / Pesquisador",
+
+    loading_starting: "Iniciando percurso...",
+    loading_no_init: "Não foi possível iniciar. Recarregue a página e tente novamente."
   },
 
   fr: {
@@ -865,7 +976,44 @@ const TRANSLATIONS = {
 
     modal_authors_title: "Qui sommes-nous ? — Auteurs de l'application",
     author_santi_role: "Créateur et développeur de l'application. Chercheur et vulgarisateur. Prof. d'Informatique spécialisé en Technologie Éducative.",
-    author_diego_role: "Chercheur et collaborateur pédagogique. Prof. d'Informatique."
+    author_diego_role: "Chercheur et collaborateur pédagogique. Prof. d'Informatique.",
+
+    modal_lab_access_title: "Accès au Laboratoire de cas",
+    modal_lab_access_desc: "Le **Laboratoire de cas (Mode atelier)** est un outil conçu pour le profil **Enseignant** pour la délibération et le travail éthique situé.",
+    modal_lab_access_confirm_q: "Voulez-vous configurer votre profil en tant qu'Enseignant maintenant pour entrer ?",
+    modal_lab_access_yes: "✅ Oui, configurer et entrer",
+    modal_lab_access_cancel: "Annuler",
+
+    modal_confirm_exit_title: "Confirmer la sortie",
+    modal_confirm_exit_desc: "Souhaitez-vous revenir au début ?",
+    modal_confirm_exit_warn: "Vous perdrez la progression actuelle du parcours.",
+    modal_confirm_exit_cancel: "Annuler",
+    modal_confirm_exit_ok: "Accepter",
+
+    modal_info_title: "Cadres sur l'IA en éducation",
+    modal_info_desc: "Ce questionnaire est basé sur des documents et orientations de l'UNESCO, de l'ANEP, de la FING, de l'Udelar et de Ceibal sur l'usage de l'IAG dans l'éducation.",
+    modal_info_principles: "Principes clés :",
+    modal_info_p1: "Vérification des informations avec des sources fiables",
+    modal_info_p2: "Transparence dans la paternité et l'usage de l'IA",
+    modal_info_p3: "Prise de conscience et atténuation des biais",
+    modal_info_p4: "Valeur ajoutée pédagogique humaine",
+    modal_info_p5: "Protection des données et vie privée",
+    modal_info_p6: "Développement de la pensée critique",
+
+    history_score_label: "Score",
+    history_focus_label: "Focus",
+    history_no_items: "Aucun diagnostic enregistré sur cet appareil pour l'instant.",
+    history_profile_unknown: "Profil non indiqué",
+    history_result_default: "Résultat",
+    history_summary_default: "Diagnostic enregistré localement.",
+    history_clear_confirm: "Voulez-vous effacer l'historique enregistré sur cet appareil ?",
+
+    profile_docente_label: "Enseignant",
+    profile_estudiante_label: "Étudiant(e)",
+    profile_especializado_label: "Enseignant / Chercheur",
+
+    loading_starting: "Démarrage du parcours...",
+    loading_no_init: "Impossible de démarrer. Rechargez la page et réessayez."
   }
 };
 
@@ -1942,11 +2090,18 @@ function advanceOnboarding() {
     }
 
     if (typeof window.iniciarJuego === 'function') {
+      const lang2 = (window.state && window.state.lang) || 'es';
+      const tStart = TRANSLATIONS[lang2] || TRANSLATIONS['es'];
+      if (elements.startGuidanceTitle) {
+        elements.startGuidanceTitle.textContent = tStart.loading_starting || 'Iniciando recorrido...';
+      }
       window.iniciarJuego();
     } else {
       console.error('No se pudo iniciar: window.iniciarJuego no está disponible.');
+      const lang2 = (window.state && window.state.lang) || 'es';
+      const tStart = TRANSLATIONS[lang2] || TRANSLATIONS['es'];
       if (elements.startGuidanceTitle) {
-        elements.startGuidanceTitle.textContent = 'No se pudo iniciar. Recargá la página e intentá de nuevo.';
+        elements.startGuidanceTitle.textContent = tStart.loading_no_init || 'No se pudo iniciar. Recargá la página e intentá de nuevo.';
       }
     }
     return;
@@ -1989,8 +2144,10 @@ function mostrarDecisionModoDocente() {
     if (btnQuiz) {
       btnQuiz.addEventListener('click', () => {
         modal.hide();
+        const lang2 = (window.state && window.state.lang) || 'es';
+        const tStart = TRANSLATIONS[lang2] || TRANSLATIONS['es'];
         if (elements.startGuidanceTitle) {
-          elements.startGuidanceTitle.textContent = 'Iniciando recorrido...';
+          elements.startGuidanceTitle.textContent = tStart.loading_starting || 'Iniciando recorrido...';
         }
         if (typeof window.iniciarJuego === 'function') {
           window.iniciarJuego();
@@ -2302,16 +2459,18 @@ updateCarousel();
    ======================================== */
 if (elements.infoBtn) {
   elements.infoBtn.addEventListener('click', () => {
-    modal.show('Marcos sobre IA en Educación', `
-      <p>Este cuestionario está basado en documentos y orientaciones de UNESCO, ANEP, FING, Udelar y Ceibal sobre el uso de IAG contextualizado a la educación.</p>
-      <h4>Principios clave:</h4>
+    const lang = (window.state && window.state.lang) || 'es';
+    const t = TRANSLATIONS[lang] || TRANSLATIONS['es'];
+    modal.show(t.modal_info_title || 'Marcos sobre IA en Educación', `
+      <p>${t.modal_info_desc || 'Este cuestionario está basado en documentos y orientaciones de UNESCO, ANEP, FING, Udelar y Ceibal.'}</p>
+      <h4>${t.modal_info_principles || 'Principios clave:'}</h4>
       <ul>
-        <li>Verificación de información con fuentes confiables</li>
-        <li>Transparencia en autoría y uso de IA</li>
-        <li>Conciencia y mitigación de sesgos</li>
-        <li>Valor agregado pedagógico humano</li>
-        <li>Protección de datos y privacidad</li>
-        <li>Desarrollo de pensamiento crítico</li>
+        <li>${t.modal_info_p1 || 'Verificación de información con fuentes confiables'}</li>
+        <li>${t.modal_info_p2 || 'Transparencia en autoría y uso de IA'}</li>
+        <li>${t.modal_info_p3 || 'Conciencia y mitigación de sesgos'}</li>
+        <li>${t.modal_info_p4 || 'Valor agregado pedagógico humano'}</li>
+        <li>${t.modal_info_p5 || 'Protección de datos y privacidad'}</li>
+        <li>${t.modal_info_p6 || 'Desarrollo de pensamiento crítico'}</li>
       </ul>
     `);
   });
@@ -2372,16 +2531,18 @@ if (homeBtn) {
     }
 
     if (state.path && state.path.length > 0) {
+      const lang = (window.state && window.state.lang) || 'es';
+      const t = TRANSLATIONS[lang] || TRANSLATIONS['es'];
       modal.show(
-        'Confirmar salida',
+        t.modal_confirm_exit_title || 'Confirmar salida',
         `
           <p style="line-height:1.6;">
-            ¿Deseás volver al inicio?<br>
-            <strong>Perderás el progreso actual de la recorrida.</strong>
+            ${t.modal_confirm_exit_desc || '¿Deseás volver al inicio?'}<br>
+            <strong>${t.modal_confirm_exit_warn || 'Perderás el progreso actual de la recorrida.'}</strong>
           </p>
           <div style="display:flex; justify-content:flex-end; gap:0.5rem; margin-top:1rem;">
-            <button id="cancelAbort" class="btn btn-secondary">Cancelar</button>
-            <button id="confirmAbort" class="btn btn-danger">Aceptar</button>
+            <button id="cancelAbort" class="btn btn-secondary">${t.modal_confirm_exit_cancel || 'Cancelar'}</button>
+            <button id="confirmAbort" class="btn btn-danger">${t.modal_confirm_exit_ok || 'Aceptar'}</button>
           </div>
         `
       );
@@ -2950,9 +3111,11 @@ function saveLocalDiagnostic(record) {
 function renderLocalHistory() {
   if (!elements.localHistoryList) return;
   const history = readLocalHistory();
+  const lang = (window.state && window.state.lang) || 'es';
+  const t = TRANSLATIONS[lang] || TRANSLATIONS['es'];
 
   if (!history.length) {
-    elements.localHistoryList.innerHTML = '<p class="stats-empty">Todavía no hay diagnósticos guardados en este dispositivo.</p>';
+    elements.localHistoryList.innerHTML = `<p class="stats-empty">${t.history_no_items || 'Todavía no hay diagnósticos guardados en este dispositivo.'}</p>`;
     if (elements.clearLocalHistoryBtn) elements.clearLocalHistoryBtn.disabled = true;
     return;
   }
@@ -2961,18 +3124,20 @@ function renderLocalHistory() {
   elements.localHistoryList.innerHTML = history.map(item => `
     <article class="local-history-item">
       <div>
-        <strong>${escapeHtml(item.level || 'Resultado')}</strong>
-        <span>${escapeHtml(item.profile || 'Perfil no indicado')} · ${escapeHtml(item.date || '')}</span>
+        <strong>${escapeHtml(item.level || t.history_result_default || 'Resultado')}</strong>
+        <span>${escapeHtml(item.profile || t.history_profile_unknown || 'Perfil no indicado')} · ${escapeHtml(item.date || '')}</span>
       </div>
-      <p>${escapeHtml(item.summary || 'Diagnóstico guardado localmente.')}</p>
-      <small>Puntaje: ${escapeHtml(item.evidence ?? '—')} · Foco: ${escapeHtml(item.focus || '—')}</small>
+      <p>${escapeHtml(item.summary || t.history_summary_default || 'Diagnóstico guardado localmente.')}</p>
+      <small>${t.history_score_label || 'Puntaje'}: ${escapeHtml(String(item.evidence ?? '—'))} · ${t.history_focus_label || 'Foco'}: ${escapeHtml(item.focus || '—')}</small>
     </article>
   `).join('');
 }
 
 if (elements.clearLocalHistoryBtn) {
   elements.clearLocalHistoryBtn.addEventListener('click', () => {
-    if (!window.confirm('¿Querés limpiar el historial guardado en este dispositivo?')) return;
+    const lang = (window.state && window.state.lang) || 'es';
+    const t = TRANSLATIONS[lang] || TRANSLATIONS['es'];
+    if (!window.confirm(t.history_clear_confirm || '¿Querés limpiar el historial guardado en este dispositivo?')) return;
     writeLocalHistory([]);
     renderLocalHistory();
   });

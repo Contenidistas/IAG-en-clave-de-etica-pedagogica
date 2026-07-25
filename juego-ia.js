@@ -1434,27 +1434,29 @@ function construirCasosSituados() {
 
 function abrirLaboratorioCasos() {
   if (state.profile !== 'docente') {
+    const lang = (window.state && window.state.lang) || 'es';
+    const tLab = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[lang]) ? TRANSLATIONS[lang] : {};
     const content = `
       <div class="mode-selection-modal-body" style="text-align: center; padding: 1rem 0;">
         <p style="margin-bottom: 1.5rem; font-size: 1.05rem; line-height: 1.5; color: var(--text-secondary);">
-          El **Laboratorio de Casos (Modo Taller)** es una herramienta diseñada para el perfil **Docente** para la deliberación y el trabajo ético situado.
+          ${tLab.modal_lab_access_desc || 'El **Laboratorio de Casos (Modo Taller)** es una herramienta dise\u00f1ada para el perfil **Docente** para la deliberaci\u00f3n y el trabajo \u00e9tico situado.'}
         </p>
         <p style="margin-bottom: 1.5rem; font-weight: 600; color: var(--text-primary);">
-          ¿Deseás configurar tu perfil como Docente ahora para ingresar?
+          ${tLab.modal_lab_access_confirm_q || '\u00bfDese\u00e1s configurar tu perfil como Docente ahora para ingresar?'}
         </p>
         <div style="display: flex; flex-direction: column; gap: 0.75rem; max-width: 300px; margin: 0 auto;">
           <button type="button" class="btn btn-primary" id="btnConfirmDocenteProfile" style="padding: 0.85rem; font-size: 1rem; width: 100%;">
-            ✅ Sí, configurar e ingresar
+            ${tLab.modal_lab_access_yes || '\u2705 S\u00ed, configurar e ingresar'}
           </button>
           <button type="button" class="btn btn-outline" id="btnCancelDocenteProfile" style="padding: 0.85rem; font-size: 1rem; width: 100%; background: var(--bg-main);">
-            Cancelar
+            ${tLab.modal_lab_access_cancel || 'Cancelar'}
           </button>
         </div>
       </div>
     `;
     
     if (typeof modal !== 'undefined' && typeof modal.show === 'function') {
-      modal.show('Acceso al Laboratorio de Casos', content);
+      modal.show(tLab.modal_lab_access_title || 'Acceso al Laboratorio de Casos', content);
       
       const btnConfirm = document.getElementById('btnConfirmDocenteProfile');
       const btnCancel = document.getElementById('btnCancelDocenteProfile');
