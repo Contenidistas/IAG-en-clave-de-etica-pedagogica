@@ -1492,11 +1492,6 @@ function abrirLaboratorioCasos() {
   // Ocultar otras pantallas
   if (screens.intro) screens.intro.classList.add('hidden');
   if (screens.game) screens.game.classList.add('hidden');
-  if (screens.result) {
-    screens.result.classList.remove('hidden');
-    screens.result.classList.add('fade-in');
-  }
-
   // Activar la pestaña de operacionalizar
   if (elements.resultTabs && elements.resultTabs.length) {
     elements.resultTabs.forEach(tab => {
@@ -1516,6 +1511,47 @@ function abrirLaboratorioCasos() {
   // Renderizar
   renderizarCasosSituados();
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function getCaseMetaTranslation(caso, lang) {
+  const l = lang || (window.state && window.state.lang) || localStorage.getItem('app_lang') || 'es';
+  
+  const axisMap = {
+    privacidad: { es: 'PRIVACIDAD Y DATOS', en: 'PRIVACY & DATA', pt: 'PRIVACIDADE E DADOS', fr: 'CONFIDENTIALITÉ ET DONNÉES' },
+    sesgos: { es: 'SESGOS Y REPRESENTATIVIDAD', en: 'BIAS & REPRESENTATION', pt: 'VIESES E REPRESENTATIVIDADE', fr: 'BIAIS ET REPRÉSENTATIVITÉ' },
+    agencia: { es: 'AGENCIA Y AUTONOMÍA', en: 'AGENCY & AUTONOMY', pt: 'AGÊNCIA E AUTONOMIA', fr: 'AGENTIVITÉ ET AUTONOMIE' },
+    autoría: { es: 'TRANSPARENCIA E INTEGRIDAD', en: 'TRANSPARENCY & INTEGRITY', pt: 'TRANSPARÊNCIA E INTEGRIDADE', fr: 'TRANSPARENCE ET INTÉGRITÉ' },
+    equidad: { es: 'EQUIDAD Y ACCESO', en: 'EQUITY & ACCESS', pt: 'EQUIDADE E ACESSO', fr: 'ÉQUITÉ ET ACCÈS' },
+    delegacion: { es: 'AGENCIA Y DELEGACIÓN COGNITIVA', en: 'AGENCY & COGNITIVE OFFLOADING', pt: 'AGÊNCIA E DELEGAÇÃO COGNITIVA', fr: 'AGENTIVITÉ ET DÉLÉGATION COGNITIVE' }
+  };
+
+  const audienceMap = {
+    'Docencia / inclusión': { es: 'Docencia / inclusión', en: 'Teaching / Inclusion', pt: 'Docência / Inclusão', fr: 'Enseignement / Inclusion' },
+    'Docencia / didáctica': { es: 'Docencia / didáctica', en: 'Teaching / Didactics', pt: 'Docência / Didática', fr: 'Enseignement / Didactique' },
+    'Gestión / evaluación': { es: 'Gestión / evaluación', en: 'Management / Assessment', pt: 'Gestão / Avaliação', fr: 'Gestion / Évaluation' },
+    'Aula / didáctica': { es: 'Aula / didáctica', en: 'Classroom / Didactics', pt: 'Sala de aula / Didática', fr: 'Classe / Didactique' },
+    'Aula / gestión': { es: 'Aula / gestión', en: 'Classroom / Management', pt: 'Sala de aula / Gestão', fr: 'Classe / Gestion' },
+    'Aula / formación docente': { es: 'Aula / formación docente', en: 'Classroom / Teacher training', pt: 'Sala de aula / Formação docente', fr: 'Classe / Formation enseignante' },
+    'Formación docente / nivel superior': { es: 'Formación docente / Nivel superior', en: 'Teacher training / Higher ed', pt: 'Formação docente / Nível superior', fr: 'Formation enseignante / Supérieur' },
+    'Educación técnica / terciaria / universidad (informática)': { es: 'Educación técnica / Universidad', en: 'Technical / Higher ed (CS)', pt: 'Ensino Técnico / Superior', fr: 'Enseignement technique / Supérieur' }
+  };
+
+  const titlesMap = {
+    privacidad: { es: 'Personalizar sin etiquetar ni exponer', en: 'Personalize without labeling or exposing', pt: 'Personalizar sem rotular nem expor', fr: 'Personnaliser sans étiqueter ni exposer' },
+    sesgos: { es: 'La selección invisible de autores', en: 'The invisible selection of authors', pt: 'A seleção invisível de autores', fr: 'La sélection invisible d\'auteurs' },
+    agencia: { es: 'El algoritmo evaluador', en: 'The evaluating algorithm', pt: 'O algoritmo avaliador', fr: 'L\'algorithme évaluateur' },
+    transparencia: { es: 'La entrega bajo sospecha', en: 'Submission under suspicion', pt: 'A entrega sob suspeita', fr: 'Le devoir sous suspicion' },
+    equidad: { es: 'La brecha de las licencias', en: 'The license gap', pt: 'A lacuna das licenças', fr: 'L\'écart des licences' },
+    delegacion: { es: 'La paradoja del borrador: agencia humana y delegación cognitiva', en: 'The draft paradox: human agency and cognitive offloading', pt: 'O paradoxo do rascunho: agência humana e delegação cognitiva', fr: 'Le paradoxe du brouillon : agentivité humaine et délégation cognitive' },
+    tfg_docente: { es: 'El marco teórico automatizado: ética en la investigación de grado', en: 'The automated theoretical framework: ethics in undergraduate research', pt: 'O marco teórico automatizado: ética na pesquisa de graduação', fr: 'Le cadre théorique automatisé : éthique dans la recherche de diplôme' },
+    coconstruccion_codex: { es: 'El artefacto generado: co-construcción de software y comprensión algorítmica', en: 'The generated artifact: software co-construction and algorithmic understanding', pt: 'O artefato gerado: co-construção de software e compreensão algorítmica', fr: 'L\'artéfact généré : co-construction de logiciel et compréhension algorithmique' }
+  };
+
+  return {
+    axisLabel: (axisMap[caso.axis] && axisMap[caso.axis][l]) || caso.axisLabel,
+    audience: (audienceMap[caso.audience] && audienceMap[caso.audience][l]) || caso.audience,
+    title: (titlesMap[caso.id] && titlesMap[caso.id][l]) || caso.title
+  };
 }
 
 function renderizarCasosSituados() {
@@ -1544,13 +1580,14 @@ function renderizarCasosSituados() {
     const card = document.createElement('article');
     card.className = 'case-summary-card';
     const btnLabel = t.btn_analyze_dilemma || 'Analizar dilema';
+    const meta = getCaseMetaTranslation(caso, lang);
     
     card.innerHTML = `
       <div class="case-badge-row">
-        <span class="case-badge case-badge-${caso.axis}">${caso.axisLabel}</span>
-        <span class="case-audience-badge">${caso.audience}</span>
+        <span class="case-badge case-badge-${caso.axis}">${meta.axisLabel}</span>
+        <span class="case-audience-badge">${meta.audience}</span>
       </div>
-      <h4>${caso.title}</h4>
+      <h4>${meta.title}</h4>
       <p>${caso.story.substring(0, 120)}...</p>
       <button type="button" class="btn btn-primary btn-play-case" data-case-id="${caso.id}">${btnLabel}</button>
     `;
@@ -1572,6 +1609,10 @@ function cargarCasoInteractivo(caseId) {
   if (!elements.situatedCases) return;
   const caso = CASOS_LABORATORIO.find(c => c.id === caseId);
   if (!caso) return;
+
+  const lang = (window.state && window.state.lang) || localStorage.getItem('app_lang') || 'es';
+  const t = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[lang]) ? TRANSLATIONS[lang] : {};
+  const meta = getCaseMetaTranslation(caso, lang);
   
   let decisionInicial = null;
   let decisionFinal = null;
@@ -1583,10 +1624,10 @@ function cargarCasoInteractivo(caseId) {
     player.innerHTML = `
       <div class="active-case-player-header">
         <div class="case-player-meta">
-          <span class="case-badge case-badge-${caso.axis}" style="display:inline-block; margin-bottom:0.4rem;">${caso.axisLabel}</span>
-          <h3 style="font-weight:700;">${caso.title}</h3>
+          <span class="case-badge case-badge-${caso.axis}" style="display:inline-block; margin-bottom:0.4rem;">${meta.axisLabel}</span>
+          <h3 style="font-weight:700;">${meta.title}</h3>
         </div>
-        <button type="button" class="btn btn-outline btn-close-case" id="btnCloseCase" style="min-width:auto; padding: 0.5rem 1rem;">← Volver</button>
+        <button type="button" class="btn btn-outline btn-close-case" id="btnCloseCase" style="min-width:auto; padding: 0.5rem 1rem;">${t.player_back || '← Volver'}</button>
       </div>
       
       <div class="case-story-box">
@@ -1594,12 +1635,12 @@ function cargarCasoInteractivo(caseId) {
       </div>
       
       <div class="case-dilemma-box">
-        <strong>Dilema ético-pedagógico</strong>
+        <strong>${t.player_dilemma_tag || 'DILEMA ÉTICO-PEDAGÓGICO'}</strong>
         <p>${caso.dilemma}</p>
       </div>
       
       <div id="caseDecisionArea">
-        <h4 style="margin-bottom:1rem; font-weight:700;">Tomá tu decisión inicial:</h4>
+        <h4 style="margin-bottom:1rem; font-weight:700;">${t.player_initial_prompt || 'Tomá tu decisión inicial:'}</h4>
         <div class="case-options-grid">
           ${Object.entries(caso.options).map(([key, opt]) => `
             <button type="button" class="case-option-card${decisionInicial === key ? ' selected' : ''}" data-option="${key}">
@@ -1640,32 +1681,38 @@ function cargarCasoInteractivo(caseId) {
     if (!giroArea) return;
     
     giroArea.className = 'case-giro-box';
+    const giroQuestionText = (t.player_giro_question || '¿Mantendrías tu decisión inicial "{decision}" o preferís cambiarla tras esta nueva información?').replace('{decision}', decisionInicial);
+    const btnKeepText = (t.player_btn_keep || 'Mantener opción "{decision}"').replace('{decision}', decisionInicial);
+    const btnChangeText = t.player_btn_change || 'Cambiar mi decisión';
+
     giroArea.innerHTML = `
       <div class="case-giro-header">
         <span>⚠</span>
-        <strong>GIRO DEL CASO (Nueva información)</strong>
+        <strong>${t.player_giro_header || 'GIRO DEL CASO (Nueva información)'}</strong>
       </div>
       <div class="case-giro-text">
         ${caso.giro}
       </div>
       <div class="case-giro-question" style="margin-bottom:1.25rem; font-weight:700;">
-        ¿Mantendrías tu decisión inicial "${decisionInicial}" o preferís cambiarla tras esta nueva información?
+        ${giroQuestionText}
       </div>
       <div class="case-giro-actions">
-        <button type="button" class="btn btn-success" id="btnMantenerDecision">Mantener opción "${decisionInicial}"</button>
-        <button type="button" class="btn btn-outline" id="btnCambiarDecision">Cambiar mi decisión</button>
+        <button type="button" class="btn btn-success" id="btnMantenerDecision">${btnKeepText}</button>
+        <button type="button" class="btn btn-outline" id="btnCambiarDecision">${btnChangeText}</button>
       </div>
     `;
     
     player.querySelector('#btnMantenerDecision').addEventListener('click', () => {
       decisionFinal = decisionInicial;
-      giroArea.innerHTML = `<p class="case-giro-text" style="background:var(--bg-main); padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid var(--border);"><em>Decidiste mantener tu opción inicial: <strong>"${decisionInicial}"</strong>.</em></p>`;
+      const keptMsg = (t.player_kept_msg || 'Decidiste mantener tu opción inicial: <strong>"{decision}"</strong>.').replace('{decision}', decisionInicial);
+      giroArea.innerHTML = `<p class="case-giro-text" style="background:var(--bg-main); padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid var(--border);"><em>${keptMsg}</em></p>`;
       mostrarResolucionFinal();
     });
     
     player.querySelector('#btnCambiarDecision').addEventListener('click', () => {
+      const selectNewText = t.player_select_new || 'Seleccioná tu nueva opción de resolución:';
       giroArea.innerHTML = `
-        <p class="case-giro-text"><em>Seleccioná tu nueva opción de resolución:</em></p>
+        <p class="case-giro-text"><em>${selectNewText}</em></p>
         <div class="case-options-grid" style="margin-bottom: 0;">
           ${Object.entries(caso.options).map(([key, opt]) => `
             <button type="button" class="case-option-card${decisionInicial === key ? ' disabled' : ''}" id="btnNewOpt-${key}" data-option="${key}">
@@ -1681,7 +1728,8 @@ function cargarCasoInteractivo(caseId) {
         if (btn) {
           btn.addEventListener('click', () => {
             decisionFinal = key;
-            giroArea.innerHTML = `<p class="case-giro-text" style="background:var(--bg-main); padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid var(--border);"><em>Cambiaste tu decisión de la opción inicial "${decisionInicial}" a la opción: <strong>"${decisionFinal}"</strong>.</em></p>`;
+            const changedMsg = (t.player_changed_msg || 'Cambiaste tu decisión de la opción inicial "{initial}" a la opción: <strong>"{final}"</strong>.').replace('{initial}', decisionInicial).replace('{final}', decisionFinal);
+            giroArea.innerHTML = `<p class="case-giro-text" style="background:var(--bg-main); padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid var(--border);"><em>${changedMsg}</em></p>`;
             mostrarResolucionFinal();
           });
         }
@@ -1700,53 +1748,52 @@ function cargarCasoInteractivo(caseId) {
     const feedbackOpt = caso.options[decisionFinal]?.feedback || '';
     
     resArea.innerHTML = `
-      <h4>Análisis pedagógico y resolución</h4>
+      <h4>${t.player_resolution_title || 'Análisis pedagógico y resolución'}</h4>
       <div class="case-feedback-alert">
         ${feedbackOpt}
       </div>
       
       <p style="line-height: 1.65; margin-bottom: 1.75rem;">
-        <strong>Reflexión ética general:</strong> ${caso.analysis}
+        <strong>${t.player_general_reflection || 'Reflexión ética general:'}</strong> ${caso.analysis}
       </p>
       
       <div class="case-debate-guide">
         <h5>
           <span style="font-size:1.15rem;">👥</span>
-          Guía de debate para talleres
+          ${t.player_workshop_guide || 'Guía de debate para talleres'}
         </h5>
         <ul>
           ${caso.debateQuestions.map(q => `<li>${q}</li>`).join('')}
         </ul>
       </div>
 
-      <!-- 📊 Distribución de Decisiones de la Comunidad (Sección Admin/Talleres) -->
+      <!-- 📊 Distribución de Decisiones de la Comunidad -->
       <div class="community-stats-card" style="margin-top: 2rem; background: var(--bg-hover); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
-        <h5 style="margin-bottom: 0.5rem; font-weight: 700; color: var(--primary);">📊 Decisiones de la Comunidad de Docentes</h5>
+        <h5 style="margin-bottom: 0.5rem; font-weight: 700; color: var(--primary);">${t.player_community_title || '📊 Decisiones de la Comunidad de Docentes'}</h5>
         <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
-          Resultados acumulados de las elecciones de docentes en talleres formativos (se resalta tu decisión final en color):
+          ${t.player_community_sub || 'Resultados acumulados de las elecciones de docentes en talleres formativos:'}
         </p>
         <div class="stats-bars-container" id="caseCommunityStatsBars"></div>
         
         <!-- Comentarios dinámicos cargados desde la DB -->
         <div id="caseCommunityComments" style="margin-top: 1.5rem; border-top: 1px dashed var(--border); padding-top: 1.25rem; display: none;">
-          <h6 style="font-weight: 700; margin-bottom: 0.75rem; font-size: 0.9rem; color: var(--text-primary);">💬 Reflexiones de otros colegas sobre este caso:</h6>
+          <h6 style="font-weight: 700; margin-bottom: 0.75rem; font-size: 0.9rem; color: var(--text-primary);">${t.player_comments_title || '💬 Reflexiones de otros colegas sobre este caso:'}</h6>
           <div id="caseCommentsList" style="font-size: 0.85rem; display: flex; flex-direction: column; gap: 0.65rem; max-height: 250px; overflow-y: auto; padding-right: 0.5rem;"></div>
         </div>
       </div>
 
-      <!-- Espacio para recoger sugerencias o mejoras (Carácter evolutivo de la app) -->
+      <!-- Espacio para recoger sugerencias -->
       <div class="case-feedback-form" style="margin-top: 2rem; border-top: 1px dashed var(--border); padding-top: 1.5rem; margin-bottom: 2rem;">
-        <h5 style="margin-bottom: 0.5rem; font-weight: 700; color: var(--primary);">✏️ Sugerencias o mejoras para este caso:</h5>
+        <h5 style="margin-bottom: 0.5rem; font-weight: 700; color: var(--primary);">${t.player_feedback_title || '✏️ Sugerencias o mejoras para este caso:'}</h5>
         <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
-          Este laboratorio es un recurso evolutivo. Compartí tus reflexiones o propuestas de mejora para esta situación.
+          ${t.player_feedback_desc || 'Este laboratorio es un recurso evolutivo. Compartí tus reflexiones o propuestas de mejora para esta situación.'}
         </p>
-        <textarea id="caseSuggestionText" class="input" style="width:100%; min-height: 80px; resize: vertical; margin-bottom: 0.75rem; border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem;" placeholder="Escribí aquí tus sugerencias o ideas de mejora para este caso..."></textarea>
-        <button type="button" class="btn btn-outline" id="btnSendCaseSuggestion" style="width: 100%; font-weight: 600;">Enviar sugerencia</button>
+        <textarea id="caseSuggestionText" class="input" style="width:100%; min-height: 80px; resize: vertical; margin-bottom: 0.75rem; border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem;" placeholder="${t.player_textarea_placeholder || 'Escribí aquí tus sugerencias o ideas de mejora para este caso...'}"></textarea>
+        <button type="button" class="btn btn-outline" id="btnSendCaseSuggestion" style="width: 100%; font-weight: 600;">${t.player_btn_send_feedback || 'Enviar sugerencia'}</button>
         <div id="caseSuggestionStatus" style="font-size: 0.88rem; margin-top: 0.65rem; text-align: center; font-weight: 600;"></div>
       </div>
       
       <div style="display:flex; flex-direction: column; gap: 1rem; margin-top:2.5rem; max-width: 500px; margin-left: auto; margin-right: auto;">
-        <button type="button" class="btn btn-outline" id="btnPrintCaseGuide" style="width: 100%; font-weight: 600;">🖨️ Descargar Ficha de Taller (PDF)</button>
         <button type="button" class="btn btn-primary" id="btnFinishCase" style="width: 100%; font-weight: 600;">Volver a la lista de dilemas</button>
       </div>
     `;
