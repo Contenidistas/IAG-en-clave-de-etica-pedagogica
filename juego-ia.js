@@ -416,13 +416,20 @@ function renderPrincipleGraph(target, statusTarget, options = {}) {
   }
 
   if (options.result && !active && statusTarget) {
+    const lang = (window.state && window.state.lang) || 'es';
+    const t = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[lang]) ? TRANSLATIONS[lang] : {};
     const priority = nodes.find(node => node.className === 'priority') || nodes.find(node => node.className === 'progress');
-    statusTarget.textContent = priority ? `Foco: ${priority.label}` : 'Recorrido sin focos críticos';
+    statusTarget.textContent = priority
+      ? `${t.branch_focus_prefix || 'Foco: '}${priority.label}`
+      : (t.branch_no_critical || 'Recorrido sin focos críticos');
   }
 }
 
 function renderDecisionBranchMap() {
   if (!elements.decisionBranchMap) return;
+
+  const lang = (window.state && window.state.lang) || 'es';
+  const t = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[lang]) ? TRANSLATIONS[lang] : {};
 
   const perfil = CONFIG.perfiles[state.profileKey];
   const currentNode = perfil && perfil.nodos ? perfil.nodos[state.currentId] : null;
@@ -430,8 +437,8 @@ function renderDecisionBranchMap() {
 
   if (elements.decisionBranchStatus) {
     elements.decisionBranchStatus.textContent = steps.length
-      ? `${steps.length} decisión(es)`
-      : 'Inicio';
+      ? `${steps.length} ${t.branch_decisions_label || 'decisión(es)'}`
+      : (t.branch_start || 'Inicio');
   }
 
   const renderedSteps = steps.map((step, index) => {
@@ -464,7 +471,7 @@ function renderDecisionBranchMap() {
         <div>
           <strong>${escapeGameHtml(inferirCriterioDeNodo(currentNode).label)}</strong>
           <p>${escapeGameHtml(String(currentNode.title || '').replace(/^¿|[?]$/g, ''))}</p>
-          <em>Decisión actual</em>
+          <em>${escapeGameHtml(t.branch_current || 'Decisión actual')}</em>
         </div>
       </article>
     `
@@ -472,9 +479,9 @@ function renderDecisionBranchMap() {
       <article class="decision-branch-node finish">
         <span class="decision-branch-index">✓</span>
         <div>
-          <strong>Recorrido completo</strong>
-          <p>Ya hay base para generar la devolución y el acuerdo.</p>
-          <em>Resultado</em>
+          <strong>${escapeGameHtml(t.branch_finish_title || 'Recorrido completo')}</strong>
+          <p>${escapeGameHtml(t.branch_finish_desc || 'Ya hay base para generar la devolución y el acuerdo.')}</p>
+          <em>${escapeGameHtml(t.branch_finish_label || 'Resultado')}</em>
         </div>
       </article>
     `;
@@ -482,7 +489,7 @@ function renderDecisionBranchMap() {
   elements.decisionBranchMap.innerHTML = `
     <div class="decision-branch-start">
       <span></span>
-      <strong>Inicio</strong>
+      <strong>${escapeGameHtml(t.branch_start || 'Inicio')}</strong>
     </div>
     ${renderedSteps}
     ${activeNode}
@@ -498,31 +505,33 @@ function inferirCriterioDeNodo(nodo) {
 
 function obtenerEstadoCriterio(criterioId) {
   const pasos = state.path.filter(paso => paso.criterionId === criterioId);
+  const lang = (window.state && window.state.lang) || 'es';
+  const t = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[lang]) ? TRANSLATIONS[lang] : {};
   if (!pasos.length) {
     return {
       className: 'pending',
-      label: 'Pendiente',
-      feedback: 'Todavía no apareció una decisión vinculada a este principio.'
+      label: t.criterion_status_pending || 'Pendiente',
+      feedback: t.criterion_pending_feedback || 'Todavía no apareció una decisión vinculada a este principio.'
     };
   }
   if (pasos.some(paso => paso.answerKey === 'no')) {
     return {
       className: 'priority',
-      label: 'Priorizar',
-      feedback: 'Conviene atender este principio en primer lugar: hay señales que requieren acuerdos, revisión o criterios más explícitos.'
+      label: t.criterion_status_priority || 'Priorizar',
+      feedback: t.criterion_priority_feedback || 'Conviene atender este principio en primer lugar.'
     };
   }
   if (pasos.some(paso => paso.answerKey === 'sometimes')) {
     return {
       className: 'progress',
-      label: 'En proceso',
-      feedback: 'Hay avances, pero la práctica todavía necesita mayor sistematicidad, registro o claridad.'
+      label: t.criterion_status_progress || 'En proceso',
+      feedback: t.criterion_progress_feedback || 'Hay avances, pero la práctica necesita mayor sistematicidad.'
     };
   }
   return {
     className: 'done',
-    label: 'Alineado',
-    feedback: 'Las respuestas muestran una práctica coherente con este principio. Conviene sostenerla y documentarla.'
+    label: t.criterion_status_done || 'Alineado',
+    feedback: t.criterion_done_feedback || 'Las respuestas muestran una práctica coherente con este principio.'
   };
 }
 
@@ -530,14 +539,16 @@ function renderDecisionContext(nodo) {
   const criterio = inferirCriterioDeNodo(nodo);
   if (elements.activeCriterionBadge) {
     const lang = (window.state && window.state.lang) || 'es';
-  const t = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[lang]) ? TRANSLATIONS[lang] : {};
-  const cPrefix = t.criterion_label_prefix || 'Criterio: ';
-  elements.activeCriterionBadge.textContent = `${cPrefix}${criterio.label}`;
+    const t = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[lang]) ? TRANSLATIONS[lang] : {};
+    const cPrefix = t.criterion_label_prefix || 'Criterio: ';
+    elements.activeCriterionBadge.textContent = `${cPrefix}${criterio.label}`;
   }
   if (elements.decisionReason) {
+    const lang = (window.state && window.state.lang) || 'es';
+    const t = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[lang]) ? TRANSLATIONS[lang] : {};
     const last = state.path[state.path.length - 1];
     elements.decisionReason.textContent = last
-      ? `Llegaste aquí después de responder "${last.answer}" en: ${last.question}`
+      ? `${t.decision_reason_answered || 'Llegaste aquí después de responder'} "${last.answer}" ${t.decision_reason_in || 'en:'} ${last.question}`
       : criterio.reason;
   }
 }
@@ -548,6 +559,9 @@ function updateDecisionMap() {
     return;
   }
 
+  const lang = (window.state && window.state.lang) || 'es';
+  const t = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[lang]) ? TRANSLATIONS[lang] : {};
+
   const touched = new Set(state.path.map(paso => paso.criterionId).filter(Boolean));
   const activeCriterion = (() => {
     const perfil = CONFIG.perfiles[state.profileKey];
@@ -556,7 +570,7 @@ function updateDecisionMap() {
   })();
 
   if (elements.decisionMapCount) {
-    elements.decisionMapCount.textContent = `${touched.size} de ${DECISION_CRITERIA.length} criterios`;
+    elements.decisionMapCount.textContent = `${touched.size} ${t.branch_criteria_of || 'de'} ${DECISION_CRITERIA.length} ${t.branch_criteria_label || 'criterios'}`;
   }
 
   elements.decisionMapAxes.innerHTML = DECISION_CRITERIA.map(criterio => {
@@ -634,10 +648,12 @@ function renderQuestion() {
   elements.backBtn.disabled = state.path.length === 0;
 
   elements.contextBtn.onclick = () => {
-    modal.show('Marcos de referencia', `
-      <p><strong>Fundamentación:</strong></p>
+    const lang = (window.state && window.state.lang) || 'es';
+    const t = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[lang]) ? TRANSLATIONS[lang] : {};
+    modal.show(t.modal_frameworks_title || 'Marcos de referencia', `
+      <p><strong>${t.modal_fw_foundation || 'Fundamentación:'}</strong></p>
       <p>${nodo.context}</p>
-      <p style="margin-top: 1rem;"><strong>Referencia:</strong> ${nodo.anepRef}</p>
+      <p style="margin-top: 1rem;"><strong>${t.modal_fw_reference || 'Referencia:'}</strong> ${nodo.anepRef}</p>
     `);
   };
 }
@@ -646,42 +662,39 @@ function renderQuestion() {
  * Construye un mensaje de feedback breve según la pregunta y la respuesta
  */
 function construirFeedback(nodo, answerKey) {
+  const t2 = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[(window.state && window.state.lang) || 'es']) || {};
   const t = nodo.title.toLowerCase();
 
   if (answerKey === 'na') {
-    return 'Queda registrado como no aplicable. Podés avanzar sin que afecte tu puntaje.';
+    return t2.fb_na || 'Queda registrado como no aplicable. Podés avanzar sin que afecte tu puntaje.';
   }
 
   if (answerKey === 'sometimes') {
-    if (t.includes('verific')) return 'Buen punto de partida: conviene volver la verificación más sistemática.';
-    if (t.includes('sesg')) return 'Hay una base: podés fortalecer el análisis de sesgos con criterios más explícitos.';
-    if (t.includes('autor')) return 'Vas en camino: intentá declarar la asistencia de IA siempre que corresponda.';
-    if (t.includes('regla')) return 'Hay acuerdos parciales: conviene hacerlos más claros y compartidos.';
-    return 'Respuesta parcial: hay avances, pero todavía puede consolidarse como práctica habitual.';
+    if (t.includes('verific')) return t2.fb_sometimes_verific || 'Buen punto de partida: conviene volver la verificación más sistemática.';
+    if (t.includes('sesg'))   return t2.fb_sometimes_sesg   || 'Hay una base: podés fortalecer el análisis de sesgos con criterios más explícitos.';
+    if (t.includes('autor'))  return t2.fb_sometimes_autor  || 'Vas en camino: intentá declarar la asistencia de IA siempre que corresponda.';
+    if (t.includes('regla'))  return t2.fb_sometimes_regla  || 'Hay acuerdos parciales: conviene hacerlos más claros y compartidos.';
+    return t2.fb_sometimes_default || 'Respuesta parcial: hay avances, pero todavía puede consolidarse como práctica habitual.';
   }
 
   if (answerKey === 'yes') {
-    if (t.includes('verific'))      return 'Excelente: verificás la información antes de usarla.';
-    if (t.includes('sesg'))         return 'Muy bien: reconocés sesgos y trabajás para mitigarlos.';
-    if (t.includes('autor'))        return 'Correcto: declarás autoría y asistencia de IA.';
-    if (t.includes('valor'))        return 'Bien: explicitás el valor pedagógico de la IA.';
-    if (t.includes('regla'))        return 'Perfecto: establecés reglas claras de uso.';
-    if (t.includes('aporte') || t.includes('personal'))
-      return 'Sumás valor humano: análisis, síntesis y contexto.';
-    if (t.includes('prev') || t.includes('conocimiento'))
-      return 'Correcto: partís de bases conceptuales.';
-    return 'Decisión alineada al uso crítico de la IA.';
+    if (t.includes('verific'))                             return t2.fb_yes_verific || 'Excelente: verificás la información antes de usarla.';
+    if (t.includes('sesg'))                               return t2.fb_yes_sesg    || 'Muy bien: reconocés sesgos y trabajás para mitigarlos.';
+    if (t.includes('autor'))                              return t2.fb_yes_autor   || 'Correcto: declarás autoría y asistencia de IA.';
+    if (t.includes('valor'))                              return t2.fb_yes_valor   || 'Bien: explicitás el valor pedagógico de la IA.';
+    if (t.includes('regla'))                              return t2.fb_yes_regla   || 'Perfecto: establecés reglas claras de uso.';
+    if (t.includes('aporte') || t.includes('personal'))   return t2.fb_yes_aporte  || 'Sumás valor humano: análisis, síntesis y contexto.';
+    if (t.includes('prev') || t.includes('conocimiento')) return t2.fb_yes_prev    || 'Correcto: partís de bases conceptuales.';
+    return t2.fb_yes_default || 'Decisión alineada al uso crítico de la IA.';
   } else {
-    if (t.includes('verific'))      return 'Foco posible: sumar verificación de información antes de usarla.';
-    if (t.includes('sesg'))         return 'Foco posible: incorporar análisis de sesgos y estrategias de mitigación.';
-    if (t.includes('autor'))        return 'Foco posible: declarar autoría y asistencia de IA cuando corresponda.';
-    if (t.includes('valor'))        return 'Foco posible: explicitar el valor pedagógico de la IA.';
-    if (t.includes('regla'))        return 'Foco posible: definir reglas claras de uso para tu curso.';
-    if (t.includes('aporte') || t.includes('personal'))
-      return 'Foco posible: incorporar aportes personales, síntesis y mirada crítica.';
-    if (t.includes('prev') || t.includes('conocimiento'))
-      return 'Foco posible: asegurar bases conceptuales previas.';
-    return 'Foco de mejora identificado para seguir pensando.';
+    if (t.includes('verific'))                             return t2.fb_no_verific || 'Foco posible: sumar verificación de información antes de usarla.';
+    if (t.includes('sesg'))                               return t2.fb_no_sesg    || 'Foco posible: incorporar análisis de sesgos y estrategias de mitigación.';
+    if (t.includes('autor'))                              return t2.fb_no_autor   || 'Foco posible: declarar autoría y asistencia de IA cuando corresponda.';
+    if (t.includes('valor'))                              return t2.fb_no_valor   || 'Foco posible: explicitar el valor pedagógico de la IA.';
+    if (t.includes('regla'))                              return t2.fb_no_regla   || 'Foco posible: definir reglas claras de uso para tu curso.';
+    if (t.includes('aporte') || t.includes('personal'))   return t2.fb_no_aporte  || 'Foco posible: incorporar aportes personales, síntesis y mirada crítica.';
+    if (t.includes('prev') || t.includes('conocimiento')) return t2.fb_no_prev    || 'Foco posible: asegurar bases conceptuales previas.';
+    return t2.fb_no_default || 'Foco de mejora identificado para seguir pensando.';
   }
 }
 
@@ -773,14 +786,16 @@ function responder(answerKey) {
  * Muestra el feedback inmediato debajo de la pregunta
  */
 function mostrarFeedback(texto, tone) {
+  const lang = (window.state && window.state.lang) || 'es';
+  const t = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[lang]) ? TRANSLATIONS[lang] : {};
   const tipo = tone === 'success' ? 'success' : tone === 'neutral' ? 'neutral' : 'warning';
   const titulo = tone === 'success'
-    ? 'Decisión alineada al uso crítico'
+    ? (t.feedback_title_success || 'Decisión alineada al uso crítico')
     : tone === 'neutral'
-      ? 'Respuesta registrada'
+      ? (t.feedback_title_neutral || 'Respuesta registrada')
       : tone === 'partial'
-        ? 'Práctica en proceso'
-        : 'Área de mejora identificada';
+        ? (t.feedback_title_partial || 'Práctica en proceso')
+        : (t.feedback_title_warning || 'Área de mejora identificada');
 
   elements.feedbackBox.className = `feedback ${tipo}`;
   elements.feedbackBox.innerHTML = `
