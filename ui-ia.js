@@ -18,6 +18,10 @@ const screens = {
    ======================================== */
 const TRANSLATIONS = {
   es: {
+    modal_mode_title: "¿Qué recorrido deseás realizar?",
+    modal_mode_desc: "Como docente, tenés la opción de realizar el cuestionario reflexivo para evaluar tu práctica, o ingresar directamente al Laboratorio de Casos.",
+    modal_mode_quiz: "📝 Iniciar cuestionario reflexivo",
+    modal_mode_lab: "🧪 Entrar al Laboratorio de Casos",
     consent_help: "Podés iniciar el recorrido aunque no aceptes. Si marcás esta opción, se guarda únicamente: perfil, país, seudónimo opcional, nivel de familiaridad, uso de recursos similares y registro del cuestionario.",
     consent_unchecked: "Acepto registro anónimo",
     consent_checked: "Registro anónimo aceptado",
@@ -120,6 +124,10 @@ const TRANSLATIONS = {
   },
 
   en: {
+    modal_mode_title: "Which path do you want to take?",
+    modal_mode_desc: "As a teacher, you can choose to complete the reflective questionnaire or go directly to the Cases Laboratory (Workshop Mode).",
+    modal_mode_quiz: "📝 Start reflective questionnaire",
+    modal_mode_lab: "🧪 Open Cases Laboratory",
     consent_help: "You can start the journey even if you do not accept. If checked, only profile, country, optional pseudonym, familiarity level, resources usage, and survey responses are saved anonymously.",
     consent_unchecked: "I accept anonymous tracking",
     consent_checked: "Anonymous tracking accepted",
@@ -222,6 +230,10 @@ const TRANSLATIONS = {
   },
 
   pt: {
+    modal_mode_title: "Qual percurso você deseja realizar?",
+    modal_mode_desc: "Como professor, você pode optar por preencher o questionário reflexivo ou acessar diretamente o Laboratório de Casos (Modo Oficina).",
+    modal_mode_quiz: "📝 Iniciar questionário reflexivo",
+    modal_mode_lab: "🧪 Entrar no Laboratório de Casos",
     consent_help: "Você pode iniciar o percurso mesmo sem aceitar. Se marcado, salva-se apenas: perfil, país, pseudônimo opcional, familiaridade, uso de recursos e respostas anônimas.",
     consent_unchecked: "Aceito registro anônimo",
     consent_checked: "Registro anônimo aceito",
@@ -324,6 +336,10 @@ const TRANSLATIONS = {
   },
 
   fr: {
+    modal_mode_title: "Quel parcours souhaitez-vous effectuer ?",
+    modal_mode_desc: "En tant qu'enseignant, vous pouvez choisir de remplir le questionnaire réflexif ou d'accéder directement au Laboratoire de cas (Mode atelier).",
+    modal_mode_quiz: "📝 Démarrer le questionnaire réflexif",
+    modal_mode_lab: "🧪 Entrer dans le Laboratoire de cas",
     consent_help: "Vous pouvez commencer le parcours même si vous n'acceptez pas. Si vous cochez cette option, seuls le profil, le pays, le pseudonyme optionnel, la familiarité, l'usage des ressources et les réponses sont enregistrés anonymement.",
     consent_unchecked: "J'accepte l'enregistrement anonyme",
     consent_checked: "Enregistrement anonyme accepté",
@@ -1427,7 +1443,9 @@ function updateOnboardingUI() {
   }
   if (elements.onboardingNextBtn) {
     const isLast = state.onboardingStep === keys.length - 1;
-    elements.onboardingNextBtn.textContent = isLast ? 'Iniciar cuestionario' : 'Siguiente';
+    const lang = (window.state && window.state.lang) || 'es';
+    const t = TRANSLATIONS[lang] || TRANSLATIONS['es'];
+    elements.onboardingNextBtn.textContent = isLast ? (t.btn_start_game || 'Iniciar cuestionario') : (t.btn_next || 'Siguiente');
   }
 
   updateCarousel();
@@ -1493,24 +1511,31 @@ function advanceOnboarding() {
 }
 
 function mostrarDecisionModoDocente() {
+  const lang = (window.state && window.state.lang) || 'es';
+  const t = TRANSLATIONS[lang] || TRANSLATIONS['es'];
+  const modalTitle = t.modal_mode_title || '¿Qué recorrido deseás realizar?';
+  const modalDesc = t.modal_mode_desc || 'Como docente, tenés la opción de realizar el cuestionario reflexivo para evaluar tu práctica con inteligencia artificial generativa, o ingresar de manera directa al Laboratorio de Casos (Modo Taller).';
+  const quizBtnText = t.modal_mode_quiz || '📝 Iniciar cuestionario reflexivo';
+  const labBtnText = t.modal_mode_lab || '🧪 Entrar al Laboratorio de Casos';
+
   const content = `
     <div class="mode-selection-modal-body" style="text-align: center; padding: 1rem 0;">
       <p style="margin-bottom: 1.5rem; font-size: 1.05rem; line-height: 1.5; color: var(--text-secondary);">
-        Como docente, tenés la opción de realizar el cuestionario reflexivo para evaluar tu práctica con inteligencia artificial generativa, o ingresar de manera directa al **Laboratorio de Casos (Modo Taller)**.
+        ${modalDesc}
       </p>
       <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 320px; margin: 0 auto;">
         <button type="button" class="btn btn-primary" id="btnChooseQuiz" style="padding: 0.85rem; font-size: 1rem; width: 100%;">
-          📝 Iniciar cuestionario reflexivo
+          ${quizBtnText}
         </button>
         <button type="button" class="btn btn-outline" id="btnChooseLab" style="padding: 0.85rem; font-size: 1rem; width: 100%; border-color: var(--primary); color: var(--primary); background: var(--bg-main);">
-          🧪 Entrar al Laboratorio de Casos
+          ${labBtnText}
         </button>
       </div>
     </div>
   `;
   
   if (typeof modal !== 'undefined' && typeof modal.show === 'function') {
-    modal.show('¿Qué recorrido deseás realizar?', content);
+    modal.show(modalTitle, content);
     
     const btnQuiz = document.getElementById('btnChooseQuiz');
     const btnLab = document.getElementById('btnChooseLab');
