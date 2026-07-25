@@ -18,6 +18,19 @@ const screens = {
    ======================================== */
 const TRANSLATIONS = {
   es: {
+    footer_created_by: "Creado por",
+    footer_based_on: "Basado en marcos de",
+    footer_updated_text: "Sitio en constante actualización con nuevas funcionalidades y mejoras",
+    footer_ia_declaration: "Declaración de uso de IA",
+    help_toggle_title: "Ver ayuda y contexto",
+    decision_reason_default: "El recorrido adapta las preguntas según tus respuestas.",
+    criterion_label_prefix: "Criterio: ",
+    results_level_prefix: "Nivel: ",
+    results_your_level: "Tu nivel: ",
+    compass_kicker: "BRÚJULA ÉTICA",
+    compass_title: "Mapa de criterios para decidir",
+    compass_suggested_focus: "Foco sugerido: ",
+    badge_priority: "Prioritario",
     btn_prev_slide: "← Anterior",
     btn_next_slide: "Siguiente →",
     framework_kicker: "Fundamentación de la herramienta",
@@ -164,6 +177,19 @@ const TRANSLATIONS = {
   },
 
   en: {
+    footer_created_by: "Created by",
+    footer_based_on: "Based on frameworks from",
+    footer_updated_text: "Site constantly updated with new features and improvements",
+    footer_ia_declaration: "AI usage statement",
+    help_toggle_title: "View help and context",
+    decision_reason_default: "The journey adapts questions based on your responses.",
+    criterion_label_prefix: "Criterion: ",
+    results_level_prefix: "Level: ",
+    results_your_level: "Your level: ",
+    compass_kicker: "ETHICAL COMPASS",
+    compass_title: "Decision criteria map",
+    compass_suggested_focus: "Suggested focus: ",
+    badge_priority: "Priority",
     btn_prev_slide: "← Previous",
     btn_next_slide: "Next →",
     framework_kicker: "Tool rationale & foundation",
@@ -456,6 +482,19 @@ const TRANSLATIONS = {
   },
 
   fr: {
+    footer_created_by: "Créé par",
+    footer_based_on: "Basé sur les cadres de",
+    footer_updated_text: "Site en constante mise à jour avec de nouvelles fonctionnalités et améliorations",
+    footer_ia_declaration: "Déclaration d'utilisation de l'IA",
+    help_toggle_title: "Voir l'aide et le contexte",
+    decision_reason_default: "Le parcours adapte les questions selon vos réponses.",
+    criterion_label_prefix: "Critère : ",
+    results_level_prefix: "Niveau : ",
+    results_your_level: "Votre niveau : ",
+    compass_kicker: "BOUSSOLE ÉTHIQUE",
+    compass_title: "Carte des critères de décision",
+    compass_suggested_focus: "Focus suggéré : ",
+    badge_priority: "Prioritaire",
     btn_prev_slide: "← Précédent",
     btn_next_slide: "Suivant →",
     framework_kicker: "Fondement de l'outil",
@@ -635,7 +674,7 @@ function updateAppLanguage(lang = 'es') {
   const abortBtn = document.getElementById('btnAbortGame');
   if (abortBtn) abortBtn.textContent = t.btn_abort || 'Volver al inicio';
   const helpBtn = document.getElementById('toggleHelpBtn');
-  if (helpBtn) helpBtn.textContent = t.help_toggle || 'Ayuda pedagógica';
+  if (helpBtn) { helpBtn.textContent = '?'; helpBtn.title = t.help_toggle_title || 'Ver ayuda y contexto'; helpBtn.setAttribute('aria-label', helpBtn.title); }
   const prevBtn = document.getElementById('prevQuestionBtn');
   if (prevBtn) prevBtn.textContent = t.btn_prev_question || 'Anterior';
   const nextBtn = document.getElementById('nextQuestionBtn');

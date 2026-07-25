@@ -7153,6 +7153,8 @@ select.input,
 .btn-toggle-help {
   width: 32px;
   height: 32px;
+  min-width: 32px;
+  min-height: 32px;
   border-radius: 50%;
   border: 1px solid var(--border);
   background: var(--bg-main);
@@ -7161,12 +7163,16 @@ select.input,
   font-size: 1.1rem;
   font-weight: 700;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   transition: all 0.25s ease;
   box-shadow: var(--shadow);
   padding: 0;
+  line-height: 1;
+  text-align: center;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .btn-toggle-help:hover {

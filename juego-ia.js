@@ -529,7 +529,10 @@ function obtenerEstadoCriterio(criterioId) {
 function renderDecisionContext(nodo) {
   const criterio = inferirCriterioDeNodo(nodo);
   if (elements.activeCriterionBadge) {
-    elements.activeCriterionBadge.textContent = `Criterio: ${criterio.label}`;
+    const lang = (window.state && window.state.lang) || 'es';
+  const t = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[lang]) ? TRANSLATIONS[lang] : {};
+  const cPrefix = t.criterion_label_prefix || 'Criterio: ';
+  elements.activeCriterionBadge.textContent = `${cPrefix}${criterio.label}`;
   }
   if (elements.decisionReason) {
     const last = state.path[state.path.length - 1];
@@ -837,8 +840,11 @@ function retroceder() {
 function updateProgress() {
   const porcentaje = ((state.currentQuestion - 1) / state.totalQuestions) * 100;
   elements.progressFill.style.width = `${porcentaje}%`;
-  elements.progressText.textContent =
-    `Pregunta ${state.currentQuestion} de ${state.totalQuestions}`;
+  const lang = (window.state && window.state.lang) || 'es';
+  const t = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[lang]) ? TRANSLATIONS[lang] : { question_counter_q: 'Pregunta', question_counter_of: 'de' };
+  const qWord = t.question_counter_q || 'Pregunta';
+  const ofWord = t.question_counter_of || 'de';
+  elements.progressText.textContent = `${qWord} ${state.currentQuestion} ${ofWord} ${state.totalQuestions}`;
 }
 
 function updateLikert() {
