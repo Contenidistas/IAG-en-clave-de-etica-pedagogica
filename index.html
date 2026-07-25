@@ -359,7 +359,7 @@
                ========================================== -->
    <div class="carousel-controls">
   
-  <button class="carousel-btn" id="prevSlide">
+  <button class="carousel-btn" id="prevSlide" data-i18n="btn_prev_slide">
     ← Anterior
   </button>
   
@@ -370,7 +370,7 @@
 
   <div class="action-buttons">
     
-    <button class="carousel-btn" id="nextSlide">
+    <button class="carousel-btn" id="nextSlide" data-i18n="btn_next_slide">
       Siguiente →
     </button>
 
@@ -390,27 +390,27 @@
       <!-- Principios clave UNESCO/ANEP/FING/Udelar/Ceibal -->
       <div class="card framework-card audience-framework" style="margin-top: 1.5rem;">
         <div class="framework-hero">
-          <p class="section-kicker">Fundamentación de la herramienta</p>
+          <p class="section-kicker" data-i18n="framework_kicker">Fundamentación de la herramienta</p>
           <h3 id="frameworkAudienceTitle">Marcos de UNESCO, ANEP, FING, Udelar y Ceibal</h3>
           <p id="frameworkAudienceIntro">
             Una propuesta construida desde investigación, formación docente, experiencia de aula y marcos uruguayos recientes para pensar el uso ético, crítico y reflexivo de la IA.
           </p>
           <div class="framework-hero-actions">
-            <a href="fundamentacion.html" class="framework-read-more">Leer fundamentación completa</a>
+            <a href="fundamentacion.html" class="framework-read-more" data-i18n="fw_read_full">Leer fundamentación completa</a>
             <button type="button" class="framework-read-more framework-toggle-btn" id="toggleFrameworkBtn">Ver marcos</button>
           </div>
         </div>
 
         <div class="framework-context">
-          <strong>Sentido de la propuesta</strong>
+          <strong data-i18n="fw_sense_title">Sentido de la propuesta</strong>
           <p id="frameworkContextText">
             Estas herramientas requieren criterios compartidos, transparencia y espacios de reflexión pedagógica situada.
           </p>
         </div>
 
         <div class="framework-compact-summary" id="frameworkCompactSummary">
-          <strong>En este recorrido vas a revisar:</strong>
-          <span>transparencia, verificación, privacidad, sesgos y aporte humano.</span>
+          <strong data-i18n="fw_compact_prefix">En este recorrido vas a revisar:</strong>
+          <span data-i18n="fw_compact_items">transparencia, verificación, privacidad, sesgos y aporte humano.</span>
         </div>
 
         <div class="framework-links" aria-label="Accesos directos a marcos de referencia">
@@ -568,13 +568,13 @@
       <section class="stats-section" aria-labelledby="statsTitle">
         <div class="stats-header">
           <div>
-            <p class="section-kicker">Datos anónimos de uso</p>
-            <h2 id="statsTitle">Estadísticas globales</h2>
+            <p class="section-kicker" data-i18n="stats_kicker">Datos anónimos de uso</p>
+            <h2 id="statsTitle" data-i18n="stats_title">Estadísticas globales</h2>
           </div>
-          <button type="button" class="btn btn-outline" id="refreshStatsBtn">Actualizar</button>
+          <button type="button" class="btn btn-outline" id="refreshStatsBtn" data-i18n="btn_refresh_stats">Actualizar</button>
         </div>
 
-        <p class="stats-note">
+        <p class="stats-note" data-i18n="stats_note">
           Estos indicadores muestran datos agregados: sesiones anónimas y cuestionarios efectivamente guardados en la base D1. No se publican nombres, respuestas individuales ni datos identificables.
         </p>
 
@@ -583,46 +583,46 @@
         <div id="statsContent" class="stats-content hidden">
           <div class="stats-kpis">
             <div class="stats-kpi">
-              <span class="stats-kpi-label">Sesiones registradas</span>
+              <span class="stats-kpi-label" data-i18n="stat_visits_label">Sesiones registradas</span>
               <strong id="statVisits">0</strong>
             </div>
             <div class="stats-kpi">
-              <span class="stats-kpi-label">Cuestionarios completados</span>
+              <span class="stats-kpi-label" data-i18n="stat_completed_label">Cuestionarios completados</span>
               <strong id="statCompleted">0</strong>
             </div>
             <div class="stats-kpi">
-              <span class="stats-kpi-label">Puntaje promedio</span>
+              <span class="stats-kpi-label" data-i18n="stat_average_label">Puntaje promedio</span>
               <strong id="statAverage">0</strong>
             </div>
             <div class="stats-kpi">
-              <span class="stats-kpi-label">Nivel más frecuente</span>
+              <span class="stats-kpi-label" data-i18n="stat_top_level_label">Nivel más frecuente</span>
               <strong id="statTopLevel">—</strong>
             </div>
           </div>
 
           <div class="stats-grid">
             <article class="stats-card">
-              <h3>Distribución por nivel</h3>
+              <h3 data-i18n="stat_chart_levels">Distribución por nivel</h3>
               <div id="statsLevels" class="stats-bars"></div>
             </article>
 
             <article class="stats-card">
-              <h3>Perfiles participantes</h3>
+              <h3 data-i18n="stat_chart_profiles">Perfiles participantes</h3>
               <div id="statsProfiles" class="stats-bars"></div>
             </article>
 
             <article class="stats-card stats-card--improvement">
-              <h3>Indicadores a fortalecer</h3>
+              <h3 data-i18n="stat_chart_indicators">Indicadores a fortalecer</h3>
               <div id="statsIndicators" class="stats-bars"></div>
             </article>
 
             <article class="stats-card">
-              <h3>Distribución por formación</h3>
+              <h3 data-i18n="stat_chart_education">Distribución por formación</h3>
               <div id="statsEducation" class="stats-bars"></div>
             </article>
 
             <article class="stats-card stats-card--insight">
-              <h3>Lectura pedagógica</h3>
+              <h3 data-i18n="stat_chart_insight">Lectura pedagógica</h3>
               <div id="statsInsight" class="stats-insight"></div>
             </article>
           </div>
@@ -632,8 +632,8 @@
       <section class="opinions-section" aria-labelledby="opinionsTitle">
         <div class="opinions-header">
           <div>
-            <p class="section-kicker">Opiniones anónimas</p>
-            <h2 id="opinionsTitle">Qué dicen quienes la usaron</h2>
+            <p class="section-kicker" data-i18n="opinions_kicker">Opiniones anónimas</p>
+            <h2 id="opinionsTitle" data-i18n="opinions_title">Qué dicen quienes la usaron</h2>
           </div>
           <div class="opinions-controls" aria-label="Controles de opiniones">
             <button type="button" class="opinion-nav-btn" id="prevOpinionBtn" aria-label="Opinión anterior">‹</button>
@@ -647,7 +647,7 @@
       <section class="local-history-section" aria-labelledby="localHistoryTitle">
         <div class="local-history-header">
           <div>
-            <p class="section-kicker">Historial local</p>
+            <p class="section-kicker" data-i18n="history_kicker">Historial local</p>
             <h2 id="localHistoryTitle">Mis últimos diagnósticos</h2>
           </div>
           <button type="button" class="btn btn-outline" id="clearLocalHistoryBtn">Limpiar historial</button>

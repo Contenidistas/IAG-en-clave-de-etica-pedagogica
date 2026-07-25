@@ -18,6 +18,46 @@ const screens = {
    ======================================== */
 const TRANSLATIONS = {
   es: {
+    btn_prev_slide: "← Anterior",
+    btn_next_slide: "Siguiente →",
+    framework_kicker: "Fundamentación de la herramienta",
+    fw_read_full: "Leer fundamentación completa",
+    fw_btn_view: "Ver marcos",
+    fw_btn_hide: "Ocultar marcos",
+    fw_sense_title: "Sentido de la propuesta",
+    fw_compact_prefix: "En este recorrido vas a revisar:",
+    fw_compact_items: "transparencia, verificación, privacidad, sesgos y aporte humano.",
+    fw_foreign_title: "Marco Internacional de la UNESCO",
+    fw_foreign_context: "Para países fuera de Uruguay, la herramienta adapta las referencias priorizando las directrices internacionales de la UNESCO.",
+    fw_base_title: "Marcos de UNESCO, ANEP, FING, Udelar y Ceibal",
+    fw_base_intro: "Una propuesta construida desde investigación, formación docente, experiencia de aula y marcos actuales para pensar el uso ético de la IA.",
+    fw_base_context: "Estas herramientas requieren criterios compartidos, transparencia y espacios de reflexión pedagógica situada.",
+    fw_estudiante_title: "Criterios para usar IA en tareas y estudio",
+    fw_estudiante_intro: "Un recorrido breve para revisar transparencia, verificación, privacidad y aporte propio.",
+    fw_estudiante_context: "El recorrido prioriza decisiones concretas para estudiar y producir con responsabilidad.",
+    fw_docente_title: "Criterios para orientar prácticas de aula",
+    fw_docente_intro: "Una guía para pensar consignas, evaluación, acompañamiento y acuerdos de uso de IA con estudiantes.",
+    fw_docente_context: "Como docentes, necesitamos criterios claros para definir cuándo se permite la IA, cómo se declara y cómo se evalúa el aporte humano.",
+    fw_especializado_title: "Marcos para formación, investigación y criterios compartidos",
+    fw_especializado_intro: "Una lectura ampliada para quienes investigan, forman o acompañan procesos sobre IA educativa.",
+    fw_especializado_context: "Desde la formación, la investigación y la experiencia situada, estos marcos permiten construir criterios compartidos.",
+    stats_kicker: "Datos anónimos de uso",
+    stats_title: "Estadísticas globales",
+    btn_refresh_stats: "Actualizar",
+    stats_note: "Estos indicadores muestran datos agregados: sesiones anónimas y cuestionarios efectivamente guardados en la base D1. No se publican nombres, respuestas individuales ni datos identificables.",
+    stat_visits_label: "Sesiones registradas",
+    stat_completed_label: "Cuestionarios completados",
+    stat_average_label: "Puntaje promedio",
+    stat_top_level_label: "Nivel más frecuente",
+    stat_chart_levels: "Distribución por nivel",
+    stat_chart_profiles: "Perfiles participantes",
+    stat_chart_indicators: "Indicadores a fortalecer",
+    stat_chart_education: "Distribución por formación",
+    stat_chart_insight: "Lectura pedagógica",
+    opinions_kicker: "Opiniones anónimas",
+    opinions_title: "Qué dicen quienes la usaron",
+    history_kicker: "Historial local",
+    history_title: "Tus recorridos previos",
     modal_mode_title: "¿Qué recorrido deseás realizar?",
     modal_mode_desc: "Como docente, tenés la opción de realizar el cuestionario reflexivo para evaluar tu práctica, o ingresar directamente al Laboratorio de Casos.",
     modal_mode_quiz: "📝 Iniciar cuestionario reflexivo",
@@ -124,6 +164,46 @@ const TRANSLATIONS = {
   },
 
   en: {
+    btn_prev_slide: "← Previous",
+    btn_next_slide: "Next →",
+    framework_kicker: "Tool rationale & foundation",
+    fw_read_full: "Read full rationale",
+    fw_btn_view: "View frameworks",
+    fw_btn_hide: "Hide frameworks",
+    fw_sense_title: "Proposal purpose",
+    fw_compact_prefix: "In this journey you will review:",
+    fw_compact_items: "transparency, verification, privacy, bias, and human contribution.",
+    fw_foreign_title: "UNESCO International Framework",
+    fw_foreign_context: "For countries outside Uruguay, the tool adapts references prioritizing UNESCO international guidelines.",
+    fw_base_title: "UNESCO, ANEP, FING, Udelar & Ceibal Frameworks",
+    fw_base_intro: "A proposal built from research, teacher training, classroom experience, and current frameworks to consider ethical AI use.",
+    fw_base_context: "These tools require shared criteria, transparency, and situated pedagogical reflection.",
+    fw_estudiante_title: "Criteria for using AI in tasks and study",
+    fw_estudiante_intro: "A brief journey to review transparency, verification, privacy, and personal contribution.",
+    fw_estudiante_context: "The journey prioritizes concrete decisions to study and produce responsibly.",
+    fw_docente_title: "Criteria for guiding classroom practices",
+    fw_docente_intro: "A guide for designing assignments, assessment, guidance, and AI usage agreements with students.",
+    fw_docente_context: "As teachers, we need clear criteria to define when AI is allowed, how it is disclosed, and how human contribution is evaluated.",
+    fw_especializado_title: "Frameworks for training, research, and shared criteria",
+    fw_especializado_intro: "An expanded reading for those who research, train, or support educational AI processes.",
+    fw_especializado_context: "From training, research, and situated experience, these frameworks build shared, pedagogically sound criteria.",
+    stats_kicker: "Anonymous usage data",
+    stats_title: "Global statistics",
+    btn_refresh_stats: "Refresh",
+    stats_note: "These metrics show aggregated data: anonymous sessions and surveys saved in the D1 database. No names or individual responses are published.",
+    stat_visits_label: "Registered sessions",
+    stat_completed_label: "Completed surveys",
+    stat_average_label: "Average score",
+    stat_top_level_label: "Most frequent level",
+    stat_chart_levels: "Level distribution",
+    stat_chart_profiles: "Participant profiles",
+    stat_chart_indicators: "Indicators to strengthen",
+    stat_chart_education: "Education level distribution",
+    stat_chart_insight: "Pedagogical insight",
+    opinions_kicker: "Anonymous feedback",
+    opinions_title: "What users say",
+    history_kicker: "Local history",
+    history_title: "Your previous journeys",
     modal_mode_title: "Which path do you want to take?",
     modal_mode_desc: "As a teacher, you can choose to complete the reflective questionnaire or go directly to the Cases Laboratory (Workshop Mode).",
     modal_mode_quiz: "📝 Start reflective questionnaire",
@@ -230,6 +310,46 @@ const TRANSLATIONS = {
   },
 
   pt: {
+    btn_prev_slide: "← Voltar",
+    btn_next_slide: "Avançar →",
+    framework_kicker: "Fundamentação da ferramenta",
+    fw_read_full: "Ler fundamentação completa",
+    fw_btn_view: "Ver marcos",
+    fw_btn_hide: "Ocultar marcos",
+    fw_sense_title: "Sentido da proposta",
+    fw_compact_prefix: "Neste percurso você revisará:",
+    fw_compact_items: "transparência, verificação, privacidade, vieses e contribuição humana.",
+    fw_foreign_title: "Marco Internacional da UNESCO",
+    fw_foreign_context: "Para países fora do Uruguai, a ferramenta adapta as referências priorizando as diretrizes internacionais da UNESCO.",
+    fw_base_title: "Marcos da UNESCO, ANEP, FING, Udelar e Ceibal",
+    fw_base_intro: "Uma proposta construída a partir de pesquisa, formação docente, experiência em sala de aula e marcos atuais sobre o uso ético da IA.",
+    fw_base_context: "Estas ferramentas exigem critérios compartilhados, transparência e espaços de reflexão pedagógica situada.",
+    fw_estudiante_title: "Critérios para usar IA em tarefas e estudos",
+    fw_estudiante_intro: "Um breve percurso para revisar transparência, verificação, privacidade e contribuição própria.",
+    fw_estudiante_context: "O percurso prioriza decisões concretas para estudar e produzir com responsabilidade.",
+    fw_docente_title: "Critérios para orientar práticas de sala de aula",
+    fw_docente_intro: "Um guia para pensar tarefas, avaliação, acompanhamento e acordos de uso de IA com estudantes.",
+    fw_docente_context: "Como professores, precisamos de critérios claros para definir quando a IA é permitida e como a contribuição humana é avaliada.",
+    fw_especializado_title: "Marcos para formação, pesquisa e critérios compartilhados",
+    fw_especializado_intro: "Uma leitura ampliada para quem pesquisa, forma ou acompanha processos de IA educacional.",
+    fw_especializado_context: "A partir da formação e da experiência situada, estes marcos permitem construir critérios compartilhados.",
+    stats_kicker: "Dados anônimos de uso",
+    stats_title: "Estatísticas globais",
+    btn_refresh_stats: "Atualizar",
+    stats_note: "Estes indicadores mostram dados agregados: sessões anônimas e questionários salvos no banco D1. Nenhum nome ou resposta individual é publicado.",
+    stat_visits_label: "Sessões registradas",
+    stat_completed_label: "Questionários concluídos",
+    stat_average_label: "Pontuação média",
+    stat_top_level_label: "Nível mais frequente",
+    stat_chart_levels: "Distribuição por nível",
+    stat_chart_profiles: "Perfis participantes",
+    stat_chart_indicators: "Indicadores a fortalecer",
+    stat_chart_education: "Distribuição por formação",
+    stat_chart_insight: "Leitura pedagógica",
+    opinions_kicker: "Opiniões anônimas",
+    opinions_title: "O que dizem os usuários",
+    history_kicker: "Histórico local",
+    history_title: "Seus percursos anteriores",
     modal_mode_title: "Qual percurso você deseja realizar?",
     modal_mode_desc: "Como professor, você pode optar por preencher o questionário reflexivo ou acessar diretamente o Laboratório de Casos (Modo Oficina).",
     modal_mode_quiz: "📝 Iniciar questionário reflexivo",
@@ -336,6 +456,46 @@ const TRANSLATIONS = {
   },
 
   fr: {
+    btn_prev_slide: "← Précédent",
+    btn_next_slide: "Suivant →",
+    framework_kicker: "Fondement de l'outil",
+    fw_read_full: "Lire le fondement complet",
+    fw_btn_view: "Voir les cadres",
+    fw_btn_hide: "Masquer les cadres",
+    fw_sense_title: "Sens de la proposition",
+    fw_compact_prefix: "Dans ce parcours vous examinerez :",
+    fw_compact_items: "transparence, vérification, confidentialité, biais et apport humain.",
+    fw_foreign_title: "Cadre International de l'UNESCO",
+    fw_foreign_context: "Pour les pays hors Uruguay, l'outil adapte les références en priorisant les directives internationales de l'UNESCO.",
+    fw_base_title: "Cadres de l'UNESCO, ANEP, FING, Udelar & Ceibal",
+    fw_base_intro: "Une proposition construite à partir de la recherche, de la formation enseignante et de l'expérience de classe sur l'usage éthique de l'IA.",
+    fw_base_context: "Ces outils nécessitent des critères partagés, de la transparence et de la réflexion pédagogique située.",
+    fw_estudiante_title: "Critères pour utiliser l'IA dans les travaux et études",
+    fw_estudiante_intro: "Un bref parcours pour réviser la transparence, la vérification, la confidentialité et l'apport personnel.",
+    fw_estudiante_context: "Le parcours priorise des décisions concrètes pour étudier et produire de manière responsable.",
+    fw_docente_title: "Critères pour orienter les pratiques de classe",
+    fw_docente_intro: "Un guide pour concevoir les travaux, l'évaluation, l'accompagnement et les accords d'usage de l'IA avec les élèves.",
+    fw_docente_context: "En tant qu'enseignants, nous avons besoin de critères clairs pour définir quand l'IA est autorisée et comment l'apport humain est évalué.",
+    fw_especializado_title: "Cadres pour la formation, la recherche et les critères partagés",
+    fw_especializado_intro: "Une lecture approfondie pour ceux qui cherchent, forment ou accompagnent les processus d'IA éducative.",
+    fw_especializado_context: "À partir de la formation et de l'expérience située, ces cadres permettent de construire des critères partagés.",
+    stats_kicker: "Données d'utilisation anonymes",
+    stats_title: "Statistiques globales",
+    btn_refresh_stats: "Actualiser",
+    stats_note: "Ces indicateurs montrent des données agrégées : sessions anonymes et questionnaires effectivement enregistrés dans la base D1.",
+    stat_visits_label: "Sessions enregistrées",
+    stat_completed_label: "Questionnaires terminés",
+    stat_average_label: "Score moyen",
+    stat_top_level_label: "Niveau le plus fréquent",
+    stat_chart_levels: "Distribution par niveau",
+    stat_chart_profiles: "Profils participants",
+    stat_chart_indicators: "Indicateurs à renforcer",
+    stat_chart_education: "Distribution par niveau d'études",
+    stat_chart_insight: "Analyse pédagogique",
+    opinions_kicker: "Avis anonymes",
+    opinions_title: "Ce que disent les utilisateurs",
+    history_kicker: "Historique local",
+    history_title: "Vos parcours précédents",
     modal_mode_title: "Quel parcours souhaitez-vous effectuer ?",
     modal_mode_desc: "En tant qu'enseignant, vous pouvez choisir de remplir le questionnaire réflexif ou d'accéder directement au Laboratoire de cas (Mode atelier).",
     modal_mode_quiz: "📝 Démarrer le questionnaire réflexif",
@@ -525,6 +685,13 @@ function updateAppLanguage(lang = 'es') {
   if (typeof syncSelectWithChips === 'function') {
     syncSelectWithChips('familiaridadInicial', 'familiaridadChips');
   }
+  if (typeof updateFrameworkAudience === 'function') {
+    updateFrameworkAudience(window.state && window.state.profile ? window.state.profile : null);
+  }
+  const prevSlideBtn = document.getElementById('prevSlide');
+  if (prevSlideBtn) prevSlideBtn.textContent = t.btn_prev_slide || '← Anterior';
+  const nextSlideBtn = document.getElementById('nextSlide');
+  if (nextSlideBtn) nextSlideBtn.textContent = t.btn_next_slide || 'Siguiente →';
 }
 
 
@@ -1210,24 +1377,29 @@ function updateFrameworkAudience(perfil) {
   if (!elements.frameworkCard) return;
   const audience = perfil || 'none';
   const isForeign = isForeignCountry();
-  const baseTitle = isForeign ? 'Marco Internacional de la UNESCO (IA Generativa en Educación)' : 'Marcos de UNESCO, ANEP, FING, Udelar y Ceibal';
-  const copy = FRAMEWORK_AUDIENCE_COPY[audience] || {
-    title: baseTitle,
-    intro: 'Elegí un perfil para adaptar la profundidad de la fundamentación y hacer el recorrido más liviano.',
-    context: isForeign ? 'Para países fuera de Uruguay, la herramienta adapta las referencias priorizando las directrices internacionales de la UNESCO.' : 'La herramienta adapta la densidad de los marcos según el lugar desde el que se realiza el recorrido.',
-    button: 'Ver marcos'
-  };
-  if (isForeign) {
-    copy.title = 'Marco Internacional de la UNESCO';
+  const lang = (window.state && window.state.lang) || 'es';
+  const t = TRANSLATIONS[lang] || TRANSLATIONS['es'];
+
+  const baseTitle = isForeign
+    ? (t.fw_foreign_title || 'Marco Internacional de la UNESCO')
+    : (t.fw_base_title || 'Marcos de UNESCO, ANEP, FING, Udelar y Ceibal');
+
+  let title = t[`fw_${audience}_title`] || baseTitle;
+  let intro = t[`fw_${audience}_intro`] || (t.fw_base_intro || 'Una propuesta construida desde investigación, formación docente...');
+  let context = t[`fw_${audience}_context`] || (isForeign ? (t.fw_foreign_context || 'Para países fuera de Uruguay, la herramienta adapta las referencias priorizando la UNESCO.') : (t.fw_base_context || 'Estas herramientas requieren criterios compartidos...'));
+  let buttonText = audience === 'especializado' ? (t.fw_btn_hide || 'Ocultar marcos') : (t.fw_btn_view || 'Ver marcos');
+
+  if (isForeign && audience === 'none') {
+    title = t.fw_foreign_title || 'Marco Internacional de la UNESCO';
   }
 
   elements.frameworkCard.dataset.audience = audience;
   elements.frameworkCard.classList.toggle('framework-expanded', audience === 'especializado');
 
-  if (elements.frameworkAudienceTitle) elements.frameworkAudienceTitle.textContent = copy.title;
-  if (elements.frameworkAudienceIntro) elements.frameworkAudienceIntro.textContent = copy.intro;
-  if (elements.frameworkContextText) elements.frameworkContextText.textContent = copy.context;
-  if (elements.toggleFrameworkBtn) elements.toggleFrameworkBtn.textContent = copy.button;
+  if (elements.frameworkAudienceTitle) elements.frameworkAudienceTitle.textContent = title;
+  if (elements.frameworkAudienceIntro) elements.frameworkAudienceIntro.textContent = intro;
+  if (elements.frameworkContextText) elements.frameworkContextText.textContent = context;
+  if (elements.toggleFrameworkBtn) elements.toggleFrameworkBtn.textContent = buttonText;
 }
 if (elements.nextSlide) {
   elements.nextSlide.addEventListener('click', () => { 
