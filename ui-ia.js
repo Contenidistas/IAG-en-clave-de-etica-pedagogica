@@ -215,11 +215,27 @@ const TRANSLATIONS = {
     btn_download_pdf: "Descargar PDF",
     btn_restart: "Volver al inicio / Reiniciar",
     cases_section_title: "Laboratorio de casos / Dilemas para debatir",
+    cases_kicker: "Casos situados",
+    cases_title: "Dilemas para debatir y decidir",
+    cases_badge: "Aplicable",
+    cases_lead: "Elegí un caso para abrir una conversación de aula, sala docente o equipo institucional. Cada caso conecta una decisión concreta con los principios activados en tu recorrido.",
+    lab_cases_title: "Laboratorio de Casos: Dilemas Éticos en Modo Taller",
+    situated_dilemmas_title: "Dilemas pedagógicos situados",
 
     lab_title: "Laboratorio de casos situados",
     lab_subtitle: "Análisis de dilemas éticos y pedagógicos para la toma de decisiones",
     btn_analyze_dilemma: "Analizar dilema",
     btn_download_ficha: "Descargar ficha PDF (Taller)",
+
+    chatbot_tooltip_title: "Oportunidad de profundización",
+    chatbot_tooltip_copy: "Consultá al Asistente Pedagógico para resolver dudas sobre el uso crítico de IA.",
+    chatbot_label: "Asistente Pedagógico",
+    chatbot_header_subtitle: "Asistencia generada con IA",
+    chatbot_welcome_title: "Hola, soy tu Asistente Pedagógico",
+    chatbot_welcome_copy: "Puedo ayudarte a interpretar tus respuestas, revisar preguntas del recorrido y pensar mejoras para un uso crítico de IA en educación.",
+    chatbot_disclosure_title: "Transparencia de uso",
+    chatbot_disclosure_copy: "Este asistente usa IA generativa para orientar la reflexión. Sus respuestas pueden requerir verificación y no sustituyen el criterio docente, académico o institucional.",
+    chatbot_input_placeholder: "Escribí tu consulta...",
 
     level_primaria: "Primaria",
     level_media_basica: "Enseñanza Media Básica",
@@ -468,11 +484,27 @@ const TRANSLATIONS = {
     btn_download_pdf: "Download PDF",
     btn_restart: "Return to start / Restart",
     cases_section_title: "Case Laboratory / Dilemmas for debate",
+    cases_kicker: "Situated cases",
+    cases_title: "Dilemmas for debate and decision",
+    cases_badge: "Applicable",
+    cases_lead: "Choose a case to open a conversation in the classroom, faculty room, or institutional team. Each case connects a concrete decision with the principles activated in your journey.",
+    lab_cases_title: "Cases Laboratory: Ethical Dilemmas in Workshop Mode",
+    situated_dilemmas_title: "Situated pedagogical dilemmas",
 
-    lab_title: "Situated Cases Laboratory",
+    lab_title: "Situated Case Laboratory",
     lab_subtitle: "Analysis of ethical and pedagogical dilemmas for decision-making",
     btn_analyze_dilemma: "Analyze dilemma",
-    btn_download_ficha: "Download PDF Worksheet (Workshop)",
+    btn_download_ficha: "Download PDF worksheet (Workshop)",
+
+    chatbot_tooltip_title: "Opportunity for deep dive",
+    chatbot_tooltip_copy: "Consult the Pedagogical Assistant to resolve questions about the critical use of AI.",
+    chatbot_label: "Pedagogical Assistant",
+    chatbot_header_subtitle: "AI-generated assistance",
+    chatbot_welcome_title: "Hello, I am your Pedagogical Assistant",
+    chatbot_welcome_copy: "I can help you interpret your answers, review journey questions, and plan improvements for critical AI use in education.",
+    chatbot_disclosure_title: "Usage transparency",
+    chatbot_disclosure_copy: "This assistant uses generative AI to guide reflection. Its responses may require verification and do not replace professional, academic, or institutional judgment.",
+    chatbot_input_placeholder: "Type your question...",
 
     level_primaria: "Primary Education",
     level_media_basica: "Lower Secondary Education",
@@ -708,11 +740,27 @@ const TRANSLATIONS = {
     btn_download_pdf: "Baixar PDF",
     btn_restart: "Voltar ao início / Reiniciar",
     cases_section_title: "Laboratório de casos / Dilemas para debater",
+    cases_kicker: "Casos situados",
+    cases_title: "Dilemas para debater e decidir",
+    cases_badge: "Aplicável",
+    cases_lead: "Escolha um caso para iniciar uma conversa na sala de aula, sala dos professores ou equipe institucional. Cada caso conecta uma decisão concreta com os princípios ativados em seu percurso.",
+    lab_cases_title: "Laboratório de Casos: Dilemas Éticos em Modo Oficina",
+    situated_dilemmas_title: "Dilemas pedagógicos situados",
 
     lab_title: "Laboratório de casos situados",
     lab_subtitle: "Análise de dilemas éticos e pedagógicos para a tomada de decisões",
     btn_analyze_dilemma: "Analisar dilema",
     btn_download_ficha: "Baixar ficha PDF (Oficina)",
+
+    chatbot_tooltip_title: "Oportunidade de aprofundamento",
+    chatbot_tooltip_copy: "Consulte o Assistente Pedagógico para esclarecer dúvidas sobre o uso crítico da IA.",
+    chatbot_label: "Assistente Pedagógico",
+    chatbot_header_subtitle: "Assistência gerada por IA",
+    chatbot_welcome_title: "Olá, sou seu Assistente Pedagógico",
+    chatbot_welcome_copy: "Posso ajudá-lo a interpretar suas respostas, revisar perguntas do percurso e pensar em melhorias para o uso crítico da IA na educação.",
+    chatbot_disclosure_title: "Transparência de uso",
+    chatbot_disclosure_copy: "Este assistente usa IA generativa para orientar a reflexão. Suas respostas podem exigir verificação e não substituem o critério docente, acadêmico ou institucional.",
+    chatbot_input_placeholder: "Digite sua consulta...",
 
     level_primaria: "Ensino Fundamental I",
     level_media_basica: "Ensino Fundamental II",
@@ -961,11 +1009,27 @@ const TRANSLATIONS = {
     btn_download_pdf: "Télécharger le PDF",
     btn_restart: "Retour au début / Réinitialiser",
     cases_section_title: "Laboratoire de cas / Dilemmes à débattre",
+    cases_kicker: "Cas situés",
+    cases_title: "Dilemmes à débattre et décider",
+    cases_badge: "Applicable",
+    cases_lead: "Choisissez un cas pour ouvrir une conversation en classe, en salle des profs ou en équipe institutionnelle. Chaque cas relie une décision concrète aux principes activés dans votre parcours.",
+    lab_cases_title: "Laboratoire de cas : Dilemmes éthiques en mode atelier",
+    situated_dilemmas_title: "Dilemmes pédagogiques situés",
 
     lab_title: "Laboratoire de cas situés",
     lab_subtitle: "Analyse de dilemmes éthiques et pédagogiques pour la prise de décision",
     btn_analyze_dilemma: "Analyser le dilemme",
     btn_download_ficha: "Télécharger fiche PDF (Atelier)",
+
+    chatbot_tooltip_title: "Opportunité d'approfondissement",
+    chatbot_tooltip_copy: "Consultez l'Assistant Pédagogique pour répondre à vos questions sur l'usage critique de l'IA.",
+    chatbot_label: "Assistant Pédagogique",
+    chatbot_header_subtitle: "Assistance générée par IA",
+    chatbot_welcome_title: "Bonjour, je suis votre Assistant Pédagogique",
+    chatbot_welcome_copy: "Je peux vous aider à interpréter vos réponses, réviser les questions du parcours et envisager des améliorations pour un usage critique de l'IA en éducation.",
+    chatbot_disclosure_title: "Transparence d'utilisation",
+    chatbot_disclosure_copy: "Cet assistant utilise l'IA générative pour guider la réflexion. Ses réponses peuvent nécessiter une vérification et ne remplacent pas le jugement professionnel, académique ou institutionnel.",
+    chatbot_input_placeholder: "Écrivez votre question...",
 
     level_primaria: "École Élémentaire",
     level_media_basica: "Collège (Enseignement Secondaire Inférieur)",
@@ -1119,6 +1183,13 @@ function updateAppLanguage(lang = 'es') {
   if (prevSlideBtn) prevSlideBtn.textContent = t.btn_prev_slide || '← Anterior';
   const nextSlideBtn = document.getElementById('nextSlide');
   if (nextSlideBtn) nextSlideBtn.textContent = t.btn_next_slide || 'Siguiente →';
+
+  if (typeof window.renderizarCasosSituados === 'function') {
+    window.renderizarCasosSituados();
+  }
+  if (typeof window.updateChatbotLanguage === 'function') {
+    window.updateChatbotLanguage(lang);
+  }
 }
 
 

@@ -1521,6 +1521,9 @@ function abrirLaboratorioCasos() {
 function renderizarCasosSituados() {
   if (!elements.situatedCases) return;
   
+  const lang = (window.state && window.state.lang) || localStorage.getItem('app_lang') || 'es';
+  const t = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[lang]) ? TRANSLATIONS[lang] : {};
+
   elements.situatedCases.innerHTML = '';
   
   const wrapperDiv = document.createElement('div');
@@ -1530,8 +1533,8 @@ function renderizarCasosSituados() {
   title.className = 'cases-laboratory-title';
   title.style.fontWeight = '700';
   title.textContent = state.isLaboratorioMode 
-    ? 'Laboratorio de Casos: Dilemas Éticos en Modo Taller' 
-    : 'Dilemas pedagógicos situados';
+    ? (t.lab_cases_title || 'Laboratorio de Casos: Dilemas Éticos en Modo Taller')
+    : (t.situated_dilemmas_title || 'Dilemas pedagógicos situados');
   wrapperDiv.appendChild(title);
   
   const listGrid = document.createElement('div');
@@ -1540,6 +1543,7 @@ function renderizarCasosSituados() {
   CASOS_LABORATORIO.forEach(caso => {
     const card = document.createElement('article');
     card.className = 'case-summary-card';
+    const btnLabel = t.btn_analyze_dilemma || 'Analizar dilema';
     
     card.innerHTML = `
       <div class="case-badge-row">
@@ -1548,7 +1552,7 @@ function renderizarCasosSituados() {
       </div>
       <h4>${caso.title}</h4>
       <p>${caso.story.substring(0, 120)}...</p>
-      <button type="button" class="btn btn-primary btn-play-case" data-case-id="${caso.id}">Analizar dilema</button>
+      <button type="button" class="btn btn-primary btn-play-case" data-case-id="${caso.id}">${btnLabel}</button>
     `;
     
     card.querySelector('.btn-play-case').addEventListener('click', () => {
@@ -1561,6 +1565,8 @@ function renderizarCasosSituados() {
   wrapperDiv.appendChild(listGrid);
   elements.situatedCases.appendChild(wrapperDiv);
 }
+
+window.renderizarCasosSituados = renderizarCasosSituados;
 
 function cargarCasoInteractivo(caseId) {
   if (!elements.situatedCases) return;

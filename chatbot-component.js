@@ -868,6 +868,101 @@ const addMessage = (content, type = 'bot', save = true) => {
 
 
 
+  // ========== INICIALIZACIÓN DE IDIOMA ==========
+  const CHATBOT_TRANSLATIONS = {
+    es: {
+      tooltipTitle: "Oportunidad de profundización",
+      tooltipCopy: "Consultá al Asistente Pedagógico para resolver dudas sobre el uso crítico de IA.",
+      tooltipClose: "Cerrar",
+      floatingLabel: "Asistente Pedagógico",
+      headerTitle: "Asistente Pedagógico",
+      headerSubtitle: "Asistencia generada con IA",
+      welcomeTitle: "Hola, soy tu Asistente Pedagógico",
+      welcomeCopy: "Puedo ayudarte a interpretar tus respuestas, revisar preguntas del recorrido y pensar mejoras para un uso crítico de IA en educación.",
+      disclosureTitle: "Transparencia de uso",
+      disclosureCopy: "Este asistente usa IA generativa para orientar la reflexión. Sus respuestas pueden requerir verificación y no sustituyen el criterio docente, académico o institucional.",
+      placeholder: "Escribí tu consulta..."
+    },
+    en: {
+      tooltipTitle: "Opportunity for deep dive",
+      tooltipCopy: "Consult the Pedagogical Assistant to resolve questions about the critical use of AI.",
+      tooltipClose: "Close",
+      floatingLabel: "Pedagogical Assistant",
+      headerTitle: "Pedagogical Assistant",
+      headerSubtitle: "AI-generated assistance",
+      welcomeTitle: "Hello, I am your Pedagogical Assistant",
+      welcomeCopy: "I can help you interpret your answers, review journey questions, and plan improvements for critical AI use in education.",
+      disclosureTitle: "Usage transparency",
+      disclosureCopy: "This assistant uses generative AI to guide reflection. Its responses may require verification and do not replace professional, academic, or institutional judgment.",
+      placeholder: "Type your question..."
+    },
+    pt: {
+      tooltipTitle: "Oportunidade de aprofundamento",
+      tooltipCopy: "Consulte o Assistente Pedagógico para esclarecer dúvidas sobre o uso crítico da IA.",
+      tooltipClose: "Fechar",
+      floatingLabel: "Assistente Pedagógico",
+      headerTitle: "Assistente Pedagógico",
+      headerSubtitle: "Assistência gerada por IA",
+      welcomeTitle: "Olá, sou seu Assistente Pedagógico",
+      welcomeCopy: "Posso ajudá-lo a interpretar suas respostas, revisar perguntas do percurso e pensar em melhorias para o uso crítico da IA na educação.",
+      disclosureTitle: "Transparência de uso",
+      disclosureCopy: "Este assistente usa IA generativa para orientar a reflexão. Suas respostas podem exigir verificação e não substituem o critério docente, acadêmico ou institucional.",
+      placeholder: "Digite sua consulta..."
+    },
+    fr: {
+      tooltipTitle: "Opportunité d'approfondissement",
+      tooltipCopy: "Consultez l'Assistant Pédagogique pour répondre à vos questions sur l'usage critique de l'IA.",
+      tooltipClose: "Fermer",
+      floatingLabel: "Assistant Pédagogique",
+      headerTitle: "Assistant Pédagogique",
+      headerSubtitle: "Assistance générée par IA",
+      welcomeTitle: "Bonjour, je suis votre Assistant Pédagogique",
+      welcomeCopy: "Je peux vous aider à interpréter vos réponses, réviser les questions du parcours et envisager des améliorations pour un usage critique de l'IA en éducation.",
+      disclosureTitle: "Transparence d'utilisation",
+      disclosureCopy: "Cet assistant utilise l'IA générative pour guider la réflexion. Ses réponses peuvent nécessiter une vérification et ne remplacent pas le jugement professionnel, académique ou institutionnel.",
+      placeholder: "Écrivez votre question..."
+    }
+  };
+
+  function updateChatbotLanguage(lang) {
+    const l = lang || localStorage.getItem('app_lang') || 'es';
+    const t = CHATBOT_TRANSLATIONS[l] || CHATBOT_TRANSLATIONS['es'];
+
+    const tooltipTitleEl = document.querySelector('#chatbotTooltip .chatbot-tooltip-title');
+    if (tooltipTitleEl) tooltipTitleEl.textContent = t.tooltipTitle;
+
+    const tooltipCopyEl = document.querySelector('#chatbotTooltip p');
+    if (tooltipCopyEl) tooltipCopyEl.textContent = t.tooltipCopy;
+
+    const tooltipCloseEl = document.getElementById('chatbotTooltipClose');
+    if (tooltipCloseEl) tooltipCloseEl.textContent = t.tooltipClose;
+
+    const floatingLabelEl = document.querySelector('.chatbot-floating-label');
+    if (floatingLabelEl) floatingLabelEl.textContent = t.floatingLabel;
+
+    const headerTitleEl = document.querySelector('#chatbotWindow .chatbot-header-title h3');
+    if (headerTitleEl) headerTitleEl.textContent = t.headerTitle;
+
+    const headerSubEl = document.querySelector('#chatbotWindow .chatbot-header-subtitle');
+    if (headerSubEl) headerSubEl.textContent = t.headerSubtitle;
+
+    const welcomeTitleEl = document.querySelector('#chatbotMessages .chatbot-welcome h4');
+    if (welcomeTitleEl) welcomeTitleEl.textContent = t.welcomeTitle;
+
+    const welcomeCopyEl = document.querySelector('#chatbotMessages .chatbot-welcome p');
+    if (welcomeCopyEl) welcomeCopyEl.textContent = t.welcomeCopy;
+
+    const disclosureEl = document.querySelector('.chatbot-ai-disclosure');
+    if (disclosureEl) {
+      disclosureEl.innerHTML = `<strong>${t.disclosureTitle}</strong> ${t.disclosureCopy}`;
+    }
+
+    const inputEl = document.getElementById('chatbotInput');
+    if (inputEl) inputEl.placeholder = t.placeholder;
+  }
+
+  window.updateChatbotLanguage = updateChatbotLanguage;
+
   // ========== INICIALIZACIÓN ==========
   
   // Cargar historial previo de la sesión
@@ -876,6 +971,8 @@ const addMessage = (content, type = 'bot', save = true) => {
   if (localStorage.getItem(TOOLTIP_DISMISSED_KEY) === 'true') {
     el.tooltip.classList.add('hidden');
   }
+
+  updateChatbotLanguage();
 
   debugLog('Chatbot Pedagógico iniciado con persistencia');
   
