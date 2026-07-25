@@ -1271,7 +1271,7 @@ function toCsv(rows, columns) {
     columns.map(column => csvCell(row[column])).join(',')
   ));
 
-  return [header, ...lines].join('\r\n');
+  return '\uFEFF' + [header, ...lines].join('\r\n');
 }
 
 function csvCell(value) {
