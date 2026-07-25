@@ -1030,6 +1030,11 @@ function updateAppLanguage(lang = 'es') {
     }
   });
 
+  // Actualizar enlaces a fundamentacion.html para pasar ?lang=
+  document.querySelectorAll('a[href^="fundamentacion.html"]').forEach(a => {
+    a.href = `fundamentacion.html?lang=${lang}`;
+  });
+
   // 2. Placeholders con data-i18n-placeholder
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     const key = el.dataset.i18nPlaceholder;

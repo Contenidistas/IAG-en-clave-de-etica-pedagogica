@@ -206,16 +206,12 @@ function applyFwTranslations(lang) {
   });
 }
 
-// ── Detectar idioma desde localStorage (misma clave que ui-ia.js) ──
+// ── Detectar idioma desde localStorage ('app_lang') o URL ──
 function detectLanguage() {
   try {
-    const stored = localStorage.getItem('iag_state');
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      if (parsed && parsed.lang) return parsed.lang;
-    }
+    const stored = localStorage.getItem('app_lang');
+    if (stored && FW_TRANSLATIONS[stored]) return stored;
   } catch (_) {}
-  // Fallback: intentar leer parámetro de URL ?lang=en
   const urlLang = new URLSearchParams(window.location.search).get('lang');
   if (urlLang && FW_TRANSLATIONS[urlLang]) return urlLang;
   return 'es';
