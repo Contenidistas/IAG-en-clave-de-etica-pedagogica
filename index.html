@@ -282,7 +282,7 @@
 
                 <!-- Nivel de familiaridad con el tema -->
                 <div id="familiaridadInicialWrapper" class="onboarding-step" data-onboarding-step="cierre" style="max-width: 500px; margin: 1.5rem auto;">
-                  <label style="display:block; margin-bottom:0.75rem; font-weight:600; text-align:center;">
+                  <label style="display:block; margin-bottom:0.75rem; font-weight:600; text-align:center;" data-i18n="label_familiarity">
                     Antes de comenzar, ¿qué nivel de familiaridad tenés con este tema?
                   </label>
                   <select id="familiaridadInicial" class="input" style="display:none;">
@@ -300,21 +300,21 @@
 
                 <!-- Uso de recursos similares -->
                 <div id="recursosSimilaresWrapper" class="onboarding-step" data-onboarding-step="cierre" style="max-width: 500px; margin: 1.5rem auto;">
-                  <p style="margin-bottom:0.5rem; font-weight:600;">
+                  <p style="margin-bottom:0.5rem; font-weight:600;" data-i18n="label_resources">
                           ¿Has usado recursos similares sobre este tema (guías, simuladores, cursos en línea)?
                   </p>
                   <div style="display:flex; flex-wrap:wrap; gap:1rem; font-size:0.95rem;">
                     <label style="display:flex; align-items:center; gap:0.35rem;">
                       <input type="radio" name="recursosSimilares" value="Sí">
-                      <span>Sí</span>
+                      <span data-i18n="opt_yes">Sí</span>
                     </label>
                     <label style="display:flex; align-items:center; gap:0.35rem;">
                       <input type="radio" name="recursosSimilares" value="No">
-                      <span>No</span>
+                      <span data-i18n="opt_no">No</span>
                     </label>
                     <label style="display:flex; align-items:center; gap:0.35rem;">
                       <input type="radio" name="recursosSimilares" value="No estoy seguro/a">
-                      <span>No estoy seguro/a</span>
+                      <span data-i18n="opt_unsure">No estoy seguro/a</span>
                     </label>
                   </div>
                 </div>
@@ -322,7 +322,7 @@
                 <!-- Checkbox de consentimiento -->
                 <div class="mt-2 consent-box onboarding-step" data-onboarding-step="cierre" style="max-width: 700px; margin: 1.5rem auto 0 auto; display:flex; align-items:flex-start; gap:0.5rem; font-size:0.85rem; color:var(--text-secondary);">
                   <div class="consent-content">
-                    <p class="consent-help" style="margin-top:0.25rem;">
+                    <p class="consent-help" style="margin-top:0.25rem;" data-i18n="consent_help">
                       Podés iniciar el recorrido aunque no aceptes. Si marcás esta opción, se guarda únicamente: perfil, país, seudónimo opcional, nivel de familiaridad, uso de recursos similares y registro del cuestionario.
                     </p>
                   </div>
@@ -330,8 +330,8 @@
 
                 <div id="startGuidance" class="start-guidance" aria-live="polite">
                   <div class="start-guidance-header">
-                    <span id="startGuidanceBadge">Paso a paso</span>
-                    <strong id="startGuidanceTitle">Completá lo necesario para iniciar</strong>
+                    <span id="startGuidanceBadge" data-i18n="guidance_badge">Paso a paso</span>
+                    <strong id="startGuidanceTitle" data-i18n="guidance_title_pending">Completá lo necesario para iniciar</strong>
                   </div>
                   <div id="startGuidanceList" class="start-guidance-list"></div>
                 </div>
@@ -340,8 +340,8 @@
                   <button type="button" class="btn btn-outline" id="onboardingBackBtn" data-i18n="btn_back">Anterior</button>
                   <label for="consentTracking" class="btn btn-primary consent-action-label" style="cursor:pointer; line-height:1.4; font-weight:500;">
                     <input type="checkbox" id="consentTracking" style="margin-top:0.15rem; cursor:pointer;" />
-                    <span class="consent-unchecked">Acepto registro anónimo</span>
-                    <span class="consent-checked">Registro anónimo aceptado</span>
+                    <span class="consent-unchecked" data-i18n="consent_unchecked">Acepto registro anónimo</span>
+                    <span class="consent-checked" data-i18n="consent_checked">Registro anónimo aceptado</span>
                   </label>
                   <button type="button" class="btn btn-primary" id="onboardingNextBtn" data-i18n="btn_next">Siguiente</button>
                 </div>

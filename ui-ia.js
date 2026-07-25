@@ -18,6 +18,20 @@ const screens = {
    ======================================== */
 const TRANSLATIONS = {
   es: {
+    consent_help: "Podés iniciar el recorrido aunque no aceptes. Si marcás esta opción, se guarda únicamente: perfil, país, seudónimo opcional, nivel de familiaridad, uso de recursos similares y registro del cuestionario.",
+    consent_unchecked: "Acepto registro anónimo",
+    consent_checked: "Registro anónimo aceptado",
+    guidance_badge: "Paso a paso",
+    guidance_title_ready: "Listo, ya podés iniciar el recorrido",
+    guidance_title_pending: "Completá estos pasos para iniciar",
+    guidance_ready_item: "Todo preparado",
+    guidance_ready_sub: "El botón Iniciar cuestionario ya está disponible.",
+    fam_1: "Nunca lo estudié",
+    fam_2: "Lo conozco superficialmente",
+    fam_3: "Lo he trabajado en cursos o actividades",
+    fam_4: "Lo domino a nivel práctico",
+    fam_5: "Lo manejo en profundidad o lo enseño",
+    opt_unsure: "No estoy seguro/a",
     diag_kicker: "Diagnóstico guiado",
     diag_title: "Comenzar el proceso de reflexión crítica de mis prácticas",
     diag_subtitle: "Este cuestionario interactivo te ayudará a evaluar tu práctica y recibir recomendaciones personalizadas.",
@@ -106,6 +120,20 @@ const TRANSLATIONS = {
   },
 
   en: {
+    consent_help: "You can start the journey even if you do not accept. If checked, only profile, country, optional pseudonym, familiarity level, resources usage, and survey responses are saved anonymously.",
+    consent_unchecked: "I accept anonymous tracking",
+    consent_checked: "Anonymous tracking accepted",
+    guidance_badge: "Step by step",
+    guidance_title_ready: "Ready, you can now start the questionnaire",
+    guidance_title_pending: "Complete these steps to start",
+    guidance_ready_item: "All set",
+    guidance_ready_sub: "The Start questionnaire button is now available.",
+    fam_1: "I have never studied it",
+    fam_2: "I know it superficially",
+    fam_3: "I have worked on it in courses or activities",
+    fam_4: "I master it at a practical level",
+    fam_5: "I master it in depth or teach it",
+    opt_unsure: "I'm not sure",
     diag_kicker: "Guided Assessment",
     diag_title: "Begin the critical reflection process on your practices",
     diag_subtitle: "This interactive questionnaire will help you evaluate your practice and receive personalized recommendations.",
@@ -194,6 +222,20 @@ const TRANSLATIONS = {
   },
 
   pt: {
+    consent_help: "Você pode iniciar o percurso mesmo sem aceitar. Se marcado, salva-se apenas: perfil, país, pseudônimo opcional, familiaridade, uso de recursos e respostas anônimas.",
+    consent_unchecked: "Aceito registro anônimo",
+    consent_checked: "Registro anônimo aceito",
+    guidance_badge: "Passo a passo",
+    guidance_title_ready: "Pronto, você já pode iniciar o questionário",
+    guidance_title_pending: "Conclua estes passos para iniciar",
+    guidance_ready_item: "Tudo preparado",
+    guidance_ready_sub: "O botão Iniciar questionário já está disponível.",
+    fam_1: "Nunca estudei",
+    fam_2: "Conheço superficialmente",
+    fam_3: "Já trabalhei em cursos ou atividades",
+    fam_4: "Domino em nível prático",
+    fam_5: "Manejo em profundidade ou ensino",
+    opt_unsure: "Não tenho certeza",
     diag_kicker: "Diagnóstico guiado",
     diag_title: "Iniciar o processo de reflexão crítica sobre minhas práticas",
     diag_subtitle: "Este questionário interativo ajudará você a avaliar sua prática e receber recomendações personalizadas.",
@@ -282,6 +324,20 @@ const TRANSLATIONS = {
   },
 
   fr: {
+    consent_help: "Vous pouvez commencer le parcours même si vous n'acceptez pas. Si vous cochez cette option, seuls le profil, le pays, le pseudonyme optionnel, la familiarité, l'usage des ressources et les réponses sont enregistrés anonymement.",
+    consent_unchecked: "J'accepte l'enregistrement anonyme",
+    consent_checked: "Enregistrement anonyme accepté",
+    guidance_badge: "Étape par étape",
+    guidance_title_ready: "Prêt, vous pouvez maintenant démarrer le questionnaire",
+    guidance_title_pending: "Complétez ces étapes pour commencer",
+    guidance_ready_item: "Tout est prêt",
+    guidance_ready_sub: "Le bouton Démarrer le questionnaire est maintenant disponible.",
+    fam_1: "Je ne l'ai jamais étudié",
+    fam_2: "Je le connais superficiellement",
+    fam_3: "J'ai travaillé dessus dans des cours ou activités",
+    fam_4: "Je le maîtrise au niveau pratique",
+    fam_5: "Je le maîtrise en profondeur ou je l'enseigne",
+    opt_unsure: "Je ne suis pas sûr(e)",
     diag_kicker: "Diagnostic guidé",
     diag_title: "Commencer le processus de réflexion critique sur mes pratiques",
     diag_subtitle: "Ce questionnaire interactif vous aidera à évaluer votre pratique et à recevoir des recommandations personnalisées.",
@@ -449,6 +505,9 @@ function updateAppLanguage(lang = 'es') {
   }
   if (typeof updateProgress === 'function' && window.state && window.state.currentQuestion) {
     updateProgress();
+  }
+  if (typeof syncSelectWithChips === 'function') {
+    syncSelectWithChips('familiaridadInicial', 'familiaridadChips');
   }
 }
 
@@ -2535,6 +2594,17 @@ function syncSelectWithChips(selectId, chipsContainerId) {
   const container = document.getElementById(chipsContainerId);
   if (!select || !container) return;
 
+  const lang = (window.state && window.state.lang) || 'es';
+  const t = TRANSLATIONS[lang] || TRANSLATIONS['es'];
+
+  const FAMILIARIDAD_MAP = {
+    "Nunca lo estudié": "fam_1",
+    "Lo conozco superficialmente": "fam_2",
+    "Lo he trabajado en cursos o actividades": "fam_3",
+    "Lo domino a nivel práctico": "fam_4",
+    "Lo manejo en profundidad o lo enseño": "fam_5"
+  };
+
   // Ocultar select nativo
   select.style.display = 'none';
 
@@ -2548,7 +2618,8 @@ function syncSelectWithChips(selectId, chipsContainerId) {
     if (select.value === opt.value) {
       btn.classList.add('active');
     }
-    btn.textContent = opt.textContent;
+    const key = FAMILIARIDAD_MAP[opt.value];
+    btn.textContent = key && t[key] ? t[key] : opt.textContent;
     btn.dataset.value = opt.value;
 
     btn.addEventListener('click', () => {
