@@ -18,10 +18,22 @@ const screens = {
    ======================================== */
 const TRANSLATIONS = {
   es: {
+    and_word: "y",
     footer_created_by: "Creado por",
     footer_based_on: "Basado en marcos de",
     footer_updated_text: "Sitio en constante actualización con nuevas funcionalidades y mejoras",
     footer_ia_declaration: "Declaración de uso de IA",
+    modal_ia_disclosure_title: "Declaración de uso de IA",
+    modal_ia_disclosure_p1: "Esta herramienta fue construida con asistencia de inteligencia artificial generativa en tareas de ideación, redacción, revisión de interfaz, organización de código y mejora progresiva de la experiencia de usuario.",
+    modal_ia_disclosure_p2: "El uso de IA se realizó bajo criterios de transparencia, supervisión humana, protección de datos, verificación, pertinencia pedagógica y mejora continua, coherentes con los marcos de ANEP, UNESCO, FING, Udelar y Ceibal integrados en la propia herramienta.",
+    modal_ia_disclosure_l1_title: "Responsabilidad humana:",
+    modal_ia_disclosure_l1_text: "las decisiones pedagógicas, conceptuales y de diseño fueron revisadas y validadas por los autores.",
+    modal_ia_disclosure_l2_title: "Trazabilidad:",
+    modal_ia_disclosure_l2_text: "los cambios se aplicaron de forma incremental, revisando funcionamiento, accesibilidad, legibilidad y coherencia ética.",
+    modal_ia_disclosure_l3_title: "Límites:",
+    modal_ia_disclosure_l3_text: "la IA no sustituye el juicio profesional ni garantiza ausencia de errores; por eso se mantiene revisión humana y actualización permanente.",
+    modal_ia_disclosure_l4_title: "Coherencia ética:",
+    modal_ia_disclosure_l4_text: "declarar este uso forma parte del mismo principio de transparencia que la herramienta propone para prácticas educativas con IAG.",
     help_toggle_title: "Ver ayuda y contexto",
     decision_reason_default: "El recorrido adapta las preguntas según tus respuestas.",
     criterion_label_prefix: "Criterio: ",
@@ -310,10 +322,22 @@ const TRANSLATIONS = {
   },
 
   en: {
+    and_word: "and",
     footer_created_by: "Created by",
     footer_based_on: "Based on frameworks from",
     footer_updated_text: "Site constantly updated with new features and improvements",
     footer_ia_declaration: "AI usage statement",
+    modal_ia_disclosure_title: "AI Usage Statement",
+    modal_ia_disclosure_p1: "This tool was built with the assistance of generative artificial intelligence for ideation, writing, UI review, code organization, and progressive improvement of user experience.",
+    modal_ia_disclosure_p2: "AI was used under criteria of transparency, human supervision, data protection, verification, pedagogical relevance, and continuous improvement, aligned with ANEP, UNESCO, FING, Udelar, and Ceibal frameworks.",
+    modal_ia_disclosure_l1_title: "Human responsibility:",
+    modal_ia_disclosure_l1_text: "pedagogical, conceptual, and design decisions were reviewed and validated by the authors.",
+    modal_ia_disclosure_l2_title: "Traceability:",
+    modal_ia_disclosure_l2_text: "changes were applied incrementally, reviewing functionality, accessibility, readability, and ethical consistency.",
+    modal_ia_disclosure_l3_title: "Limits:",
+    modal_ia_disclosure_l3_text: "AI does not replace professional judgment nor guarantee the absence of errors; human review and continuous updates are maintained.",
+    modal_ia_disclosure_l4_title: "Ethical consistency:",
+    modal_ia_disclosure_l4_text: "disclosing this usage is part of the same transparency principle that the tool proposes for educational practices with GAI.",
     help_toggle_title: "View help and context",
     decision_reason_default: "The journey adapts questions based on your responses.",
     criterion_label_prefix: "Criterion: ",
@@ -602,6 +626,22 @@ const TRANSLATIONS = {
   },
 
   pt: {
+    and_word: "e",
+    footer_created_by: "Criado por",
+    footer_based_on: "Baseado em marcos de",
+    footer_updated_text: "Site em constante atualização com novas funcionalidades e melhorias",
+    footer_ia_declaration: "Declaração de uso de IA",
+    modal_ia_disclosure_title: "Declaração de uso de IA",
+    modal_ia_disclosure_p1: "Esta ferramenta foi construída com a assistência de inteligência artificial generativa em tarefas de ideação, redação, revisão de interface, organização de código e melhoria progressiva da experiência do usuário.",
+    modal_ia_disclosure_p2: "O uso da IA foi realizado sob critérios de transparência, supervisão humana, proteção de dados, verificação, relevância pedagógica e melhoria contínua, coerentes com os marcos da ANEP, UNESCO, FING, Udelar e Ceibal integrados na própria ferramenta.",
+    modal_ia_disclosure_l1_title: "Responsabilidade humana:",
+    modal_ia_disclosure_l1_text: "as decisões pedagógicas, conceituais e de design foram revisadas e validadas pelos autores.",
+    modal_ia_disclosure_l2_title: "Rastreabilidade:",
+    modal_ia_disclosure_l2_text: "as alterações foram aplicadas de forma incremental, revisando funcionamento, acessibilidade, legibilidade e consistência ética.",
+    modal_ia_disclosure_l3_title: "Limites:",
+    modal_ia_disclosure_l3_text: "a IA não substitui o julgamento profissional nem garante a ausência de erros; por isso, a revisão humana e a atualização permanente são mantidas.",
+    modal_ia_disclosure_l4_title: "Consistência ética:",
+    modal_ia_disclosure_l4_text: "declarar este uso faz parte do mesmo princípio de transparência que a ferramenta propõe para práticas educativas com IAG.",
     btn_prev_slide: "← Voltar",
     btn_next_slide: "Avançar →",
     framework_kicker: "Fundamentação da ferramenta",
@@ -881,10 +921,22 @@ const TRANSLATIONS = {
   },
 
   fr: {
+    and_word: "et",
     footer_created_by: "Créé par",
     footer_based_on: "Basé sur les cadres de",
     footer_updated_text: "Site en constante mise à jour avec de nouvelles fonctionnalités et améliorations",
     footer_ia_declaration: "Déclaration d'utilisation de l'IA",
+    modal_ia_disclosure_title: "Déclaration d'utilisation de l'IA",
+    modal_ia_disclosure_p1: "Cet outil a été conçu avec l'assistance de l'intelligence artificielle générative pour l'idéation, la rédaction, la révision d'interface, l'organisation du code et l'amélioration progressive de l'expérience utilisateur.",
+    modal_ia_disclosure_p2: "L'utilisation de l'IA s'est faite selon des critères de transparence, de supervision humaine, de protection des données, de vérification, de pertinence pédagogique et d'amélioration continue, en cohérence avec les cadres de l'ANEP, de l'UNESCO, de la FING, de l'Udelar et de Ceibal.",
+    modal_ia_disclosure_l1_title: "Responsabilité humaine :",
+    modal_ia_disclosure_l1_text: "les décisions pédagogiques, conceptuelles et de conception ont été révisées et validées par les auteurs.",
+    modal_ia_disclosure_l2_title: "Traçabilité :",
+    modal_ia_disclosure_l2_text: "les modifications ont été appliquées de manière incrémentale, en vérifiant le fonctionnement, l'accessibilité, la lisibilité et la cohérence éthique.",
+    modal_ia_disclosure_l3_title: "Limites :",
+    modal_ia_disclosure_l3_text: "l'IA ne remplace pas le jugement professionnel ni ne garantit l'absence d'erreurs ; c'est pourquoi la révision humaine et la mise à jour permanente sont maintenues.",
+    modal_ia_disclosure_l4_title: "Cohérence éthique :",
+    modal_ia_disclosure_l4_text: "déclarer cet usage fait partie du même principe de transparence que l'outil propose pour les pratiques éducatives avec l'IAG.",
     help_toggle_title: "Voir l'aide et le contexte",
     decision_reason_default: "Le parcours adapte les questions selon vos réponses.",
     criterion_label_prefix: "Critère : ",
@@ -1923,19 +1975,21 @@ if (elements.toggleFrameworkBtn) {
 
 if (elements.aiUseDisclosureBtn) {
   elements.aiUseDisclosureBtn.addEventListener('click', () => {
-    modal.show('Declaración de uso de IA', `
+    const lang = (window.state && window.state.lang) || localStorage.getItem('app_lang') || 'es';
+    const t = TRANSLATIONS[lang] || TRANSLATIONS['es'];
+    modal.show(t.modal_ia_disclosure_title || 'Declaración de uso de IA', `
       <div class="ai-disclosure-modal">
         <p>
-          Esta herramienta fue construida con asistencia de inteligencia artificial generativa en tareas de ideación, redacción, revisión de interfaz, organización de código y mejora progresiva de la experiencia de usuario.
+          ${t.modal_ia_disclosure_p1 || 'Esta herramienta fue construida con asistencia de inteligencia artificial generativa...'}
         </p>
         <p>
-          El uso de IA se realizó bajo criterios de transparencia, supervisión humana, protección de datos, verificación, pertinencia pedagógica y mejora continua, coherentes con los marcos de ANEP, UNESCO, FING, Udelar y Ceibal integrados en la propia herramienta.
+          ${t.modal_ia_disclosure_p2 || 'El uso de IA se realizó bajo criterios de transparencia...'}
         </p>
         <ul>
-          <li><strong>Responsabilidad humana:</strong> las decisiones pedagógicas, conceptuales y de diseño fueron revisadas y validadas por los autores.</li>
-          <li><strong>Trazabilidad:</strong> los cambios se aplicaron de forma incremental, revisando funcionamiento, accesibilidad, legibilidad y coherencia ética.</li>
-          <li><strong>Límites:</strong> la IA no sustituye el juicio profesional ni garantiza ausencia de errores; por eso se mantiene revisión humana y actualización permanente.</li>
-          <li><strong>Coherencia ética:</strong> declarar este uso forma parte del mismo principio de transparencia que la herramienta propone para prácticas educativas con IAG.</li>
+          <li><strong>${t.modal_ia_disclosure_l1_title || 'Responsabilidad humana:'}</strong> ${t.modal_ia_disclosure_l1_text || 'las decisiones pedagógicas...'}</li>
+          <li><strong>${t.modal_ia_disclosure_l2_title || 'Trazabilidad:'}</strong> ${t.modal_ia_disclosure_l2_text || 'los cambios se aplicaron...'}</li>
+          <li><strong>${t.modal_ia_disclosure_l3_title || 'Límites:'}</strong> ${t.modal_ia_disclosure_l3_text || 'la IA no sustituye...'}</li>
+          <li><strong>${t.modal_ia_disclosure_l4_title || 'Coherencia ética:'}</strong> ${t.modal_ia_disclosure_l4_text || 'declarar este uso...'}</li>
         </ul>
       </div>
     `);
