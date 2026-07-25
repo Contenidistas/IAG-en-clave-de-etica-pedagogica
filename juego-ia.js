@@ -1489,9 +1489,13 @@ function abrirLaboratorioCasos() {
   state.isLaboratorioMode = true;
   document.body.classList.add('laboratorio-active');
 
-  // Ocultar otras pantallas
+  // Ocultar otras pantallas y mostrar pantalla de resultados/casos
   if (screens.intro) screens.intro.classList.add('hidden');
   if (screens.game) screens.game.classList.add('hidden');
+  if (screens.result) {
+    screens.result.classList.remove('hidden');
+    screens.result.classList.add('fade-in');
+  }
   // Activar la pestaña de operacionalizar
   if (elements.resultTabs && elements.resultTabs.length) {
     elements.resultTabs.forEach(tab => {
