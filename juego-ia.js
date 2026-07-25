@@ -1910,8 +1910,8 @@ function cargarCasoInteractivo(caseId) {
     player.innerHTML = `
       <div class="active-case-player-header">
         <div class="case-player-meta">
-          <span class="case-badge case-badge-${caso.axis}" style="display:inline-block; margin-bottom:0.4rem;">${meta.axisLabel}</span>
-          <h3 style="font-weight:700;">${meta.title}</h3>
+          <span class="case-badge case-badge-${caso.axis}" style="display:inline-block; margin-bottom:0.4rem;">${caso.axisLabel}</span>
+          <h3 style="font-weight:700;">${caso.title}</h3>
         </div>
         <button type="button" class="btn btn-outline btn-close-case" id="btnCloseCase" style="min-width:auto; padding: 0.5rem 1rem;">${t.player_back || '← Volver'}</button>
       </div>
