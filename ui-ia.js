@@ -580,20 +580,61 @@ const elements = {
 /* ========================================
    🆕 CONFIGURACIÓN DE NIVELES EDUCATIVOS
    ======================================== */
-const NIVELES_EDUCATIVOS = {
+/* ========================================
+   🇨🇦 SISTEMA EDUCATIVO DE CANADÁ Y OTROS PAÍSES
+   ======================================== */
+const NIVELES_POR_PAIS = {
+  'Canadá': {
+    framework: 'CMEC (Council of Ministers of Education, Canada) & UNESCO',
+    docente: [
+      { key: 'level_ca_elem', default: 'Elementary School (Primary)' },
+      { key: 'level_ca_sec', default: 'Secondary School (High School)' },
+      { key: 'level_ca_college', default: 'College / CEGEP / Vocational' },
+      { key: 'level_ca_teacher_ed', default: 'Teacher Education (Faculty of Education)' },
+      { key: 'level_ca_uni', default: 'University / Higher Education' }
+    ],
+    estudiante: [
+      { key: 'level_ca_sec', default: 'Secondary School (High School)' },
+      { key: 'level_ca_college', default: 'College / CEGEP / Technical' },
+      { key: 'level_ca_teacher_prog', default: 'Teacher Education Program (B.Ed.)' },
+      { key: 'level_ca_undergrad', default: 'Undergraduate Degree (Bachelor’s)' },
+      { key: 'level_ca_grad', default: 'Graduate Studies (Master’s / Ph.D.)' }
+    ]
+  },
+  'Uruguay': {
+    framework: 'ANEP / Ceibal / Udelar',
+    docente: [
+      { key: 'level_primaria', default: 'Primaria' },
+      { key: 'level_media_basica', default: 'Enseñanza Media Básica' },
+      { key: 'level_media_superior', default: 'Enseñanza Media Superior' },
+      { key: 'level_formacion_docente', default: 'Formación Docente' },
+      { key: 'level_universitaria', default: 'Universitaria' }
+    ],
+    estudiante: [
+      { key: 'level_media_basica', default: 'Enseñanza Media Básica' },
+      { key: 'level_media_superior', default: 'Enseñanza Media Superior' },
+      { key: 'level_terciaria_tecnica', default: 'Educación Terciaria Técnica' },
+      { key: 'level_formacion_docente', default: 'Formación Docente' },
+      { key: 'level_universitaria', default: 'Universitaria' }
+    ]
+  }
+};
+
+const DEFAULT_INTERNATIONAL_NIVELES = {
+  framework: 'UNESCO Global AI Guidelines',
   docente: [
-    { key: 'level_primaria', default: 'Primaria' },
-    { key: 'level_media_basica', default: 'Enseñanza Media Básica' },
-    { key: 'level_media_superior', default: 'Enseñanza Media Superior' },
-    { key: 'level_formacion_docente', default: 'Formación Docente' },
-    { key: 'level_universitaria', default: 'Universitaria' }
+    { key: 'level_int_primary', default: 'Primary Education' },
+    { key: 'level_int_secondary', default: 'Secondary Education / High School' },
+    { key: 'level_int_technical', default: 'Technical & Vocational College' },
+    { key: 'level_int_teacher_training', default: 'Teacher Training / Pedagogy' },
+    { key: 'level_int_higher', default: 'Higher Education / University' }
   ],
   estudiante: [
-    { key: 'level_media_basica', default: 'Enseñanza Media Básica' },
-    { key: 'level_media_superior', default: 'Enseñanza Media Superior' },
-    { key: 'level_terciaria_tecnica', default: 'Educación Terciaria Técnica' },
-    { key: 'level_formacion_docente', default: 'Formación Docente' },
-    { key: 'level_universitaria', default: 'Universitaria' }
+    { key: 'level_int_secondary', default: 'Secondary Education' },
+    { key: 'level_int_technical', default: 'Technical & Vocational College' },
+    { key: 'level_int_teacher_training', default: 'Teacher Preparation Student' },
+    { key: 'level_int_undergrad', default: 'Undergraduate University' },
+    { key: 'level_int_postgrad', default: 'Postgraduate / Master / Doctorate' }
   ]
 };
 
@@ -821,6 +862,9 @@ if (elements.countrySelect && elements.countryFinalInput) {
 
     if (window.state) {
       window.state.country = elements.countryFinalInput.value || 'Uruguay';
+      if (window.state.profile && typeof updateNivelEducativo === 'function') {
+        updateNivelEducativo(window.state.profile);
+      }
     }
   };
 
@@ -858,10 +902,13 @@ function updateNivelEducativo(perfil) {
   // Limpiar opciones anteriores
   elements.nivelEducativo.innerHTML = '<option value="">Seleccioná una opción</option>';
 
-  // Cargar opciones según perfil
+  // Cargar opciones según país y perfil
+  const pais = (window.state && window.state.country) || 'Uruguay';
   const lang = (window.state && window.state.lang) || 'es';
   const t = TRANSLATIONS[lang] || TRANSLATIONS['es'];
-  const nivelesObj = NIVELES_EDUCATIVOS[perfil] || [];
+  
+  const configPais = NIVELES_POR_PAIS[pais] || DEFAULT_INTERNATIONAL_NIVELES;
+  const nivelesObj = configPais[perfil] || DEFAULT_INTERNATIONAL_NIVELES[perfil];
   const niveles = nivelesObj.map(item => t[item.key] || item.default);
   
   niveles.forEach(nivel => {
