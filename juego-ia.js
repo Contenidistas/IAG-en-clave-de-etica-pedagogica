@@ -639,6 +639,13 @@ function renderQuestion() {
   [elements.yesBtn, elements.sometimesBtn, elements.noBtn, elements.notApplicableBtn]
     .filter(Boolean)
     .forEach(btn => btn.classList.remove('is-selected'));
+  const lang = (window.state && window.state.lang) || localStorage.getItem('app_lang') || 'es';
+  const t = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[lang]) ? TRANSLATIONS[lang] : {};
+  if (elements.yesBtn) elements.yesBtn.textContent = t.btn_yes || 'Sí';
+  if (elements.sometimesBtn) elements.sometimesBtn.textContent = t.btn_sometimes || 'A veces';
+  if (elements.noBtn) elements.noBtn.textContent = t.btn_no || 'No';
+  if (elements.notApplicableBtn) elements.notApplicableBtn.textContent = t.btn_na || t.btn_not_applicable || 'No aplica';
+
   elements.yesBtn.disabled  = false;
   if (elements.sometimesBtn) elements.sometimesBtn.disabled = false;
   elements.noBtn.disabled   = false;
