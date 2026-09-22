@@ -44,6 +44,10 @@ Los recorridos estan definidos en `configuracion-ia.js`. La resolucion de perfil
 - `pwa.js`: registro del service worker y control del boton de instalacion.
 - `icons/`: iconos PWA en 192 y 512 px.
 - `styles.css`: estilos visuales, responsive, brujula, mapa de decision y constructor de acuerdos.
+- `experience.css`: capa visual del inicio, selección de perfil, controles y transiciones accesibles.
+- `storage.js`: acceso a almacenamiento con respaldo temporal en memoria si el navegador lo bloquea.
+- `principle-network.js`: red de principios con posiciones estables, adaptación móvil y detalle accesible por teclado.
+- `ethical-evidence.js`: asociaciones explícitas entre preguntas y ejes, con orientaciones y enlaces a los marcos. Las preguntas de contexto y «No aplica» no valoran un eje; un eje sin respuestas permanece sin evidencia. Estas asociaciones son una interpretación pedagógica de la aplicación, no una rúbrica oficial de las instituciones citadas.
 - `configuracion-ia.js`: configuracion general, endpoints, niveles, perfiles y arboles de decision.
 - `ui-ia.js`: manejo de interfaz, carrusel, seleccion de perfil, marcos colapsables, estadisticas, opiniones, modales y estado visual.
 - `juego-ia.js`: logica del cuestionario, resolucion de perfiles, mapa de decision, brujula, acuerdo didactico, progreso y envio de datos.
@@ -59,6 +63,10 @@ Los recorridos estan definidos en `configuracion-ia.js`. La resolucion de perfil
 La app no requiere build. Para probarla con rutas locales y PDF/recursos, se recomienda usar Live Server desde `index.html`.
 
 Consideraciones:
+
+- El inicio usa tres pasos: perfil, contexto y preferencias. El consentimiento es opcional.
+- El laboratorio sigue disponible desde la portada; completar el inicio lleva directamente al cuestionario.
+- Las pruebas de interacción se documentan en `tests/README.md`.
 
 - La navegacion, cuestionario, brujula, acuerdo didactico y recursos funcionan desde Live Server.
 - La descarga del PDF usa `jsPDF` desde CDN, por lo que requiere conexion a internet.

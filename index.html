@@ -8,7 +8,7 @@
 -->
 
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; connect-src 'self' https://iag-etica-api.suscripcionessh.workers.dev; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
   <meta name="theme-color" content="#6366f1">
   <title>IA Educativa ANEP - Uso Crítico y Reflexivo</title>
@@ -19,10 +19,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="experience.css">
 </head>
 <body>
-  <!-- Canvas de fondo de red neuronal interactivo -->
-  <canvas id="neuralNetCanvas"></canvas>
 
   <!-- ============================================
        HEADER - NAVEGACIÓN PRINCIPAL
@@ -128,7 +127,7 @@
                   <article class="intro-feature-card">
                     <span>02</span>
                     <h3>Marcos de referencia</h3>
-                    <p>Articula aportes de UNESCO, ANEP, FING, Udelar y Ceibal para orientar decisiones pedagógicas.</p>
+                    <p>Articula aportes de UNESCO, ANEP, FING, Udelar, Ceibal y Agesic para orientar decisiones pedagógicas.</p>
                   </article>
                   <article class="intro-feature-card">
                     <span>03</span>
@@ -150,103 +149,64 @@
                  SLIDE 2: FORMULARIO DE CARACTERIZACIÓN
                  ========================================== -->
             <div class="carousel-slide">
-              <div class="intro-slide onboarding-flow">
+              <div class="setup-flow onboarding-flow">
                 <div id="diagnosticoInicio" class="diagnostic-heading">
                   <p class="section-kicker" data-i18n="diag_kicker">Diagnóstico guiado</p>
-                  <h2 data-i18n="diag_title">Comenzar el proceso de reflexión crítica de mis prácticas</h2>
+                  <h2 data-i18n="setup_title">Un recorrido a tu medida</h2>
                 </div>
-                <p style="color: var(--text-secondary); font-size: 1.125rem; line-height: 1.6; margin-bottom: 2rem;" data-i18n="diag_subtitle">
-                  Este cuestionario interactivo te ayudará a evaluar tu práctica y recibir recomendaciones personalizadas.
+                <p class="setup-intro" data-i18n="setup_intro">
+                  Contanos desde dónde participás. Vamos a adaptar las preguntas y la devolución a tu contexto.
                 </p>
 
-                <div class="onboarding-progress-card" id="onboardingProgress">
-                  <div class="onboarding-progress-copy">
-                    <span id="onboardingStepCounter">Paso 1 de 5</span>
-                    <strong id="onboardingStepTitle">Punto de partida</strong>
+                <div class="setup-progress-panel" id="onboardingProgress">
+                  <div class="setup-progress-copy">
+                    <span id="onboardingStepCounter">Paso 1 de 3</span>
+                    <strong id="onboardingStepTitle" tabindex="-1">Punto de partida</strong>
                   </div>
-                  <div class="onboarding-progress-dots" id="onboardingDots" aria-label="Progreso del inicio guiado"></div>
+                  <div class="setup-progress-steps" id="onboardingDots" aria-label="Progreso del inicio guiado"></div>
                 </div>
 
                 <!-- Selección de perfil (define la densidad del recorrido) -->
-                <div class="profile-selector-panel onboarding-step" id="profileSelectorPanel" data-onboarding-step="profile">
-                  <!-- Fondo de Red Neuronal -->
-                  <div class="neural-net-bg" aria-hidden="true">
-                    <svg viewBox="0 0 400 200" preserveAspectRatio="none">
-                      <line x1="40" y1="40" x2="140" y2="30" class="synapse" />
-                      <line x1="40" y1="40" x2="140" y2="100" class="synapse" />
-                      <line x1="40" y1="160" x2="140" y2="100" class="synapse" />
-                      <line x1="40" y1="160" x2="140" y2="170" class="synapse" />
-                      <line x1="140" y1="30" x2="280" y2="20" class="synapse" />
-                      <line x1="140" y1="100" x2="280" y2="100" class="synapse" />
-                      <line x1="140" y1="170" x2="280" y2="180" class="synapse" />
-                      <circle cx="40" cy="40" r="5" class="neuron" />
-                      <circle cx="40" cy="160" r="5" class="neuron" />
-                      <circle cx="140" cy="30" r="6" class="neuron" />
-                      <circle cx="140" cy="100" r="6" class="neuron" />
-                      <circle cx="140" cy="170" r="6" class="neuron" />
-                      <circle cx="280" cy="20" r="7" class="neuron" />
-                      <circle cx="280" cy="100" r="7" class="neuron" />
-                      <circle cx="280" cy="180" r="7" class="neuron" />
-                    </svg>
-                  </div>
-                  <p class="section-kicker" data-i18n="step_perfil">Punto de partida</p>
-                  <h3 data-i18n="label_role_question">¿Desde qué lugar querés hacer el recorrido?</h3>
-                  <div class="chips-container profile-choice-grid">
-                    <div class="chip profile-choice" data-profile="estudiante">
-                      <div class="profile-choice-header">
-                        <div class="profile-choice-icon-bg">
-                          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" class="profile-svg-icon"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-                        </div>
-                        <div class="profile-choice-check"></div>
-                      </div>
+                <div class="setup-profile-panel onboarding-step" id="profileSelectorPanel" data-onboarding-step="profile">
+                  <h3 id="profileQuestion" data-i18n="label_role_question">¿Desde qué lugar querés hacer el recorrido?</h3>
+                  <div class="profile-choice-grid" role="group" aria-labelledby="profileQuestion">
+                    <button type="button" class="profile-choice" data-profile="estudiante" aria-pressed="false">
+                      <span class="profile-choice-header">
+                        <span class="profile-choice-icon-bg">
+                          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" class="profile-svg-icon" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                        </span>
+                        <span class="profile-choice-check" aria-hidden="true"></span>
+                      </span>
                       <span class="profile-choice-title" data-i18n="role_estudiante_title">Estudiante</span>
                       <small class="profile-choice-desc" data-i18n="role_estudiante_desc">Uso de IA en estudio, tareas y producción académica en formación inicial.</small>
-                    </div>
-                    <div class="chip profile-choice" data-profile="docente">
-                      <div class="profile-choice-header">
-                        <div class="profile-choice-icon-bg">
-                          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" class="profile-svg-icon"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-                        </div>
-                        <div class="profile-choice-check"></div>
-                      </div>
+                    </button>
+                    <button type="button" class="profile-choice" data-profile="docente" aria-pressed="false">
+                      <span class="profile-choice-header">
+                        <span class="profile-choice-icon-bg">
+                          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" class="profile-svg-icon" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                        </span>
+                        <span class="profile-choice-check" aria-hidden="true"></span>
+                      </span>
                       <span class="profile-choice-title" data-i18n="role_docente_title">Docente</span>
                       <small class="profile-choice-desc" data-i18n="role_docente_desc">Docentes (maestros/as y profesores/as): consignas, evaluación, acompañamiento y acuerdos didácticos de aula.</small>
-                    </div>
-                    <div class="chip profile-choice" data-profile="especializado">
-                      <div class="profile-choice-header">
-                        <div class="profile-choice-icon-bg">
-                          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" class="profile-svg-icon"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-                        </div>
-                        <div class="profile-choice-check"></div>
-                      </div>
+                    </button>
+                    <button type="button" class="profile-choice" data-profile="especializado" aria-pressed="false">
+                      <span class="profile-choice-header">
+                        <span class="profile-choice-icon-bg">
+                          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" class="profile-svg-icon" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                        </span>
+                        <span class="profile-choice-check" aria-hidden="true"></span>
+                      </span>
                       <span class="profile-choice-title" data-i18n="role_investigador_title">Docente/investigador/a</span>
                       <small class="profile-choice-desc" data-i18n="role_investigador_desc">Marcos teóricos, investigación educativa, gestión y criterios compartidos.</small>
-                    </div>
+                    </button>
                   </div>
-                </div>
-
-                <!-- Campo de nivel educativo (aparece dinámicamente según perfil) -->
-                <div id="nivelEducativoWrapper" class="onboarding-step" data-onboarding-step="contexto" style="max-width: 500px; margin: 1.5rem auto; display: none;">
-                  <label style="display:block; margin-bottom:0.75rem; font-weight:600; text-align:center;">
-                    <span id="nivelEducativoLabel">En qué nivel trabajás</span>
-                  </label>
-                  <select id="nivelEducativo" class="input" style="display:none;">
-                    <option value="">Seleccioná una opción</option>
-                  </select>
-                  <div id="nivelEducativoChips" class="chips-container select-chips vertical-chips" style="display:flex; flex-direction:column; gap:0.55rem; width:100%;">
-                    <!-- Chips se cargarán dinámicamente por JS -->
-                  </div>
-                </div>
-
-                <!-- Campo de nombre (opcional) -->
-                <div id="identityWrapper" class="onboarding-step" data-onboarding-step="contexto" style="max-width: 400px; margin: 1.5rem auto 1rem auto;">
-                  <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;" data-i18n="label_name">Tu nombre (opcional)</label>
-                  <input type="text" id="playerName" class="input" placeholder="Ingresá tu nombre o un seudónimo" data-i18n-placeholder="placeholder_name" />
+                  <p id="profilePreview" class="profile-preview" role="status" data-i18n="setup_profile_hint">Elegí el rol que mejor represente tu práctica hoy. Podés cambiarlo antes de comenzar.</p>
                 </div>
 
                 <!-- Selector de país -->
                 <div id="countryWrapper" class="onboarding-step" data-onboarding-step="contexto" style="max-width: 500px; margin: 1rem auto;">
-                  <label style="display:block; margin-bottom:0.5rem; font-weight:600; text-align:center;" data-i18n="label_country">País</label>
+                  <label for="countrySelect" style="display:block; margin-bottom:0.5rem; font-weight:600; text-align:center;" data-i18n="label_country">País</label>
                   <select id="countrySelect" name="pais" class="input select-country-dropdown" style="display:block; width:100%;">
                     <option value="Uruguay" selected>🇺🇾 Uruguay</option>
                     <option value="Argentina">🇦🇷 Argentina</option>
@@ -280,12 +240,31 @@
                 <!-- Campo oculto para guardar el país final -->
                 <input type="hidden" id="countryFinal" value="Uruguay" />
 
+                <!-- Campo de nivel educativo (aparece dinámicamente según perfil) -->
+                <div id="nivelEducativoWrapper" class="onboarding-step" data-onboarding-step="contexto" style="max-width: 500px; margin: 1.5rem auto; display: none;">
+                  <label for="nivelEducativo" style="display:block; margin-bottom:0.75rem; font-weight:600; text-align:center;">
+                    <span id="nivelEducativoLabel">En qué nivel trabajás</span>
+                  </label>
+                  <select id="nivelEducativo" class="input" data-native-select>
+                    <option value="">Seleccioná una opción</option>
+                  </select>
+                  <div id="nivelEducativoChips" class="chips-container select-chips vertical-chips" style="display:flex; flex-direction:column; gap:0.55rem; width:100%;">
+                    <!-- Chips se cargarán dinámicamente por JS -->
+                  </div>
+                </div>
+
+                <!-- Campo de nombre (opcional) -->
+                <div id="identityWrapper" class="onboarding-step" data-onboarding-step="contexto" style="max-width: 400px; margin: 1.5rem auto 1rem auto;">
+                  <label for="playerName" style="display: block; margin-bottom: 0.5rem; font-weight: 600;" data-i18n="label_name">Tu nombre (opcional)</label>
+                  <input type="text" id="playerName" class="input" maxlength="80" autocomplete="nickname" placeholder="Ingresá tu nombre o un seudónimo" data-i18n-placeholder="placeholder_name" />
+                </div>
+
                 <!-- Nivel de familiaridad con el tema -->
                 <div id="familiaridadInicialWrapper" class="onboarding-step" data-onboarding-step="cierre" style="max-width: 500px; margin: 1.5rem auto;">
-                  <label style="display:block; margin-bottom:0.75rem; font-weight:600; text-align:center;" data-i18n="label_familiarity">
+                  <label for="familiaridadInicial" style="display:block; margin-bottom:0.75rem; font-weight:600; text-align:center;" data-i18n="label_familiarity">
                     Antes de comenzar, ¿qué nivel de familiaridad tenés con este tema?
                   </label>
-                  <select id="familiaridadInicial" class="input" style="display:none;">
+                  <select id="familiaridadInicial" class="input" data-native-select>
                     <option value="">Seleccioná una opción</option>
                     <option value="Nunca lo estudié">Nunca lo estudié</option>
                     <option value="Lo conozco superficialmente">Lo conozco superficialmente</option>
@@ -322,6 +301,10 @@
                 <!-- Checkbox de consentimiento -->
                 <div class="mt-2 consent-box onboarding-step" data-onboarding-step="cierre" style="max-width: 700px; margin: 1.5rem auto 0 auto; display:flex; align-items:flex-start; gap:0.5rem; font-size:0.85rem; color:var(--text-secondary);">
                   <div class="consent-content">
+                    <label for="consentTracking" class="setup-consent">
+                      <input type="checkbox" id="consentTracking" />
+                      <span data-i18n="setup_consent">Quiero aportar mi recorrido al registro anónimo (opcional)</span>
+                    </label>
                     <p class="consent-help" style="margin-top:0.25rem;" data-i18n="consent_help">
                       Podés iniciar el recorrido aunque no aceptes. Si marcás esta opción, se guarda únicamente: perfil, país, seudónimo opcional, nivel de familiaridad, uso de recursos similares y registro del cuestionario.
                     </p>
@@ -338,11 +321,6 @@
 
                 <div class="onboarding-controls" id="onboardingControls">
                   <button type="button" class="btn btn-outline" id="onboardingBackBtn" data-i18n="btn_back">Anterior</button>
-                  <label for="consentTracking" class="btn btn-primary consent-action-label" style="cursor:pointer; line-height:1.4; font-weight:500;">
-                    <input type="checkbox" id="consentTracking" style="margin-top:0.15rem; cursor:pointer;" />
-                    <span class="consent-unchecked" data-i18n="consent_unchecked">Acepto registro anónimo</span>
-                    <span class="consent-checked" data-i18n="consent_checked">Registro anónimo aceptado</span>
-                  </label>
                   <button type="button" class="btn btn-primary" id="onboardingNextBtn" data-i18n="btn_next">Siguiente</button>
                 </div>
 
@@ -391,7 +369,7 @@
       <div class="card framework-card audience-framework" style="margin-top: 1.5rem;">
         <div class="framework-hero">
           <p class="section-kicker" data-i18n="framework_kicker">Fundamentación de la herramienta</p>
-          <h3 id="frameworkAudienceTitle">Marcos de UNESCO, ANEP, FING, Udelar y Ceibal</h3>
+          <h3 id="frameworkAudienceTitle">Marcos de UNESCO, ANEP, FING, Udelar, Ceibal y Agesic</h3>
           <p id="frameworkAudienceIntro">
             Una propuesta construida desde investigación, formación docente, experiencia de aula y marcos uruguayos recientes para pensar el uso ético, crítico y reflexivo de la IA.
           </p>
@@ -414,6 +392,10 @@
         </div>
 
         <div class="framework-links" aria-label="Accesos directos a marcos de referencia">
+          <a href="https://www.gub.uy/agencia-gobierno-electronico-sociedad-informacion-conocimiento/comunicacion/publicaciones/estrategia-nacional-inteligencia-artificial-del-uruguay-2024-2030" target="_blank" rel="noopener noreferrer" class="framework-link" lang="es">
+            <span class="framework-link-label">Agesic</span>
+            <span class="framework-link-title">Estrategia Nacional de IA 2024–2030</span>
+          </a>
           <a href="https://www.anep.edu.uy/sites/default/files/images/2024/noticias/julio/240709/Documento%20IA.pdf" target="_blank" rel="noopener noreferrer" class="framework-link">
             <span class="framework-link-label">ANEP</span>
             <span class="framework-link-title">IA en educación</span>
@@ -838,6 +820,8 @@
           </div>
         </div>
 
+        <section id="recommendedCase" class="card recommended-case mt-3" hidden aria-label="Un caso para seguir pensando"></section>
+
         <!-- Timeline completo -->
         <div class="card mt-3">
           <h3 style="margin-bottom: 1rem;">Tu recorrido completo</h3>
@@ -1106,8 +1090,11 @@
   <!-- ==========================================
        SCRIPTS JAVASCRIPT
        ========================================== -->
+  <script src="storage.js"></script>
   <script src="configuracion-ia.js"></script>
+  <script src="ethical-evidence.js"></script>
   <script src="ui-ia.js"></script>
+  <script src="principle-network.js"></script>
   <script src="juego-ia.js"></script>
   <script src="chatbot-component.js"></script>
   <script src="certificado-ia.js"></script>

@@ -1,10 +1,14 @@
-const CACHE_NAME = 'iag-etica-pedagogica-v14';
+const CACHE_NAME = 'iag-etica-pedagogica-v21';
 
 const CORE_ASSETS = [
   './',
   './index.html',
   './fundamentacion.html',
   './styles.css',
+  './experience.css',
+  './storage.js',
+  './principle-network.js',
+  './ethical-evidence.js',
   './configuracion-ia.js',
   './ui-ia.js',
   './juego-ia.js',

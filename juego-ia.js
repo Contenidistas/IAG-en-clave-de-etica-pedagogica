@@ -23,7 +23,7 @@ function normalizarPreguntasDelPerfil(perfilKey) {
    - profileKey    → árbol efectivo (docente,
                      estudiante_media, etc.)
    ======================================== */
-function resolverProfileKey(profile, nivelEducativo) {
+function resolverProfileKey(profile, nivelEducativo, levelKey = '') {
   if (!profile) return null;
   const nivel = (nivelEducativo || '').toLowerCase();
 
@@ -34,6 +34,17 @@ function resolverProfileKey(profile, nivelEducativo) {
 
   // Estudiantes: segmentamos por nivel educativo
   if (profile === 'estudiante') {
+    // Route by a stable option key so translating a label cannot change the journey.
+    const levelRoutes = {
+      level_media_basica: 'estudiante_media', level_media_superior: 'estudiante_media',
+      level_ca_sec: 'estudiante_media', level_int_secondary: 'estudiante_media',
+      level_formacion_docente: 'estudiante_formacion', level_ca_teacher_prog: 'estudiante_formacion',
+      level_int_teacher_training: 'estudiante_formacion',
+      level_universitaria: 'estudiante_universitaria', level_ca_undergrad: 'estudiante_universitaria',
+      level_ca_grad: 'estudiante_universitaria', level_int_undergrad: 'estudiante_universitaria',
+      level_int_postgrad: 'estudiante_universitaria'
+    };
+    if (levelRoutes[levelKey]) return levelRoutes[levelKey];
     if (!nivel) return 'estudiante';   // genérico si no eligió
 
     if (nivel.includes('media')) {
@@ -65,7 +76,7 @@ function iniciarJuego() {
   const baseProfile = state.profile; // 'docente' | 'estudiante' | 'especializado'
 
   // 🔑 Resolver qué árbol efectivo vamos a usar
-  const profileKey = resolverProfileKey(baseProfile, state.nivelEducativo);
+  const profileKey = resolverProfileKey(baseProfile, state.nivelEducativo, elements.nivelEducativo?.selectedOptions[0]?.dataset.levelKey);
 
   if (!profileKey || !CONFIG.perfiles[profileKey]) {
     console.error('❌ No se pudo resolver un perfil válido', {
@@ -210,23 +221,24 @@ const DECISION_CRITERIA = [
 ];
 
 function construirEstadoDePrincipios() {
-  const activeCriterion = (() => {
-    if (state.graphFocusCriterionId) return state.graphFocusCriterionId;
+  const activeCriteria = (() => {
+    if (state.awaitingNext && state.path.length) return evidenciaDePaso(state.path[state.path.length - 1]).axes;
     const perfil = CONFIG.perfiles[state.profileKey];
     const nodo = perfil && perfil.nodos ? perfil.nodos[state.currentId] : null;
-    return nodo ? inferirCriterioDeNodo(nodo).id : null;
+    return nodo ? (nodo.ethicalEvidence?.axes || [inferirCriterioDeNodo(nodo).id]) : [];
   })();
 
   return DECISION_CRITERIA.map(criterio => {
-    const pasos = state.path.filter(paso => paso.criterionId === criterio.id);
+    const pasos = pasosDeCriterio(criterio.id);
     const estado = obtenerEstadoCriterio(criterio.id);
     return {
       ...criterio,
       steps: pasos.length,
+      responses: pasos.map(paso => ({ ...paso, association: evidenciaDePaso(paso) })),
       className: estado.className,
       status: estado.label,
       feedback: estado.feedback,
-      active: criterio.id === activeCriterion,
+      active: activeCriteria.includes(criterio.id),
     };
   });
 }
@@ -238,191 +250,6 @@ function escapeGameHtml(value) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
-}
-
-function construirLayoutPrincipios(nodes) {
-  const activeIndex = nodes.findIndex(node => node.active);
-  const defaultPositions = [
-    { x: 300, y: 58, size: 102, role: 'top' },
-    { x: 116, y: 138, size: 88, role: 'left' },
-    { x: 196, y: 252, size: 88, role: 'low-left' },
-    { x: 404, y: 252, size: 88, role: 'low-right' },
-    { x: 484, y: 138, size: 88, role: 'right' }
-  ];
-  const activeLayout = { x: 300, y: 62, size: 118, role: 'active' };
-  const secondaryPositions = [
-    { x: 112, y: 140, size: 86, role: 'left' },
-    { x: 178, y: 258, size: 84, role: 'low-left' },
-    { x: 422, y: 258, size: 84, role: 'low-right' },
-    { x: 488, y: 140, size: 86, role: 'right' }
-  ];
-
-  let secondaryCursor = 0;
-  return nodes.map((node, index) => {
-    const base = activeIndex >= 0
-      ? (index === activeIndex ? activeLayout : secondaryPositions[secondaryCursor++])
-      : defaultPositions[index];
-    return {
-      ...node,
-      index,
-      x: base.x,
-      y: base.y,
-      size: base.size,
-      role: base.role,
-      className: `${node.className}${node.active ? ' active' : ''}${node.steps ? ' touched' : ''}`
-    };
-  });
-}
-
-function construirRutaNeuronal(node) {
-  const cx = 300;
-  const cy = 166;
-  const controlLift = node.y < cy ? -48 : 48;
-  const c1x = cx + (node.x - cx) * 0.22;
-  const c1y = cy + controlLift;
-  const c2x = cx + (node.x - cx) * 0.72;
-  const c2y = node.y - controlLift * 0.22;
-  return `M ${cx} ${cy} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${node.x} ${node.y}`;
-}
-
-function crearPrincipleGraphSvg(target, nodes) {
-  target.innerHTML = `
-    <svg class="principle-graph-svg" viewBox="0 0 600 330" role="img" aria-label="Red de principios conectados a la decisión actual">
-      <defs>
-        <radialGradient id="neuralNodeGradient" cx="34%" cy="28%" r="72%">
-          <stop offset="0%" stop-color="#ffffff"/>
-          <stop offset="64%" stop-color="#eef2ff"/>
-          <stop offset="100%" stop-color="#e0e7ff"/>
-        </radialGradient>
-        <linearGradient id="neuralLinkGradient" x1="0%" x2="100%" y1="0%" y2="0%">
-          <stop offset="0%" stop-color="#6366f1" stop-opacity="0.78"/>
-          <stop offset="100%" stop-color="#818cf8" stop-opacity="0.18"/>
-        </linearGradient>
-        <filter id="neuralSoftShadow" x="-30%" y="-30%" width="160%" height="160%">
-          <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#4f46e5" flood-opacity="0.16"/>
-        </filter>
-      </defs>
-
-      <circle class="principle-graph-orbit orbit-main" cx="300" cy="166" r="142"></circle>
-      <circle class="principle-graph-orbit orbit-inner" cx="300" cy="166" r="92"></circle>
-
-      <g class="neural-graph-links" aria-hidden="true">
-        ${nodes.map(node => `<path class="neural-graph-link" data-criterion="${node.id}"></path>`).join('')}
-      </g>
-
-      <g class="neural-graph-core">
-        <circle cx="300" cy="166" r="49"></circle>
-        <text x="300" y="156" text-anchor="middle">IAG</text>
-        <text x="300" y="178" text-anchor="middle" class="core-strong">Decisión</text>
-      </g>
-
-      <g class="neural-graph-nodes">
-        ${nodes.map(node => `
-          <g class="neural-graph-node" data-criterion="${node.id}" style="transform: translate(300px, 166px);">
-            <g class="neural-graph-node-body">
-              <circle></circle>
-              <text text-anchor="middle" class="node-label"></text>
-              <text text-anchor="middle" class="node-status"></text>
-              <text text-anchor="middle" class="node-small"></text>
-            </g>
-            <title></title>
-          </g>
-        `).join('')}
-      </g>
-    </svg>
-    <div class="neural-graph-tooltip" aria-hidden="true">
-      <strong></strong>
-      <span></span>
-    </div>
-  `;
-}
-
-function renderPrincipleGraph(target, statusTarget, options = {}) {
-  if (!target) return;
-  const nodes = construirEstadoDePrincipios();
-  const active = nodes.find(node => node.active);
-  const touchedCount = nodes.filter(node => node.steps > 0).length;
-  const layoutNodes = construirLayoutPrincipios(nodes);
-
-  if (statusTarget) {
-    statusTarget.textContent = active
-      ? `Ahora: ${active.label}`
-      : `${touchedCount} principios activados`;
-  }
-
-  if (!target.querySelector('.principle-graph-svg')) {
-    crearPrincipleGraphSvg(target, nodes);
-    requestAnimationFrame(() => renderPrincipleGraph(target, statusTarget, options));
-    return;
-  }
-
-  layoutNodes.forEach(node => {
-    const nodeEl = target.querySelector(`.neural-graph-node[data-criterion="${node.id}"]`);
-    const pathEl = target.querySelector(`.neural-graph-link[data-criterion="${node.id}"]`);
-    if (pathEl) {
-      pathEl.setAttribute('d', construirRutaNeuronal(node));
-      pathEl.setAttribute('class', `neural-graph-link ${node.className}`);
-    }
-    if (!nodeEl) return;
-    const radius = node.size / 2;
-    const textY = -12;
-    nodeEl.setAttribute('class', `neural-graph-node ${node.className}`);
-    nodeEl.setAttribute('data-feedback', node.feedback || '');
-    nodeEl.setAttribute('data-tooltip-title', `${node.short}: ${node.status}`);
-    nodeEl.setAttribute('tabindex', '0');
-    nodeEl.setAttribute('role', 'img');
-    nodeEl.setAttribute('aria-label', `${node.short}: ${node.status}. ${node.feedback || ''}`);
-    nodeEl.style.transform = `translate(${node.x}px, ${node.y}px)`;
-    const circle = nodeEl.querySelector('circle');
-    const label = nodeEl.querySelector('.node-label');
-    const status = nodeEl.querySelector('.node-status');
-    const small = nodeEl.querySelector('.node-small');
-    const title = nodeEl.querySelector('title');
-    if (circle) circle.setAttribute('r', radius);
-    if (label) {
-      label.setAttribute('y', textY);
-      label.textContent = node.short;
-    }
-    if (status) {
-      status.setAttribute('y', textY + 22);
-      status.textContent = node.status;
-    }
-    if (small) {
-      small.setAttribute('y', textY + 42);
-      small.textContent = node.steps ? `${node.steps} señal(es)` : 'por revisar';
-    }
-    if (title) {
-      title.textContent = `${node.short}: ${node.status}. ${node.feedback || ''}`;
-    }
-  });
-
-  const tooltip = target.querySelector('.neural-graph-tooltip');
-  if (tooltip) {
-    const tooltipTitle = tooltip.querySelector('strong');
-    const tooltipText = tooltip.querySelector('span');
-    const showTooltip = (nodeEl) => {
-      if (tooltipTitle) tooltipTitle.textContent = nodeEl.getAttribute('data-tooltip-title') || '';
-      if (tooltipText) tooltipText.textContent = nodeEl.getAttribute('data-feedback') || '';
-      tooltip.classList.add('visible');
-    };
-    const hideTooltip = () => tooltip.classList.remove('visible');
-
-    target.querySelectorAll('.neural-graph-node').forEach(nodeEl => {
-      nodeEl.onmouseenter = () => showTooltip(nodeEl);
-      nodeEl.onfocus = () => showTooltip(nodeEl);
-      nodeEl.onmouseleave = hideTooltip;
-      nodeEl.onblur = hideTooltip;
-    });
-  }
-
-  if (options.result && !active && statusTarget) {
-    const lang = (window.state && window.state.lang) || 'es';
-    const t = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[lang]) ? TRANSLATIONS[lang] : {};
-    const priority = nodes.find(node => node.className === 'priority') || nodes.find(node => node.className === 'progress');
-    statusTarget.textContent = priority
-      ? `${t.branch_focus_prefix || 'Foco: '}${priority.label}`
-      : (t.branch_no_critical || 'Recorrido sin focos críticos');
-  }
 }
 
 function renderDecisionBranchMap() {
@@ -497,21 +324,30 @@ function renderDecisionBranchMap() {
 }
 
 function inferirCriterioDeNodo(nodo) {
-  const texto = `${nodo.title || ''} ${nodo.help || ''} ${nodo.context || ''} ${nodo.anepRef || ''}`.toLowerCase();
+  const explicit = DECISION_CRITERIA.find(criterion => criterion.id === nodo.ethicalEvidence?.axes[0]);
+  if (explicit) return explicit;
+  const texto = `${nodo.title || ''}`.toLowerCase();
   return DECISION_CRITERIA.find(criterio =>
     criterio.patterns.some(pattern => texto.includes(pattern))
   ) || DECISION_CRITERIA[4];
 }
 
 function obtenerEstadoCriterio(criterioId) {
-  const pasos = state.path.filter(paso => paso.criterionId === criterioId);
+  const linked = pasosDeCriterio(criterioId);
+  const pasos = linked.filter(paso => {
+    const evidence = evidenciaDePaso(paso);
+    return ['yes', 'no', 'sometimes'].includes(paso.answerKey)
+      && evidence.kind !== 'context' && !evidence.contextAxes?.includes(criterioId);
+  });
   const lang = (window.state && window.state.lang) || 'es';
   const t = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[lang]) ? TRANSLATIONS[lang] : {};
   if (!pasos.length) {
     return {
       className: 'pending',
-      label: t.criterion_status_pending || 'Pendiente',
-      feedback: t.criterion_pending_feedback || 'Todavía no apareció una decisión vinculada a este principio.'
+      label: linked.length ? 'Sin evidencia' : (t.criterion_status_pending || 'Pendiente'),
+      feedback: linked.length
+        ? 'Las respuestas vinculadas son de contexto o «No aplica». No permiten valorar este eje.'
+        : 'Todavía no hay respuestas que permitan valorar este eje; no significa una dificultad ni una fortaleza.'
     };
   }
   if (pasos.some(paso => paso.answerKey === 'no')) {
@@ -562,7 +398,7 @@ function updateDecisionMap() {
   const lang = (window.state && window.state.lang) || 'es';
   const t = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[lang]) ? TRANSLATIONS[lang] : {};
 
-  const touched = new Set(state.path.map(paso => paso.criterionId).filter(Boolean));
+  const touched = new Set(state.path.flatMap(paso => evidenciaDePaso(paso).axes));
   const activeCriterion = (() => {
     const perfil = CONFIG.perfiles[state.profileKey];
     const nodo = perfil && perfil.nodos ? perfil.nodos[state.currentId] : null;
@@ -638,8 +474,11 @@ function renderQuestion() {
   elements.feedbackBox.classList.add('hidden');
   [elements.yesBtn, elements.sometimesBtn, elements.noBtn, elements.notApplicableBtn]
     .filter(Boolean)
-    .forEach(btn => btn.classList.remove('is-selected'));
-  const lang = (window.state && window.state.lang) || localStorage.getItem('app_lang') || 'es';
+    .forEach(btn => {
+      btn.classList.remove('is-selected');
+      btn.setAttribute('aria-pressed', 'false');
+    });
+  const lang = (window.state && window.state.lang) || window.appStorage.local.getItem('app_lang') || 'es';
   const t = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[lang]) ? TRANSLATIONS[lang] : {};
   if (elements.yesBtn) elements.yesBtn.textContent = t.btn_yes || 'Sí';
   if (elements.sometimesBtn) elements.sometimesBtn.textContent = t.btn_sometimes || 'A veces';
@@ -753,9 +592,13 @@ function responder(answerKey) {
   mostrarFeedback(feedback, answer.tone);
   Object.values(answerButtons)
     .filter(Boolean)
-    .forEach(btn => btn.classList.remove('is-selected'));
+    .forEach(btn => {
+      btn.classList.remove('is-selected');
+      btn.setAttribute('aria-pressed', 'false');
+    });
   if (answerButtons[answerKey]) {
     answerButtons[answerKey].classList.add('is-selected');
+    answerButtons[answerKey].setAttribute('aria-pressed', 'true');
   }
 
   // Guardar paso en el "camino"
@@ -765,6 +608,9 @@ function responder(answerKey) {
     answer:   answer.label,
     answerKey,
     criterionId: criterio.id,
+    criterionIds: nodo.ethicalEvidence?.axes || [criterio.id],
+    associationReason: nodo.ethicalEvidence?.reason || criterio.reason,
+    evidenceKind: nodo.ethicalEvidence?.kind || 'practice',
     criterionLabel: criterio.label,
     gain:     ganancia,
     feedback
@@ -936,10 +782,10 @@ function sendResultToServer(payload) {
 function getAnalyticsSessionId() {
   try {
     const key = 'iagAnalyticsSessionId';
-    let sessionId = sessionStorage.getItem(key);
+    let sessionId = window.appStorage.session.getItem(key);
     if (!sessionId) {
       sessionId = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-      sessionStorage.setItem(key, sessionId);
+      window.appStorage.session.setItem(key, sessionId);
     }
     return sessionId;
   } catch (err) {
@@ -951,8 +797,8 @@ function sendVisitToServer() {
   if (!CONFIG.dataEndpoint) return Promise.resolve(false);
 
   try {
-    if (sessionStorage.getItem('iagVisitSent') === 'true') return Promise.resolve(false);
-    sessionStorage.setItem('iagVisitSent', 'true');
+    if (window.appStorage.session.getItem('iagVisitSent') === 'true') return Promise.resolve(false);
+    window.appStorage.session.setItem('iagVisitSent', 'true');
   } catch (err) {
     console.warn('No se pudo acceder a sessionStorage para controlar visitas:', err);
   }
@@ -977,7 +823,7 @@ function sendVisitToServer() {
     })
     .catch(err => {
     try {
-      sessionStorage.removeItem('iagVisitSent');
+      window.appStorage.session.removeItem('iagVisitSent');
     } catch (storageErr) {
       console.warn('No se pudo restablecer el control de visita:', storageErr);
     }
@@ -1075,6 +921,7 @@ function mostrarResultados() {
   renderizarAcuerdoDidactico(nivel);
   renderizarCasosSituados();
   guardarDiagnosticoEnHistorialLocal(nivel);
+  renderizarCasoRecomendado();
 
   // Lista de acuerdos didácticos
   if (elements.didacticaList) {
@@ -1774,7 +1621,7 @@ const CASOS_CONTENT_TRANSLATIONS = {
 };
 
 function getCaseFullTranslation(caso, lang) {
-  const l = lang || (window.state && window.state.lang) || localStorage.getItem('app_lang') || 'es';
+  const l = lang || (window.state && window.state.lang) || window.appStorage.local.getItem('app_lang') || 'es';
   const meta = getCaseMetaTranslation(caso, l);
 
   if (l === 'es' || !CASOS_CONTENT_TRANSLATIONS[l] || !CASOS_CONTENT_TRANSLATIONS[l][caso.id]) {
@@ -1807,7 +1654,7 @@ function getCaseFullTranslation(caso, lang) {
 }
 
 function getCaseMetaTranslation(caso, lang) {
-  const l = lang || (window.state && window.state.lang) || localStorage.getItem('app_lang') || 'es';
+  const l = lang || (window.state && window.state.lang) || window.appStorage.local.getItem('app_lang') || 'es';
   
   const axisMap = {
     privacidad: { es: 'PRIVACIDAD Y DATOS', en: 'PRIVACY & DATA', pt: 'PRIVACIDADE E DADOS', fr: 'CONFIDENTIALITÉ ET DONNÉES' },
@@ -1850,7 +1697,7 @@ function getCaseMetaTranslation(caso, lang) {
 function renderizarCasosSituados() {
   if (!elements.situatedCases) return;
   
-  const lang = (window.state && window.state.lang) || localStorage.getItem('app_lang') || 'es';
+  const lang = (window.state && window.state.lang) || window.appStorage.local.getItem('app_lang') || 'es';
   const t = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[lang]) ? TRANSLATIONS[lang] : {};
 
   elements.situatedCases.innerHTML = '';
@@ -1898,12 +1745,12 @@ function renderizarCasosSituados() {
 
 window.renderizarCasosSituados = renderizarCasosSituados;
 
-function cargarCasoInteractivo(caseId) {
-  if (!elements.situatedCases) return;
+function cargarCasoInteractivo(caseId, target = elements.situatedCases, onReturn = renderizarCasosSituados) {
+  if (!target) return;
   const rawCaso = CASOS_LABORATORIO.find(c => c.id === caseId);
   if (!rawCaso) return;
 
-  const lang = (window.state && window.state.lang) || localStorage.getItem('app_lang') || 'es';
+  const lang = (window.state && window.state.lang) || window.appStorage.local.getItem('app_lang') || 'es';
   const t = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[lang]) ? TRANSLATIONS[lang] : {};
   const caso = getCaseFullTranslation(rawCaso, lang);
   
@@ -1963,8 +1810,9 @@ function cargarCasoInteractivo(caseId) {
     
     const closeBtn = player.querySelector('#btnCloseCase');
     if (closeBtn) {
+      if (target !== elements.situatedCases) closeBtn.textContent = '← Volver a mi resultado';
       closeBtn.addEventListener('click', () => {
-        renderizarCasosSituados();
+        onReturn();
       });
     }
   }
@@ -2243,16 +2091,74 @@ function cargarCasoInteractivo(caseId) {
       });
     }
     
+    if (target !== elements.situatedCases) resArea.querySelector('#btnFinishCase').textContent = 'Volver a mi resultado';
     resArea.querySelector('#btnFinishCase').addEventListener('click', () => {
-      renderizarCasosSituados();
+      onReturn();
     });
     
     resArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
   
-  elements.situatedCases.innerHTML = '';
-  elements.situatedCases.appendChild(player);
+  target.innerHTML = '';
+  target.appendChild(player);
   renderPlayerState();
+}
+
+// Explicit links to existing stories, using the same evidence as the network.
+// Verification is addressed by the invented bibliography in the "sesgos" case.
+function recomendarCasoDelRecorrido() {
+  const casesByAxis = {
+    transparencia: 'transparencia', verificacion: 'sesgos',
+    privacidad: 'privacidad', equidad: 'equidad', agencia: 'delegacion'
+  };
+  const candidates = Object.entries(casesByAxis).map(([axis, caseId]) => {
+    const steps = pasosDeCriterio(axis).filter(step => {
+      const evidence = evidenciaDePaso(step);
+      return evidence.kind !== 'context' && !evidence.contextAxes?.includes(axis)
+        && ['yes', 'sometimes', 'no'].includes(step.answerKey);
+    });
+    const priority = step => ({ no: 3, sometimes: 2, yes: 1 })[step.answerKey];
+    const evidence = steps.slice().sort((a, b) => priority(b) - priority(a))[0];
+    return { axis, caso: CASOS_LABORATORIO.find(c => c.id === caseId), evidence,
+      score: evidence ? priority(evidence) : 0 };
+  });
+  return candidates.filter(c => c.score && c.caso).sort((a, b) => b.score - a.score)[0] || null;
+}
+
+function renderizarCasoRecomendado() {
+  const host = document.getElementById('recommendedCase');
+  if (!host) return;
+  const recommendation = recomendarCasoDelRecorrido();
+  host.hidden = !recommendation;
+  host.replaceChildren();
+  if (!recommendation) return;
+  const { axis, caso, evidence, score } = recommendation;
+  const labels = { transparencia: 'Transparencia', verificacion: 'Verificación', privacidad: 'Datos y privacidad', equidad: 'Equidad', agencia: 'Agencia' };
+  const question = CONFIG.perfiles[state.profileKey]?.nodos[evidence.id]?.title || evidence.question || '';
+  host.innerHTML = `
+    <p class="section-kicker">Del recorrido al laboratorio</p>
+    <h3>Un caso para seguir pensando</h3>
+    <p class="recommended-case-reason">${score > 1 ? 'Para trabajar' : 'Para profundizar'} en <strong>${labels[axis]}</strong>, a partir de esta respuesta:</p>
+    <blockquote><p>${escapeGameHtml(question)}</p><strong>${escapeGameHtml(evidence.answer || ({ no: 'No', sometimes: 'A veces', yes: 'Sí' })[evidence.answerKey])}</strong></blockquote>
+    <h4>${escapeGameHtml(caso.title)}</h4>
+    <p>${escapeGameHtml(caso.dilemma)}</p>
+    <p class="recommended-case-context">Situación de ${escapeGameHtml(caso.audience.toLowerCase())}. Podés analizarla desde tu perfil. Es una invitación a reflexionar, no una calificación.</p>
+    <button type="button" class="btn btn-primary" data-open-recommended>Explorar este caso</button>
+    <div data-recommended-player></div>`;
+  host.querySelector('[data-open-recommended]').addEventListener('click', event => {
+    const button = event.currentTarget;
+    button.hidden = true;
+    const target = host.querySelector('[data-recommended-player]');
+    cargarCasoInteractivo(caso.id, target, () => {
+      target.replaceChildren();
+      button.hidden = false;
+      button.focus();
+    });
+    const heading = target.querySelector('h3');
+    heading.tabIndex = -1;
+    heading.focus();
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
 }
 
 function renderizarDevolucionFinal(nivel) {
@@ -2680,15 +2586,9 @@ function generarMensajeAutomaticoDeConsejos() {
       l => state.evidence >= l.min && l.max >= state.evidence
     );
     
-    const respuestasAFortalecer = state.path.filter(p => p.answerKey === 'no' || p.answerKey === 'sometimes');
-    const areas = respuestasAFortalecer.length
-      ? respuestasAFortalecer.map((p, index) => `${index + 1}. ${p.question} - respuesta: ${p.answer}. ${p.feedback}`).join('\n')
-      : 'No hay respuestas marcadas como "No" o "A veces"; sugerí formas de consolidar y profundizar las prácticas ya alineadas.';
-    
-    return `Acabo de completar el recorrido y obtuve nivel "${nivel.id}" con ${state.evidence} puntos. Estas son mis áreas de mejora detectadas:
-${areas}
-
-Con base en los marcos UNESCO, ANEP, FING, Udelar y Ceibal, mostrame 3 sugerencias de mejora priorizadas, concretas y aplicables para mi perfil (${state.profileBase || state.profile}, ${state.nivelEducativo || 'nivel no indicado'}).`;
+    // Las respuestas y el perfil ya viajan en el contexto del chatbot.
+    // Repetirlos aquí podía superar el límite de 800 caracteres de /chat.
+    return `Acabo de completar el recorrido y obtuve nivel "${nivel.id}" con ${state.evidence} puntos. Usá las áreas de mejora y las respuestas de mi recorrido incluidas en el contexto para proponer 3 sugerencias priorizadas, concretas y aplicables a mi perfil. Si no hay respuestas "No" o "A veces", sugerí cómo profundizar mis prácticas. Basate en los marcos UNESCO, ANEP, FING, Udelar y Ceibal.`;
   } catch (err) {
     console.error('❌ Error generando mensaje automático:', err);
     return '';

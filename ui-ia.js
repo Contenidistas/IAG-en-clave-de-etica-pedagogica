@@ -63,7 +63,7 @@ const TRANSLATIONS = {
     fw_compact_items: "transparencia, verificación, privacidad, sesgos y aporte humano.",
     fw_foreign_title: "Marco Internacional de la UNESCO",
     fw_foreign_context: "Para países fuera de Uruguay, la herramienta adapta las referencias priorizando las directrices internacionales de la UNESCO.",
-    fw_base_title: "Marcos de UNESCO, ANEP, FING, Udelar y Ceibal",
+    fw_base_title: "Marcos de UNESCO, ANEP, FING, Udelar, Ceibal y Agesic",
     fw_base_intro: "Una propuesta construida desde investigación, formación docente, experiencia de aula y marcos actuales para pensar el uso ético de la IA.",
     fw_base_context: "Estas herramientas requieren criterios compartidos, transparencia y espacios de reflexión pedagógica situada.",
     fw_estudiante_title: "Criterios para usar IA en tareas y estudio",
@@ -1402,7 +1402,7 @@ const elements = {
   nextSlide: document.getElementById('nextSlide'),
   
   // Bienvenida
-  chips: document.querySelectorAll('.chip'),
+  chips: document.querySelectorAll('.profile-choice[data-profile]'),
   profileSelectorPanel: document.getElementById('profileSelectorPanel'),
   playerName: document.getElementById('playerName'),
   startBtn: document.getElementById('startBtn'),
@@ -1601,13 +1601,13 @@ const DEFAULT_INTERNATIONAL_NIVELES = {
 /* ========================================
    TEMA + MODAL
    ======================================== */
-let darkMode = localStorage.getItem('darkMode') === 'true';
+let darkMode = window.appStorage.local.getItem('darkMode') === 'true';
 updateTheme();
 
 if (elements.themeToggle) {
   elements.themeToggle.addEventListener('click', () => {
     darkMode = !darkMode;
-    localStorage.setItem('darkMode', darkMode);
+    window.appStorage.local.setItem('darkMode', darkMode);
     updateTheme();
   });
 }
@@ -1641,8 +1641,8 @@ const QUICK_GUIDE_KEY = 'iag_quick_guide_seen';
 
 function mostrarGuiaRapidaInicial() {
   try {
-    if (localStorage.getItem(QUICK_GUIDE_KEY) === 'true') return;
-    localStorage.setItem(QUICK_GUIDE_KEY, 'true');
+    if (window.appStorage.local.getItem(QUICK_GUIDE_KEY) === 'true') return;
+    window.appStorage.local.setItem(QUICK_GUIDE_KEY, 'true');
   } catch (err) {
     console.warn('No se pudo guardar el estado de la guia rapida:', err);
   }
@@ -1821,14 +1821,17 @@ if (elements.countrySelect && elements.countryFinalInput) {
     }
 
     if (window.state) {
-      window.state.country = elements.countryFinalInput.value || 'Uruguay';
-      if (window.state.profile && typeof updateNivelEducativo === 'function') {
+      window.state.country = elements.countryFinalInput.value;
+      if (['docente', 'estudiante'].includes(window.state.profile) && typeof updateNivelEducativo === 'function') {
         updateNivelEducativo(window.state.profile);
       }
     }
   };
 
-  elements.countrySelect.addEventListener('change', updateCountryFinal);
+  elements.countrySelect.addEventListener('change', () => {
+    updateCountryFinal();
+    updateStartButtonState();
+  });
 
   if (elements.countryOtherInput) {
     elements.countryOtherInput.addEventListener('input', () => {
@@ -1837,6 +1840,7 @@ if (elements.countrySelect && elements.countryFinalInput) {
         if (window.state) {
           window.state.country = elements.countryFinalInput.value;
         }
+        updateStartButtonState();
       }
     });
   }
@@ -1849,6 +1853,14 @@ if (elements.countrySelect && elements.countryFinalInput) {
    ======================================== */
 function updateNivelEducativo(perfil) {
   if (!elements.nivelEducativoWrapper || !elements.nivelEducativo) return;
+  if (!['docente', 'estudiante'].includes(perfil)) {
+    hideNivelEducativo();
+    return;
+  }
+  const select = elements.nivelEducativo;
+  const previousKey = select.dataset.profile === perfil
+    ? select.selectedOptions[0]?.dataset.levelKey : null;
+  select.dataset.profile = perfil;
 
   // Mostrar el campo
   elements.nivelEducativoWrapper.style.display = 'block';
@@ -1868,27 +1880,35 @@ function updateNivelEducativo(perfil) {
   const t = TRANSLATIONS[lang] || TRANSLATIONS['es'];
   
   const configPais = NIVELES_POR_PAIS[pais] || DEFAULT_INTERNATIONAL_NIVELES;
+  if (elements.nivelEducativoLabel) elements.nivelEducativoLabel.textContent = t[`label_nivel_${perfil}`] || elements.nivelEducativoLabel.textContent;
   const nivelesObj = configPais[perfil] || DEFAULT_INTERNATIONAL_NIVELES[perfil];
   const niveles = nivelesObj.map(item => t[item.key] || item.default);
   
-  niveles.forEach(nivel => {
+  niveles.forEach((nivel, index) => {
     const option = document.createElement('option');
     option.value = nivel;
     option.textContent = nivel;
+    option.dataset.levelKey = nivelesObj[index].key;
     elements.nivelEducativo.appendChild(option);
   });
 
   // Reset valor
-  elements.nivelEducativo.value = '';
+  const retainedOption = Array.from(select.options).find(option => previousKey && option.dataset.levelKey === previousKey);
+  elements.nivelEducativo.value = retainedOption?.value || '';
   
   // Sincronizar con state
   if (window.state) {
-    window.state.nivelEducativo = '';
+    window.state.nivelEducativo = elements.nivelEducativo.value;
   }
 
   // Ocultar select nativo y generar chips
-  elements.nivelEducativo.style.display = 'none';
+  elements.nivelEducativo.style.display = '';
   const chipsContainer = document.getElementById('nivelEducativoChips');
+  if (select.hasAttribute('data-native-select')) {
+    if (chipsContainer) chipsContainer.hidden = true;
+    updateStartButtonState();
+    return;
+  }
   if (chipsContainer) {
     chipsContainer.innerHTML = '';
     niveles.forEach(nivel => {
@@ -1971,6 +1991,8 @@ function updateCarousel() {
 
   const activeSlide = elements.carouselTrack.children[state.currentSlide];
   Array.from(elements.carouselTrack.children).forEach((slide, index) => {
+    slide.inert = index !== state.currentSlide;
+    slide.setAttribute('aria-hidden', String(index !== state.currentSlide));
     slide.classList.toggle('is-active', index === state.currentSlide);
     slide.classList.toggle('is-before', index < state.currentSlide);
     slide.classList.toggle('is-after', index > state.currentSlide);
@@ -1994,7 +2016,7 @@ function updateCarousel() {
   }
 
   if (elements.prevSlide) {
-    elements.prevSlide.style.display = state.currentSlide === 0 ? 'none' : 'block';
+    elements.prevSlide.style.display = 'none';
   }
 
   if (!elements.nextSlide || !elements.startBtn) return;
@@ -2031,7 +2053,7 @@ if (elements.toggleFrameworkBtn) {
 
 if (elements.aiUseDisclosureBtn) {
   elements.aiUseDisclosureBtn.addEventListener('click', () => {
-    const lang = (window.state && window.state.lang) || localStorage.getItem('app_lang') || 'es';
+    const lang = (window.state && window.state.lang) || window.appStorage.local.getItem('app_lang') || 'es';
     const t = TRANSLATIONS[lang] || TRANSLATIONS['es'];
     modal.show(t.modal_ia_disclosure_title || 'Declaración de uso de IA', `
       <div class="ai-disclosure-modal">
@@ -2082,7 +2104,7 @@ function updateFrameworkAudience(perfil) {
 
   const baseTitle = isForeign
     ? (t.fw_foreign_title || 'Marco Internacional de la UNESCO')
-    : (t.fw_base_title || 'Marcos de UNESCO, ANEP, FING, Udelar y Ceibal');
+    : (t.fw_base_title || 'Marcos de UNESCO, ANEP, FING, Udelar, Ceibal y Agesic');
 
   let title = t[`fw_${audience}_title`] || baseTitle;
   let intro = t[`fw_${audience}_intro`] || (t.fw_base_intro || 'Una propuesta construida desde investigación, formación docente...');
@@ -2137,6 +2159,8 @@ function scrollToDiagnosticStart() {
 
   window.setTimeout(() => {
     updateCarousel();
+    target.setAttribute('tabindex', '-1');
+    target.focus({ preventScroll: true });
     const headerOffset = 88;
     const top = target.getBoundingClientRect().top + window.scrollY - headerOffset;
     window.scrollTo({ top: Math.max(0, top), behavior: 'auto' });
@@ -2148,11 +2172,14 @@ function focusInitialField(targetKey) {
     profile: elements.profileSelectorPanel,
     nivel: elements.nivelEducativoWrapper,
     contexto: elements.playerName || elements.countrySelect,
+    country: isCountryOtherVisible() ? elements.countryOtherInput : elements.countrySelect,
     familiaridad: elements.familiaridadInicialWrapper,
     recursos: elements.recursosSimilaresWrapper,
     start: elements.startBtn
   };
   const focusMap = {
+    profile: elements.chips?.[0],
+    country: isCountryOtherVisible() ? elements.countryOtherInput : elements.countrySelect,
     nivel: elements.nivelEducativo,
     contexto: elements.playerName || elements.countrySelect,
     familiaridad: elements.familiaridadInicial,
@@ -2163,7 +2190,7 @@ function focusInitialField(targetKey) {
   if (!target) return;
 
   target.classList.add('field-guidance-highlight');
-  target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  target.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
   window.setTimeout(() => {
     const focusTarget = focusMap[targetKey];
     if (focusTarget && typeof focusTarget.focus === 'function') {
@@ -2176,41 +2203,37 @@ function focusInitialField(targetKey) {
 function renderStartGuidance(missingItems, ready) {
   if (!elements.startGuidance || !elements.startGuidanceList) return;
 
-  elements.startGuidance.classList.toggle('is-ready', ready);
-  if (elements.startGuidanceBadge) {
-    elements.startGuidanceBadge.textContent = ready ? 'Listo' : `${missingItems.length} pendiente(s)`;
-  }
-  if (elements.startGuidanceTitle) {
-    elements.startGuidanceTitle.textContent = ready
-      ? 'Listo, ya podés iniciar el recorrido'
-      : 'Completá estos pasos para iniciar';
-  }
+  // Validation stays next to the active step, without duplicating navigation.
+  const stepTargets = [['profile'], ['nivel', 'country'], ['familiaridad', 'recursos']];
+  const targets = stepTargets[state.onboardingStep || 0] || [];
+  const currentMissing = missingItems.filter(item => targets.includes(item.target));
+  elements.startGuidance.hidden = !state.onboardingAttempted || currentMissing.length === 0;
+  elements.startGuidanceList.replaceChildren();
+  currentMissing.forEach(item => {
+    const line = document.createElement('p');
+    line.textContent = item.title;
+    elements.startGuidanceList.appendChild(line);
+  });
+  if (elements.startGuidanceTitle) elements.startGuidanceTitle.textContent = setupText('missing');
+  if (elements.startGuidanceBadge) elements.startGuidanceBadge.hidden = true;
+}
 
-  if (ready) {
-    elements.startGuidanceList.innerHTML = `
-      <button type="button" class="start-guidance-item is-complete" data-guide-target="start">
-        <span>✓</span>
-        <strong>Todo preparado</strong>
-        <small>El botón Iniciar cuestionario ya está disponible.</small>
-      </button>
-    `;
-    return;
-  }
-
-  elements.startGuidanceList.innerHTML = missingItems.map((item, index) => `
-    <button type="button" class="start-guidance-item" data-guide-target="${item.target}">
-      <span>${index + 1}</span>
-      <strong>${item.title}</strong>
-      <small>${item.help}</small>
-    </button>
-  `).join('');
+function setupText(key) {
+  const texts = {
+    es: { profile: 'Tu perfil', contexto: 'Tu contexto', cierre: 'Antes de empezar', back: 'Volver al inicio', next: 'Continuar', missing: 'Revisá estos datos para continuar', setup_title: 'Un recorrido a tu medida', setup_intro: 'Contanos desde dónde participás. Vamos a adaptar las preguntas y la devolución a tu contexto.', setup_profile_hint: 'Elegí el rol que mejor represente tu práctica hoy. Podés cambiarlo antes de comenzar.', setup_consent: 'Quiero aportar mi recorrido al registro anónimo (opcional)', estudiante: 'Vas a explorar cómo estudiar, crear y reconocer el aporte de la IA en tus trabajos.', docente: 'Vas a revisar consignas, evaluación y acuerdos para el uso de IA en el aula.', especializado: 'Vas a profundizar en investigación, marcos éticos y criterios institucionales.' },
+    en: { profile: 'Your role', contexto: 'Your context', cierre: 'Before you start', back: 'Back to home', next: 'Continue', missing: 'Check these details to continue', setup_title: 'A journey shaped around you', setup_intro: 'Tell us about your role. We will adapt the questions and feedback to your context.', setup_profile_hint: 'Choose the role that best reflects your practice today. You can change it before starting.', setup_consent: 'Contribute my journey to anonymous records (optional)', estudiante: 'Explore studying, creating and acknowledging AI contributions in your work.', docente: 'Review assignments, assessment and agreements for using AI in the classroom.', especializado: 'Explore research, ethical frameworks and institutional criteria.' },
+    pt: { profile: 'Seu perfil', contexto: 'Seu contexto', cierre: 'Antes de começar', back: 'Voltar ao início', next: 'Continuar', missing: 'Confira estes dados para continuar', setup_title: 'Um percurso para você', setup_intro: 'Conte de onde você participa. Vamos adaptar as perguntas e a devolutiva ao seu contexto.', setup_profile_hint: 'Escolha o papel que melhor representa sua prática hoje. Você pode mudar antes de começar.', setup_consent: 'Quero contribuir com meu percurso para o registro anônimo (opcional)', estudiante: 'Explore como estudar, criar e reconhecer a contribuição da IA nos seus trabalhos.', docente: 'Revise atividades, avaliação e acordos para o uso de IA em sala de aula.', especializado: 'Aprofunde pesquisa, referenciais éticos e critérios institucionais.' },
+    fr: { profile: 'Votre profil', contexto: 'Votre contexte', cierre: 'Avant de commencer', back: 'Retour à l’accueil', next: 'Continuer', missing: 'Vérifiez ces informations pour continuer', setup_title: 'Un parcours à votre mesure', setup_intro: 'Présentez votre rôle. Nous adapterons les questions et le bilan à votre contexte.', setup_profile_hint: 'Choisissez le rôle qui correspond à votre pratique. Vous pourrez le modifier avant de commencer.', setup_consent: 'Contribuer au registre anonyme avec mon parcours (facultatif)', estudiante: 'Explorez comment étudier, créer et reconnaître les apports de l’IA.', docente: 'Examinez les consignes, l’évaluation et les accords sur l’IA en classe.', especializado: 'Approfondissez la recherche, les cadres éthiques et les critères institutionnels.' }
+  };
+  const language = state.lang || 'es';
+  return (texts[language] || texts.es)[key] || texts.es[key] || key;
 }
 
 const ONBOARDING_STEP_META = {
   profile: {
     title: 'Punto de partida',
     target: 'profile',
-    isValid: () => !!state.profile
+    isValid: () => ['estudiante', 'docente', 'especializado'].includes(state.profile)
   },
   contexto: {
     title: 'Tu contexto',
@@ -2218,7 +2241,7 @@ const ONBOARDING_STEP_META = {
     isValid: () => {
       const levelOk = !(state.profile === 'docente' || state.profile === 'estudiante')
         || (elements.nivelEducativo && elements.nivelEducativo.value.trim() !== '');
-      const countryOk = (elements.countrySelect && elements.countrySelect.value.trim() !== '');
+      const countryOk = !!elements.countrySelect?.value && (elements.countrySelect.value !== 'Otro' || !!elements.countryOtherInput?.value.trim());
       return levelOk && countryOk;
     }
   },
@@ -2258,7 +2281,10 @@ function updateOnboardingUI() {
     const key = step.dataset.onboardingStep;
     const isActive = key === activeKey;
     const isCountryOther = step.id === 'countryOtherWrapper';
-    step.classList.toggle('active', isActive && (!isCountryOther || isCountryOtherVisible()));
+    const needsLevel = step.id !== 'nivelEducativoWrapper' || ['docente', 'estudiante'].includes(state.profile);
+    const visible = isActive && needsLevel && (!isCountryOther || isCountryOtherVisible());
+    step.classList.toggle('active', visible);
+    step.inert = !visible;
   });
 
   const lang = (window.state && window.state.lang) || 'es';
@@ -2270,45 +2296,18 @@ function updateOnboardingUI() {
     elements.onboardingStepCounter.textContent = `${stepWord} ${state.onboardingStep + 1} ${ofWord} ${keys.length}`;
   }
   if (elements.onboardingStepTitle) {
-    elements.onboardingStepTitle.textContent = t[`step_${activeKey}`] || ONBOARDING_STEP_META[activeKey]?.title || 'Punto de partida';
+    elements.onboardingStepTitle.textContent = setupText(activeKey);
   }
   if (elements.onboardingDots) {
-    elements.onboardingDots.style.setProperty('--onboarding-steps', keys.length);
-    
-    // Nombres cortos para cada paso en la red neuronal
-    const t = TRANSLATIONS[state.lang || 'es'] || TRANSLATIONS['es'];
-    const stepNames = {
-      profile: t.step_perfil || 'Perfil',
-      contexto: t.step_contexto || 'Contexto',
-      cierre: t.step_cierre || 'Uso y privacidad'
-    };
-    
-    elements.onboardingDots.innerHTML = `
-      <div class="neural-stepper-track">
-        <div class="neural-stepper-progress" style="width: ${(state.onboardingStep / (keys.length - 1)) * 100}%"></div>
-      </div>
-      <div class="neural-stepper-steps">
-        ${keys.map((key, index) => {
-          const isActive = index === state.onboardingStep;
-          const isCompleted = index < state.onboardingStep;
-          const isValid = ONBOARDING_STEP_META[key]?.isValid();
-          const stepName = stepNames[key] || 'Paso';
-          
-          return `
-            <button type="button" 
-                    class="neural-step-node${isActive ? ' active' : ''}${isCompleted ? ' completed' : ''}${isValid ? ' is-valid' : ''}" 
-                    data-onboarding-index="${index}" 
-                    aria-label="Ir al paso: ${stepName}">
-              <span class="neural-step-dot"></span>
-              <span class="neural-step-label">${stepName}</span>
-            </button>
-          `;
-        }).join('')}
-      </div>
-    `;
+    elements.onboardingDots.innerHTML = keys.map((key, index) => `
+      <span class="setup-step${index === state.onboardingStep ? ' active' : ''}${index < state.onboardingStep ? ' complete' : ''}" ${index === state.onboardingStep ? 'aria-current="step"' : ''}>
+        <span class="setup-step-number">${index < state.onboardingStep ? '&#10003;' : index + 1}</span>
+        <span>${setupText(key)}</span>
+      </span>`).join('');
   }
   if (elements.onboardingBackBtn) {
-    elements.onboardingBackBtn.disabled = state.onboardingStep === 0;
+    elements.onboardingBackBtn.disabled = false;
+    elements.onboardingBackBtn.textContent = state.onboardingStep === 0 ? setupText('back') : (t.btn_back || 'Anterior');
   }
   if (elements.onboardingControls) {
     elements.onboardingControls.classList.toggle('is-consent-step', activeKey === 'cierre');
@@ -2317,8 +2316,14 @@ function updateOnboardingUI() {
     const isLast = state.onboardingStep === keys.length - 1;
     const lang = (window.state && window.state.lang) || 'es';
     const t = TRANSLATIONS[lang] || TRANSLATIONS['es'];
-    elements.onboardingNextBtn.textContent = isLast ? (t.btn_start_game || 'Iniciar cuestionario') : (t.btn_next || 'Siguiente');
+    elements.onboardingNextBtn.textContent = isLast ? (t.btn_start_game || 'Iniciar cuestionario') : setupText('next');
   }
+
+  const preview = document.getElementById('profilePreview');
+  if (preview) preview.textContent = setupText(state.profile || 'setup_profile_hint');
+  document.querySelectorAll('[data-i18n^="setup_"]').forEach(node => {
+    if (node.id !== 'profilePreview') node.textContent = setupText(node.dataset.i18n);
+  });
 
   updateCarousel();
 }
@@ -2336,13 +2341,20 @@ function findFirstInvalidOnboardingIndex(keys = syncOnboardingStepBounds()) {
 function focusCurrentOnboardingStep() {
   const keys = syncOnboardingStepBounds();
   const activeKey = keys[state.onboardingStep] || keys[0];
-  const target = ONBOARDING_STEP_META[activeKey]?.target || activeKey;
+  let target = ONBOARDING_STEP_META[activeKey]?.target || activeKey;
+  if (activeKey === 'contexto') {
+    target = !elements.countrySelect?.value || (isCountryOtherVisible() && !elements.countryOtherInput?.value.trim()) ? 'country' : 'nivel';
+  } else if (activeKey === 'cierre') {
+    target = !elements.familiaridadInicial?.value ? 'familiaridad' : 'recursos';
+  }
   focusInitialField(target);
 }
 
 function advanceOnboarding() {
   const keys = syncOnboardingStepBounds();
   if (!currentOnboardingStepIsValid()) {
+    state.onboardingAttempted = true;
+    updateStartButtonState();
     focusCurrentOnboardingStep();
     return;
   }
@@ -2354,12 +2366,6 @@ function advanceOnboarding() {
       updateOnboardingUI();
       updateStartButtonState();
       window.setTimeout(focusCurrentOnboardingStep, 120);
-      return;
-    }
-
-    // Si es perfil Docente, dar opción de iniciar cuestionario o entrar a Casos
-    if (state.profile === 'docente') {
-      mostrarDecisionModoDocente();
       return;
     }
 
@@ -2386,72 +2392,33 @@ function advanceOnboarding() {
   }
 
   state.onboardingStep += 1;
-  updateOnboardingUI();
-}
-
-function mostrarDecisionModoDocente() {
-  const lang = (window.state && window.state.lang) || 'es';
-  const t = TRANSLATIONS[lang] || TRANSLATIONS['es'];
-  const modalTitle = t.modal_mode_title || '¿Qué recorrido deseás realizar?';
-  const modalDesc = t.modal_mode_desc || 'Como docente, tenés la opción de realizar el cuestionario reflexivo para evaluar tu práctica con inteligencia artificial generativa, o ingresar de manera directa al Laboratorio de Casos (Modo Taller).';
-  const quizBtnText = t.modal_mode_quiz || '📝 Iniciar cuestionario reflexivo';
-  const labBtnText = t.modal_mode_lab || '🧪 Entrar al Laboratorio de Casos';
-
-  const content = `
-    <div class="mode-selection-modal-body" style="text-align: center; padding: 1rem 0;">
-      <p style="margin-bottom: 1.5rem; font-size: 1.05rem; line-height: 1.5; color: var(--text-secondary);">
-        ${modalDesc}
-      </p>
-      <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 320px; margin: 0 auto;">
-        <button type="button" class="btn btn-primary" id="btnChooseQuiz" style="padding: 0.85rem; font-size: 1rem; width: 100%;">
-          ${quizBtnText}
-        </button>
-        <button type="button" class="btn btn-outline" id="btnChooseLab" style="padding: 0.85rem; font-size: 1rem; width: 100%; border-color: var(--primary); color: var(--primary); background: var(--bg-main);">
-          ${labBtnText}
-        </button>
-      </div>
-    </div>
-  `;
-  
-  if (typeof modal !== 'undefined' && typeof modal.show === 'function') {
-    modal.show(modalTitle, content);
-    
-    const btnQuiz = document.getElementById('btnChooseQuiz');
-    const btnLab = document.getElementById('btnChooseLab');
-    
-    if (btnQuiz) {
-      btnQuiz.addEventListener('click', () => {
-        modal.hide();
-        const lang2 = (window.state && window.state.lang) || 'es';
-        const tStart = TRANSLATIONS[lang2] || TRANSLATIONS['es'];
-        if (elements.startGuidanceTitle) {
-          elements.startGuidanceTitle.textContent = tStart.loading_starting || 'Iniciando recorrido...';
-        }
-        if (typeof window.iniciarJuego === 'function') {
-          window.iniciarJuego();
-        }
-      });
-    }
-    
-    if (btnLab) {
-      btnLab.addEventListener('click', () => {
-        modal.hide();
-        if (typeof abrirLaboratorioCasos === 'function') {
-          abrirLaboratorioCasos();
-        }
-      });
-    }
-  }
+  state.onboardingAttempted = false;
+  updateStartButtonState();
+  elements.onboardingStepTitle?.focus({ preventScroll: true });
 }
 
 function retreatOnboarding() {
   syncOnboardingStepBounds();
+  if (state.onboardingStep === 0) state.currentSlide = 0;
   state.onboardingStep = Math.max(0, state.onboardingStep - 1);
-  updateOnboardingUI();
+  state.onboardingAttempted = false;
+  updateStartButtonState();
+  if (state.currentSlide === 1) elements.onboardingStepTitle?.focus({ preventScroll: true });
+  else landingGoToDiagnostic?.focus();
 }
 
 const landingGoToDiagnostic = document.getElementById('landingGoToDiagnostic');
 const landingGoToCases = document.getElementById('landingGoToCases');
+
+// These cards contain headings, so retain their structure and provide button keys.
+[landingGoToDiagnostic, landingGoToCases].filter(Boolean).forEach(card => {
+  card.addEventListener('keydown', event => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      card.click();
+    }
+  });
+});
 
 if (landingGoToDiagnostic) {
   landingGoToDiagnostic.addEventListener('click', (event) => {
@@ -2545,22 +2512,6 @@ if (elements.onboardingBackBtn) {
   elements.onboardingBackBtn.addEventListener('click', retreatOnboarding);
 }
 
-if (elements.onboardingDots) {
-  elements.onboardingDots.addEventListener('click', (event) => {
-    const dot = event.target.closest('[data-onboarding-index]');
-    if (!dot) return;
-    const requested = Number(dot.dataset.onboardingIndex);
-    if (!Number.isInteger(requested)) return;
-    const keys = syncOnboardingStepBounds();
-    const firstInvalid = findFirstInvalidOnboardingIndex(keys);
-    state.onboardingStep = firstInvalid >= 0 ? Math.min(requested, firstInvalid) : requested;
-    updateOnboardingUI();
-    if (firstInvalid >= 0 && requested > firstInvalid) {
-      window.setTimeout(focusCurrentOnboardingStep, 120);
-    }
-  });
-}
-
 /* ========================================
    🔧 HABILITAR / DESHABILITAR BOTÓN INICIO (CORREGIDO)
    ======================================== */
@@ -2574,11 +2525,11 @@ function updateStartButtonState() {
   const missingItems = [];
 
   // 1) Perfil elegido
-  const activeProfile = document.querySelector('.chip.active');
+  const activeProfile = document.querySelector('.profile-choice.active');
   if (activeProfile && window.state) {
     window.state.profile = activeProfile.dataset.profile || window.state.profile;
   }
-  const perfilOk = !!state.profile;
+  const perfilOk = ['estudiante', 'docente', 'especializado'].includes(state.profile);
   if (!perfilOk) {
     missingItems.push({
       target: 'profile',
@@ -2643,7 +2594,9 @@ function updateStartButtonState() {
   }
 
   // 🔑 Lógica de Habilitación y Visibilidad
-  const todasOk = perfilOk && nivelOk && famOk && recursosOk;
+  const countryOk = !!elements.countrySelect?.value && (!isCountryOtherVisible() || !!elements.countryOtherInput?.value.trim());
+  if (!countryOk) missingItems.push({ target: 'country', title: TRANSLATIONS[state.lang || 'es']?.label_country_other || 'Especificá tu país' });
+  const todasOk = perfilOk && nivelOk && famOk && recursosOk && countryOk;
   const nextSlideBtn = document.getElementById('nextSlide');
   const hasOnboardingFlow = elements.onboardingNextBtn && elements.onboardingSteps && elements.onboardingSteps.length;
 
@@ -2662,7 +2615,7 @@ if (todasOk) {
   elements.startBtn.classList.add('hidden');
   elements.startBtn.classList.remove('enabled');
 
-  if (nextSlideBtn) nextSlideBtn.classList.remove('hidden');
+  if (nextSlideBtn) nextSlideBtn.classList.toggle('hidden', state.currentSlide === 1);
 }
 
 return todasOk;
@@ -2675,8 +2628,12 @@ elements.chips.forEach(chip => {
   chip.addEventListener('click', () => {
     debugLog('Click en chip:', chip.dataset.profile);
     
-    elements.chips.forEach(c => c.classList.remove('active'));
+    elements.chips.forEach(c => {
+      c.classList.remove('active');
+      c.setAttribute('aria-pressed', 'false');
+    });
     chip.classList.add('active');
+    chip.setAttribute('aria-pressed', 'true');
 
     const perfil = chip.dataset.profile;
 
@@ -2859,7 +2816,10 @@ if (homeBtn) {
 
             // Reset UI
             if (elements.chips && elements.chips.length) {
-              elements.chips.forEach(c => c.classList.remove('active'));
+              elements.chips.forEach(c => {
+                c.classList.remove('active');
+                c.setAttribute('aria-pressed', 'false');
+              });
             }
             if (elements.playerName) elements.playerName.value = '';
 
@@ -3364,7 +3324,7 @@ const LOCAL_HISTORY_KEY = 'iag_local_diagnostic_history';
 
 function readLocalHistory() {
   try {
-    const parsed = JSON.parse(localStorage.getItem(LOCAL_HISTORY_KEY) || '[]');
+    const parsed = JSON.parse(window.appStorage.local.getItem(LOCAL_HISTORY_KEY) || '[]');
     return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];
@@ -3373,7 +3333,7 @@ function readLocalHistory() {
 
 function writeLocalHistory(items) {
   try {
-    localStorage.setItem(LOCAL_HISTORY_KEY, JSON.stringify(items.slice(0, 6)));
+    window.appStorage.local.setItem(LOCAL_HISTORY_KEY, JSON.stringify(items.slice(0, 6)));
   } catch (error) {
     console.warn('No se pudo guardar el historial local:', error);
   }
@@ -3519,6 +3479,16 @@ function syncSelectWithChips(selectId, chipsContainerId) {
     "Lo manejo en profundidad o lo enseño": "fam_5"
   };
 
+  if (select.hasAttribute('data-native-select')) {
+    select.style.display = '';
+    container.hidden = true;
+    Array.from(select.options).forEach(option => {
+      const key = FAMILIARIDAD_MAP[option.value];
+      if (key && t[key]) option.textContent = t[key];
+    });
+    return;
+  }
+
   // Ocultar select nativo
   select.style.display = 'none';
 
@@ -3565,7 +3535,7 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.languageSelect.addEventListener('change', (e) => {
       const newLang = e.target.value;
       state.lang = newLang;
-      localStorage.setItem('app_lang', newLang);
+      window.appStorage.local.setItem('app_lang', newLang);
       updateAppLanguage(newLang);
     });
   }
@@ -3573,7 +3543,7 @@ document.addEventListener('DOMContentLoaded', () => {
   syncSelectWithChips('familiaridadInicial', 'familiaridadChips');
   
   // Sincronizar perfil si hay un chip activo
-  const activeChip = document.querySelector('.chip.active');
+  const activeChip = document.querySelector('.profile-choice.active');
   if (activeChip && window.state) {
     const perfil = activeChip.dataset.profile;
     window.state.profile = perfil;
@@ -3622,7 +3592,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderLocalHistory();
   initNeuralNetBackground();
 
-  setTimeout(mostrarGuiaRapidaInicial, 450);
+  // El inicio guiado explica el recorrido sin interrumpirlo con un modal.
 });
 
 window.addEventListener('resize', () => {

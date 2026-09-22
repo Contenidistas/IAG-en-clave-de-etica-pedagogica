@@ -224,6 +224,22 @@
     }
 
     .chatbot-message-content strong { font-weight: 600; }
+    .chatbot-request-action {
+      display: block;
+      margin-top: 0.75rem;
+      min-height: 44px;
+      padding: 0.5rem 1rem;
+      border: 1px solid #6366f1;
+      border-radius: 8px;
+      color: #4338ca;
+      background: #eef2ff;
+      cursor: pointer;
+      font: inherit;
+    }
+    .chatbot-request-action:focus-visible {
+      outline: 3px solid #4338ca;
+      outline-offset: 2px;
+    }
     .chatbot-message-content em { font-style: italic; }
     .chatbot-message-content ul { margin: 0.5em 0 0.5em 1.2em; }
     .chatbot-message-content li { margin-bottom: 0.4em; }
@@ -532,18 +548,18 @@
 
   const getHistory = () => {
     try {
-      const parsed = JSON.parse(sessionStorage.getItem('chatbot_history') || '[]');
+      const parsed = JSON.parse(window.appStorage.session.getItem('chatbot_history') || '[]');
       return Array.isArray(parsed) ? parsed : [];
     } catch (error) {
       console.warn('Historial del chatbot inválido. Se reinicia.', error);
-      sessionStorage.removeItem('chatbot_history');
+      window.appStorage.session.removeItem('chatbot_history');
       return [];
     }
   };
 
   const saveHistory = (history) => {
     try {
-      sessionStorage.setItem('chatbot_history', JSON.stringify(history.slice(-20)));
+      window.appStorage.session.setItem('chatbot_history', JSON.stringify(history.slice(-20)));
     } catch (error) {
       console.warn('No se pudo guardar el historial del chatbot.', error);
     }
@@ -668,7 +684,7 @@ const addMessage = (content, type = 'bot', save = true) => {
       return message;
     }
 
-    return [
+    const contextualMessage = [
       message,
       '',
       'Contexto de la interfaz: el usuario se refiere a la pregunta actual del recorrido.',
@@ -676,27 +692,62 @@ const addMessage = (content, type = 'bot', save = true) => {
       `Ayuda visible: ${context.preguntaActual.ayuda}`,
       'Respondé explicando qué está preguntando esa consigna y cómo pensarla. No hables del puntaje salvo que el usuario lo pida.'
     ].join('\n');
+    // The full question also travels in context; never exceed /chat's limit.
+    return contextualMessage.length <= 800 ? contextualMessage : message;
   };
 
- const sendMessage = async (message) => {
+  const requestText = () => {
+    const lang = window.state?.lang || window.appStorage.local.getItem('app_lang') || 'es';
+    const texts = {
+      es: { waiting: 'Estoy preparando la respuesta…', slow: 'La respuesta está tardando un poco más. Sigo esperando; podés cancelar cuando quieras.', cancel: 'Cancelar', retry: 'Reintentar', cancelled: 'Consulta cancelada. Podés reintentar cuando quieras.', timeout: 'No recibí la respuesta a tiempo. Podés reintentar sin volver a escribir tu consulta.', failed: 'No pude obtener una respuesta. Podés reintentar sin volver a escribir tu consulta.' },
+      en: { waiting: 'Preparing your answer…', slow: 'This is taking a little longer. Still waiting; you can cancel at any time.', cancel: 'Cancel', retry: 'Retry', cancelled: 'Request cancelled. You can retry whenever you like.', timeout: 'The answer did not arrive in time. You can retry without typing your question again.', failed: 'Could not get an answer. You can retry without typing your question again.' },
+      fr: { waiting: 'Je prépare la réponse…', slow: 'La réponse prend un peu plus de temps. Vous pouvez annuler à tout moment.', cancel: 'Annuler', retry: 'Réessayer', cancelled: 'Demande annulée. Vous pouvez réessayer.', timeout: 'La réponse n’est pas arrivée à temps. Vous pouvez réessayer sans ressaisir votre question.', failed: 'Impossible d’obtenir une réponse. Vous pouvez réessayer sans ressaisir votre question.' }
+    };
+    return texts[lang] || texts.es;
+  };
+
+  const addRequestAction = (messageNode, label, onClick) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'chatbot-request-action';
+    button.textContent = label;
+    button.addEventListener('click', onClick);
+    messageNode.querySelector('.chatbot-message-content').appendChild(button);
+  };
+
+ const sendMessage = async (message, retryMessage = null) => {
     const cleanMessage = String(message || '').trim();
     if (!cleanMessage || isTyping) return;
 
-    addMessage(cleanMessage, 'user');
+    if (retryMessage) retryMessage.remove();
+    else addMessage(cleanMessage, 'user');
     el.input.value = '';
     el.send.disabled = true;
     el.input.disabled = true;
     isTyping = true;
 
-    const typingMessage = addMessage('TYPING_INDICATOR', 'bot', false); // Indicador visual sin guardar
-
-    let timeoutId;
+    const text = requestText();
+    const typingMessage = addMessage(text.waiting, 'bot', false);
+    const status = typingMessage.querySelector('.chatbot-message-content');
+    const statusText = document.createElement('span');
+    statusText.setAttribute('role', 'status');
+    statusText.textContent = text.waiting;
+    status.replaceChildren(statusText);
+    const controller = new AbortController();
+    let cancelled = false;
+    addRequestAction(typingMessage, text.cancel, () => {
+      cancelled = true;
+      controller.abort();
+    });
+    // Keep the deadline active until the entire response body has been read.
+    const timeoutId = window.setTimeout(() => controller.abort(), 60000);
+    const slowId = window.setTimeout(() => {
+      statusText.textContent = text.slow;
+    }, 12000);
 
    try {
   const userContext = buildQuestionContext();
   const workerMessage = buildWorkerMessage(cleanMessage, userContext);
-  const controller = new AbortController();
-  timeoutId = window.setTimeout(() => controller.abort(), 25000);
 
   const response = await fetch(CHAT_ENDPOINT, {
     method: 'POST',
@@ -709,7 +760,6 @@ const addMessage = (content, type = 'bot', save = true) => {
     }),
     signal: controller.signal
   });
-  window.clearTimeout(timeoutId);
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
@@ -718,26 +768,27 @@ const addMessage = (content, type = 'bot', save = true) => {
 
   const data = await response.json();
   debugLog("Respuesta IA:", data);
-  if (!data.ok) {
+  if (!data.ok || typeof data.reply !== 'string' || !data.reply.trim()) {
     throw new Error(data.error || 'Respuesta inválida del asistente');
   }
 
   // 👇 MOSTRAR RESPUESTA
   if (typingMessage && typingMessage.parentNode) typingMessage.remove();
-  addMessage(data.reply || "No pude responder en este momento.", 'bot');
+  addMessage(data.reply, 'bot');
 
 } catch (error) {
   console.error("Error en chatbot:", error);
   if (typingMessage && typingMessage.parentNode) typingMessage.remove();
-  const offlineMessage = error.name === 'AbortError'
-    ? 'La respuesta está demorando más de lo esperado. Probá de nuevo en unos segundos.'
-    : 'Hubo un problema al conectar con la IA. Podés intentar nuevamente en unos segundos.';
-  addMessage(offlineMessage, 'bot');
+  const offlineMessage = cancelled ? text.cancelled
+    : error.name === 'AbortError' ? text.timeout : text.failed;
+  const failureMessage = addMessage(offlineMessage, 'bot', false);
+  addRequestAction(failureMessage, text.retry, () => sendMessage(cleanMessage, failureMessage));
 } finally {
-      if (timeoutId) window.clearTimeout(timeoutId);
+      window.clearTimeout(timeoutId);
+      window.clearTimeout(slowId);
       el.send.disabled = false;
       el.input.disabled = false;
-      el.input.focus();
+      if (isOpen) el.input.focus();
       isTyping = false;
     }
   };
@@ -764,7 +815,7 @@ const addMessage = (content, type = 'bot', save = true) => {
 
   const dismissTooltip = () => {
     el.tooltip.classList.add('hidden');
-    localStorage.setItem(TOOLTIP_DISMISSED_KEY, 'true');
+    window.appStorage.local.setItem(TOOLTIP_DISMISSED_KEY, 'true');
   };
 
   const showTooltip = (title, text, options = {}) => {
@@ -790,8 +841,8 @@ const addMessage = (content, type = 'bot', save = true) => {
   };
 
   const showQuizIntroTooltip = () => {
-    if (sessionStorage.getItem(QUIZ_INTRO_TOOLTIP_KEY) === 'true') return;
-    sessionStorage.setItem(QUIZ_INTRO_TOOLTIP_KEY, 'true');
+    if (window.appStorage.session.getItem(QUIZ_INTRO_TOOLTIP_KEY) === 'true') return;
+    window.appStorage.session.setItem(QUIZ_INTRO_TOOLTIP_KEY, 'true');
 
     showTooltip(
       'Asistente Pedagógico',
@@ -862,7 +913,7 @@ const addMessage = (content, type = 'bot', save = true) => {
 
   // ========== INICIALIZACIÓN DEL TOOLTIP ==========
   // Verificar si el tooltip ya fue cerrado previamente
-  if (localStorage.getItem(TOOLTIP_DISMISSED_KEY) === 'true') {
+  if (window.appStorage.local.getItem(TOOLTIP_DISMISSED_KEY) === 'true') {
     el.tooltip.classList.add('hidden');
   }
 
@@ -925,7 +976,7 @@ const addMessage = (content, type = 'bot', save = true) => {
   };
 
   function updateChatbotLanguage(lang) {
-    const l = lang || localStorage.getItem('app_lang') || 'es';
+    const l = lang || window.appStorage.local.getItem('app_lang') || 'es';
     const t = CHATBOT_TRANSLATIONS[l] || CHATBOT_TRANSLATIONS['es'];
 
     const tooltipTitleEl = document.querySelector('#chatbotTooltip .chatbot-tooltip-title');
@@ -968,7 +1019,7 @@ const addMessage = (content, type = 'bot', save = true) => {
   // Cargar historial previo de la sesión
   getHistory().forEach(msg => addMessage(msg.content, msg.type, false));
 
-  if (localStorage.getItem(TOOLTIP_DISMISSED_KEY) === 'true') {
+  if (window.appStorage.local.getItem(TOOLTIP_DISMISSED_KEY) === 'true') {
     el.tooltip.classList.add('hidden');
   }
 
