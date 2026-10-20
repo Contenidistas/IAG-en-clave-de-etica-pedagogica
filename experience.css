@@ -124,7 +124,18 @@ html[data-theme="dark"] body { --bg-main: #101321; }
 #screenIntro #recursosSimilaresWrapper label:has(input:checked) { background: var(--surface-soft); border-color: var(--setup-accent); color: var(--text-primary); }
 #screenIntro .onboarding-flow .consent-box.active { display: block !important; border-top: 1px solid var(--border) !important; padding-top: 1rem !important; }
 #screenIntro .setup-consent { display: flex; align-items: flex-start; gap: .7rem; cursor: pointer; }
-#screenIntro .setup-consent input { appearance: auto !important; width: 20px !important; height: 20px !important; flex: 0 0 20px; margin-top: .2rem; box-shadow: none !important; accent-color: #5546a3; }
+#screenIntro .setup-consent input {
+  appearance: auto !important;
+  position: static !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  width: 20px !important;
+  height: 20px !important;
+  flex: 0 0 20px;
+  margin-top: .2rem;
+  box-shadow: none !important;
+  accent-color: #5546a3;
+}
 #screenIntro .consent-help { padding: .4rem 0 0 1.95rem; font-size: .8rem !important; }
 #screenIntro .onboarding-controls { display: flex; flex-direction: row; justify-content: space-between; align-items: center; width: 100%; max-width: none; padding-top: 1.25rem; margin-top: .5rem; border-top: 1px solid var(--setup-line); gap: 1rem; }
 #screenIntro .onboarding-controls .btn { min-height: 48px; min-width: 0; width: auto; border-radius: 10px; font-size: .9rem; }

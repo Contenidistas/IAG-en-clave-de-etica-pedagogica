@@ -302,10 +302,10 @@
                 <div class="mt-2 consent-box onboarding-step" data-onboarding-step="cierre" style="max-width: 700px; margin: 1.5rem auto 0 auto; display:flex; align-items:flex-start; gap:0.5rem; font-size:0.85rem; color:var(--text-secondary);">
                   <div class="consent-content">
                     <label for="consentTracking" class="setup-consent">
-                      <input type="checkbox" id="consentTracking" />
+                      <input type="checkbox" id="consentTracking" aria-describedby="consentTrackingHelp" />
                       <span data-i18n="setup_consent">Quiero aportar mi recorrido al registro anónimo (opcional)</span>
                     </label>
-                    <p class="consent-help" style="margin-top:0.25rem;" data-i18n="consent_help">
+                    <p class="consent-help" id="consentTrackingHelp" style="margin-top:0.25rem;" data-i18n="consent_help">
                       Podés iniciar el recorrido aunque no aceptes. Si marcás esta opción, se guarda únicamente: perfil, país, seudónimo opcional, nivel de familiaridad, uso de recursos similares y registro del cuestionario.
                     </p>
                   </div>

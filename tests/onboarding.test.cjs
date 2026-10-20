@@ -132,6 +132,39 @@ test('all three profiles can reach the questionnaire without consent or another 
   }
 });
 
+test('anonymous-record consent is operable and stays synchronized with application state', async t => {
+  const { w, $, click, change } = await app(t);
+  click('[data-profile="docente"]');
+  click('#onboardingNextBtn');
+  change('#nivelEducativo', $('#nivelEducativo').options[1].value);
+  click('#onboardingNextBtn');
+  change('#familiaridadInicial', $('#familiaridadInicial').options[1].value);
+  click('input[name="recursosSimilares"][value="No"]');
+
+  const consent = $('#consentTracking');
+  assert.equal(consent.disabled, false);
+  assert.equal(consent.checked, false);
+  assert.equal(consent.getAttribute('aria-describedby'), 'consentTrackingHelp');
+
+  for (const file of ['styles.css', 'experience.css']) {
+    const style = w.document.createElement('style');
+    style.textContent = fs.readFileSync(path.join(root, file), 'utf8');
+    w.document.head.appendChild(style);
+  }
+  const consentStyle = w.getComputedStyle(consent);
+  assert.notEqual(consentStyle.position, 'absolute');
+  assert.notEqual(consentStyle.opacity, '0');
+  assert.notEqual(consentStyle.pointerEvents, 'none');
+
+  click('.setup-consent');
+  assert.equal(consent.checked, true);
+  assert.equal(w.state.consentTracking, true);
+
+  click('.setup-consent');
+  assert.equal(consent.checked, false);
+  assert.equal(w.state.consentTracking, false);
+});
+
 test('changing language preserves the education level and updates setup copy', async t => {
   const { $, click, change } = await app(t);
   click('[data-profile="docente"]');
