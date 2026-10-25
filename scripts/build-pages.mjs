@@ -16,6 +16,7 @@ const publicFiles = [
   'admin.css',
   'storage.js',
   'configuracion-ia.js',
+  'canonical-redirect.js',
   'ethical-evidence.js',
   'ui-ia.js',
   'principle-network.js',
