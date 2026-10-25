@@ -1,6 +1,7 @@
 const DEFAULT_ALLOWED_ORIGINS = [
   'https://contenidistas.github.io',
   'https://santiherben.github.io',
+  'https://iag-en-clave-de-etica-pedagogica.pages.dev',
   'http://localhost:8787',
   'http://localhost:8000',
   'http://127.0.0.1:8787',
