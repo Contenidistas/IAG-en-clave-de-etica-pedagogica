@@ -3,7 +3,7 @@ main = "worker-d1.js"
 compatibility_date = "2026-05-02"
 
 [vars]
-ALLOWED_ORIGINS = "https://contenidistas.github.io,https://santiherben.github.io,https://iag-en-clave-de-etica-pedagogica.pages.dev,http://localhost:8000,http://127.0.0.1:8000"
+ALLOWED_ORIGINS = "https://contenidistas.github.io,https://santiherben.github.io,https://iag-en-clave-de-etica-pedagogica.pages.dev,https://iagetica.org,https://www.iagetica.org,http://localhost:8000,http://127.0.0.1:8000"
 
 [[d1_databases]]
 binding = "DB"
@@ -14,4 +14,4 @@ database_id = "9b4f5ad2-9e9d-421b-a712-71803b883e23"
 # Configuracion no sensible. Los secretos se cargan con:
 # wrangler secret put ADMIN_KEY --env production
 # wrangler secret put GEMINI_API_KEY --env production
-vars = { ALLOWED_ORIGINS = "https://contenidistas.github.io,https://santiherben.github.io,https://iag-en-clave-de-etica-pedagogica.pages.dev,http://localhost:8000,http://127.0.0.1:8000" }
+vars = { ALLOWED_ORIGINS = "https://contenidistas.github.io,https://santiherben.github.io,https://iag-en-clave-de-etica-pedagogica.pages.dev,https://iagetica.org,https://www.iagetica.org,http://localhost:8000,http://127.0.0.1:8000" }
