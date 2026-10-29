@@ -97,6 +97,53 @@ body.country-gate-open { overflow: hidden; }
 .intro-overview-copy h2 { font-size: clamp(2.3rem, 4.8vw, 4.1rem); line-height: 1.08; letter-spacing: -.045em; }
 .intro-overview-copy .landing-welcome-sub { font-size: 1.06rem; max-width: 680px; margin: 1.35rem 0 2rem; }
 .section-kicker { color: var(--setup-accent); letter-spacing: .13em; font-size: .72rem; }
+.landing-country-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  width: min(820px, 100%);
+  margin: .25rem auto 2rem;
+  padding: 1rem 1.1rem;
+  overflow: hidden;
+  border: 1px solid var(--setup-line);
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--surface-soft), var(--bg-glass-solid));
+  text-align: left;
+  transition: border-color .2s, box-shadow .2s, transform .2s;
+}
+.landing-country-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--setup-accent);
+  opacity: .35;
+}
+.landing-country-card.has-country { box-shadow: 0 12px 30px rgb(40 34 75 / 7%); }
+.landing-country-card.has-country::before { opacity: 1; }
+.landing-country-card:hover { border-color: color-mix(in srgb, var(--setup-accent) 45%, var(--setup-line)); }
+.landing-country-flag-wrap {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border: 1px solid var(--setup-line);
+  border-radius: 15px;
+  background: var(--bg-card);
+}
+.landing-country-flag { width: 38px; height: 26px; border-radius: 4px; object-fit: cover; box-shadow: 0 0 0 1px rgb(15 23 42 / 12%); }
+.landing-country-globe { font-size: 1.7rem; line-height: 1; }
+.landing-country-globe[hidden], .landing-country-flag[hidden] { display: none; }
+.landing-country-copy { min-width: 0; }
+.landing-country-eyebrow { display: block; margin-bottom: .12rem; color: var(--setup-accent); font-size: .67rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.landing-country-copy h3 { margin: 0; color: var(--text-primary); font-size: 1.2rem; line-height: 1.25; }
+.landing-country-copy p { margin: .25rem 0 0; color: var(--text-secondary); font-size: .82rem; line-height: 1.45; }
+.landing-country-framework { display: inline-flex; align-items: center; gap: .35rem; margin-top: .5rem; color: var(--setup-accent); font-size: .72rem; font-weight: 750; }
+.landing-country-framework::before { content: '✓'; display: grid; place-items: center; width: 17px; height: 17px; border-radius: 50%; background: var(--setup-accent); color: var(--bg-card); font-size: .6rem; }
+.landing-country-change { display: inline-flex; align-items: center; justify-content: center; gap: .55rem; min-height: 44px; padding: .7rem 1rem; border: 1px solid var(--setup-accent); border-radius: 11px; background: var(--bg-card); color: var(--setup-accent); font: inherit; font-size: .82rem; font-weight: 800; white-space: nowrap; cursor: pointer; transition: background .2s, color .2s, transform .2s; }
+.landing-country-change:hover { transform: translateY(-1px); background: var(--setup-accent); color: var(--bg-card); }
 .landing-welcome-actions { gap: 1rem; }
 .landing-action-card { text-align: left; border: 1px solid var(--setup-line); box-shadow: none; border-radius: 18px; background: var(--bg-glass-solid); }
 .landing-action-card:first-child { background: var(--surface-soft); }
@@ -339,6 +386,10 @@ body.country-gate-open { overflow: hidden; }
   .country-gate-actions .btn { flex: 1; }
   .container { padding: 1rem; }
   #screenIntro > .card:first-child { padding: 1.15rem; border-radius: 18px; }
+  .landing-country-card { grid-template-columns: auto minmax(0, 1fr); gap: .8rem; margin-top: 0; padding: .9rem; }
+  .landing-country-flag-wrap { width: 50px; height: 50px; border-radius: 13px; }
+  .landing-country-flag { width: 32px; height: 22px; }
+  .landing-country-change { grid-column: 1 / -1; width: 100%; }
   .landing-welcome-actions, .onboarding-flow .profile-choice-grid { grid-template-columns: 1fr; }
   #screenIntro .onboarding-flow .profile-choice { min-height: 0; padding: 1rem !important; }
   .profile-choice-header { margin-bottom: .5rem; }

@@ -147,6 +147,16 @@ test('the initial country gate persists one global context and the diagnostic sk
   assert.equal(w.localStorage.getItem('app_country'), 'Colombia');
   assert.equal(w.localStorage.getItem('app_country_code'), 'co');
   assert.equal($('#countryContextName').textContent, 'Colombia');
+  assert.equal($('#landingCountryName').textContent, 'Colombia');
+  assert.match($('#landingCountryDescription').textContent, /Colombia/);
+  assert.equal($('#landingCountryFlag').getAttribute('src'), 'icons/flags/co.svg');
+  assert.match($('#landingCountryFramework').textContent, /nacional/i);
+
+  click('#landingCountryChangeBtn');
+  assert.equal($('#countryGate').hidden, false);
+  assert.equal($('#countryGateCancel').hidden, false);
+  click('#countryGateCancel');
+  assert.equal($('#countryGate').hidden, true);
 
   w.state.currentSlide = 0;
   w.state.onboardingStep = 0;

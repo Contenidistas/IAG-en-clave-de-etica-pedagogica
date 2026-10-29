@@ -93,6 +93,12 @@ const TRANSLATIONS = {
     country_context_label: "País",
     country_select_action: "Seleccionar país",
     country_change: "Cambiar",
+    landing_country_context: "Tu contexto",
+    landing_country_change: "Cambiar país",
+    landing_country_adapted: "Marcos, niveles educativos, casos y estadísticas adaptados a {country}.",
+    landing_country_unselected: "Seleccioná un país para personalizar marcos, niveles educativos, casos y estadísticas.",
+    landing_country_national: "Marco nacional + UNESCO",
+    landing_country_international: "Base internacional UNESCO",
     country_gate_kicker: "Antes de comenzar",
     country_gate_title: "¿Desde qué país participás?",
     country_gate_description: "Vamos a adaptar marcos, niveles educativos, casos y estadísticas a este contexto. Podrás cambiarlo cuando quieras.",
@@ -434,6 +440,12 @@ const TRANSLATIONS = {
     country_context_label: "Country",
     country_select_action: "Select country",
     country_change: "Change",
+    landing_country_context: "Your context",
+    landing_country_change: "Change country",
+    landing_country_adapted: "Frameworks, education levels, cases, and statistics adapted to {country}.",
+    landing_country_unselected: "Select a country to personalize frameworks, education levels, cases, and statistics.",
+    landing_country_national: "National framework + UNESCO",
+    landing_country_international: "UNESCO international basis",
     country_gate_kicker: "Before you begin",
     country_gate_title: "Which country are you participating from?",
     country_gate_description: "We will adapt frameworks, education levels, cases, and statistics to this context. You can change it at any time.",
@@ -757,6 +769,12 @@ const TRANSLATIONS = {
     country_context_label: "País",
     country_select_action: "Selecionar país",
     country_change: "Alterar",
+    landing_country_context: "Seu contexto",
+    landing_country_change: "Alterar país",
+    landing_country_adapted: "Marcos, níveis educacionais, casos e estatísticas adaptados a {country}.",
+    landing_country_unselected: "Selecione um país para personalizar marcos, níveis educacionais, casos e estatísticas.",
+    landing_country_national: "Marco nacional + UNESCO",
+    landing_country_international: "Base internacional UNESCO",
     country_gate_kicker: "Antes de começar",
     country_gate_title: "De qual país você participa?",
     country_gate_description: "Vamos adaptar marcos, níveis educacionais, casos e estatísticas a este contexto. Você poderá alterá-lo quando quiser.",
@@ -1089,6 +1107,12 @@ const TRANSLATIONS = {
     country_context_label: "Pays",
     country_select_action: "Sélectionner un pays",
     country_change: "Modifier",
+    landing_country_context: "Votre contexte",
+    landing_country_change: "Changer de pays",
+    landing_country_adapted: "Cadres, niveaux d'enseignement, cas et statistiques adaptés à {country}.",
+    landing_country_unselected: "Sélectionnez un pays pour personnaliser les cadres, les niveaux d'enseignement, les cas et les statistiques.",
+    landing_country_national: "Cadre national + UNESCO",
+    landing_country_international: "Base internationale UNESCO",
     country_gate_kicker: "Avant de commencer",
     country_gate_title: "Depuis quel pays participez-vous ?",
     country_gate_description: "Nous adapterons les cadres, les niveaux d'enseignement, les cas et les statistiques à ce contexte. Vous pourrez le modifier à tout moment.",
@@ -1507,6 +1531,13 @@ const elements = {
   countryContextBtn: document.getElementById('countryContextBtn'),
   countryContextFlag: document.getElementById('countryContextFlag'),
   countryContextName: document.getElementById('countryContextName'),
+  landingCountryCard: document.getElementById('landingCountryCard'),
+  landingCountryFlag: document.getElementById('landingCountryFlag'),
+  landingCountryGlobe: document.getElementById('landingCountryGlobe'),
+  landingCountryName: document.getElementById('landingCountryName'),
+  landingCountryDescription: document.getElementById('landingCountryDescription'),
+  landingCountryFramework: document.getElementById('landingCountryFramework'),
+  landingCountryChangeBtn: document.getElementById('landingCountryChangeBtn'),
   countryGate: document.getElementById('countryGate'),
   countryGateClose: document.getElementById('countryGateClose'),
   countryGateCancel: document.getElementById('countryGateCancel'),
@@ -1958,6 +1989,7 @@ function updateCountryGlobalUI() {
   const name = window.state?.country || '';
   const code = window.state?.countryCode || countryCodeFor(name);
   const option = window.CountryContext?.getOption(name) || window.CountryContext?.getByCode(code);
+  const context = window.CountryContext?.get(name);
 
   if (elements.countryContextName) {
     elements.countryContextName.textContent = name || countryUiText('country_select_action', 'Seleccionar país');
@@ -1969,6 +2001,40 @@ function updateCountryGlobalUI() {
     } else {
       elements.countryContextFlag.hidden = true;
     }
+  }
+
+  if (elements.landingCountryCard) {
+    elements.landingCountryCard.classList.toggle('has-country', Boolean(name));
+  }
+  if (elements.landingCountryName) {
+    elements.landingCountryName.textContent = name || countryUiText('country_select_action', 'Seleccionar país');
+  }
+  if (elements.landingCountryDescription) {
+    const description = name
+      ? countryUiText('landing_country_adapted', 'Marcos, niveles educativos, casos y estadísticas adaptados a {country}.').replace('{country}', name)
+      : countryUiText('landing_country_unselected', 'Seleccioná un país para personalizar la experiencia.');
+    elements.landingCountryDescription.textContent = description;
+  }
+  if (elements.landingCountryFlag) {
+    if (option?.code) {
+      elements.landingCountryFlag.src = `icons/flags/${option.code}.svg`;
+      elements.landingCountryFlag.hidden = false;
+    } else {
+      elements.landingCountryFlag.hidden = true;
+    }
+  }
+  if (elements.landingCountryGlobe) {
+    elements.landingCountryGlobe.hidden = Boolean(option?.code);
+  }
+  if (elements.landingCountryFramework) {
+    elements.landingCountryFramework.hidden = !name;
+    elements.landingCountryFramework.textContent = context?.hasNationalFramework
+      ? countryUiText('landing_country_national', 'Marco nacional + UNESCO')
+      : countryUiText('landing_country_international', 'Base internacional UNESCO');
+  }
+  if (elements.landingCountryChangeBtn) {
+    const label = countryUiText('landing_country_change', 'Cambiar país');
+    elements.landingCountryChangeBtn.setAttribute('aria-label', name ? `${label}: ${name}` : label);
   }
 
   if (typeof updateStatsScopeUI === 'function') updateStatsScopeUI();
@@ -2301,6 +2367,9 @@ if (elements.countrySelect && elements.countryFinalInput) {
 
 if (elements.countryContextBtn) {
   elements.countryContextBtn.addEventListener('click', () => openCountryGate({ required: false }));
+}
+if (elements.landingCountryChangeBtn) {
+  elements.landingCountryChangeBtn.addEventListener('click', () => openCountryGate({ required: !window.state?.country }));
 }
 if (elements.countryGateClose) elements.countryGateClose.addEventListener('click', closeCountryGate);
 if (elements.countryGateCancel) elements.countryGateCancel.addEventListener('click', closeCountryGate);

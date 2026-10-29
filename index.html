@@ -125,6 +125,23 @@
                   </p>
                 </div>
 
+                <section id="landingCountryCard" class="landing-country-card" aria-labelledby="landingCountryName">
+                  <div class="landing-country-flag-wrap" aria-hidden="true">
+                    <img id="landingCountryFlag" class="landing-country-flag" src="icons/flags/uy.svg" alt="" hidden>
+                    <span id="landingCountryGlobe" class="landing-country-globe">🌐</span>
+                  </div>
+                  <div class="landing-country-copy">
+                    <span class="landing-country-eyebrow" data-i18n="landing_country_context">Tu contexto</span>
+                    <h3 id="landingCountryName" data-i18n="country_select_action">Seleccionar país</h3>
+                    <p id="landingCountryDescription" data-i18n="landing_country_unselected">Seleccioná un país para personalizar marcos, niveles educativos, casos y estadísticas.</p>
+                    <span id="landingCountryFramework" class="landing-country-framework" hidden></span>
+                  </div>
+                  <button type="button" id="landingCountryChangeBtn" class="landing-country-change" aria-haspopup="dialog" aria-controls="countryGate">
+                    <span data-i18n="landing_country_change">Cambiar país</span>
+                    <span aria-hidden="true">→</span>
+                  </button>
+                </section>
+
                 <!-- Tarjetas de Acción de Bienvenida en la Landing -->
                 <div class="landing-welcome-actions">
                   <div class="landing-action-card" id="landingGoToDiagnostic" role="button" tabindex="0">
