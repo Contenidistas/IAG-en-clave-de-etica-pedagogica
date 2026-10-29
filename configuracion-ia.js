@@ -8,7 +8,7 @@
    ======================================== */
 const CONFIG = {
   debug: false,
-  schemaVersion: '2026-06-17.1',
+  schemaVersion: '2026-10-29.1',
   apiBaseUrl: 'https://iag-etica-api.suscripcionessh.workers.dev',
   get dataEndpoint() {
     return `${this.apiBaseUrl}/events`;
@@ -634,7 +634,9 @@ const state = {
   path: [],             // Historial de respuestas
   evidence: 0,          // Puntaje acumulado
   currentSlide: 0,
-  country: '',
+  country: window.appStorage.local.getItem('app_country') || '',
+  countryCode: window.appStorage.local.getItem('app_country_code') || '',
+  statsScope: 'country',
   nivelEducativo: '',
   familiaridadInicial: '',
   recursosSimilares: '',

@@ -8,6 +8,13 @@ Guia rapida para acceder a la base de datos D1 de la app, revisar registros y li
 - Base D1: `iag-etica-db`
 - Binding del Worker: `DB`
 - Archivo de esquema: `database/schema.sql`
+- Migraciones versionadas: `database/migrations/`
+
+Antes de desplegar una versión nueva del Worker que cambie el esquema, aplicar las migraciones pendientes:
+
+```powershell
+npx wrangler d1 migrations apply iag-etica-db --remote
+```
 
 ## 1. Requisitos
 

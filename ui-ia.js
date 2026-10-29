@@ -82,9 +82,24 @@ const TRANSLATIONS = {
     fw_especializado_intro: "Una lectura ampliada para quienes investigan, forman o acompañan procesos sobre IA educativa.",
     fw_especializado_context: "Desde la formación, la investigación y la experiencia situada, estos marcos permiten construir criterios compartidos.",
     stats_kicker: "Datos anónimos de uso",
-    stats_title: "Estadísticas globales",
+    stats_title: "Estadísticas de la comunidad",
     btn_refresh_stats: "Actualizar",
     stats_note: "Estos indicadores muestran datos agregados: sesiones anónimas y cuestionarios efectivamente guardados en la base D1. No se publican nombres, respuestas individuales ni datos identificables.",
+    stats_scope_country: "Tu país",
+    stats_scope_global: "Global",
+    stats_scope_country_note: "Estadísticas agregadas de {country}. Las categorías con menos de 5 registros se omiten.",
+    stats_scope_global_note: "Vista global de todos los países participantes.",
+    stats_scope_insufficient: "Aún no hay suficientes recorridos de {country} para publicar estadísticas preservando la privacidad. Se muestra la vista global.",
+    country_context_label: "País",
+    country_select_action: "Seleccionar país",
+    country_change: "Cambiar",
+    country_gate_kicker: "Antes de comenzar",
+    country_gate_title: "¿Desde qué país participás?",
+    country_gate_description: "Vamos a adaptar marcos, niveles educativos, casos y estadísticas a este contexto. Podrás cambiarlo cuando quieras.",
+    country_search_label: "Buscar país",
+    country_search_placeholder: "Buscar país…",
+    country_gate_confirm: "Continuar con este país",
+    country_gate_cancel: "Cancelar",
     stat_visits_label: "Sesiones registradas",
     stat_completed_label: "Cuestionarios completados",
     stat_average_label: "Puntaje promedio",
@@ -408,9 +423,24 @@ const TRANSLATIONS = {
     fw_especializado_intro: "An expanded reading for those who research, train, or support educational AI processes.",
     fw_especializado_context: "From training, research, and situated experience, these frameworks build shared, pedagogically sound criteria.",
     stats_kicker: "Anonymous usage data",
-    stats_title: "Global statistics",
+    stats_title: "Community statistics",
     btn_refresh_stats: "Refresh",
     stats_note: "These metrics show aggregated data: anonymous sessions and surveys saved in the D1 database. No names or individual responses are published.",
+    stats_scope_country: "Your country",
+    stats_scope_global: "Global",
+    stats_scope_country_note: "Aggregated statistics for {country}. Categories with fewer than 5 records are omitted.",
+    stats_scope_global_note: "Global view across all participating countries.",
+    stats_scope_insufficient: "There are not enough journeys from {country} to publish statistics while preserving privacy. The global view is shown.",
+    country_context_label: "Country",
+    country_select_action: "Select country",
+    country_change: "Change",
+    country_gate_kicker: "Before you begin",
+    country_gate_title: "Which country are you participating from?",
+    country_gate_description: "We will adapt frameworks, education levels, cases, and statistics to this context. You can change it at any time.",
+    country_search_label: "Search country",
+    country_search_placeholder: "Search country…",
+    country_gate_confirm: "Continue with this country",
+    country_gate_cancel: "Cancel",
     stat_visits_label: "Registered sessions",
     stat_completed_label: "Completed surveys",
     stat_average_label: "Average score",
@@ -716,9 +746,24 @@ const TRANSLATIONS = {
     fw_especializado_intro: "Uma leitura ampliada para quem pesquisa, forma ou acompanha processos de IA educacional.",
     fw_especializado_context: "A partir da formação e da experiência situada, estes marcos permitem construir critérios compartilhados.",
     stats_kicker: "Dados anônimos de uso",
-    stats_title: "Estatísticas globais",
+    stats_title: "Estatísticas da comunidade",
     btn_refresh_stats: "Atualizar",
     stats_note: "Estes indicadores mostram dados agregados: sessões anônimas e questionários salvos no banco D1. Nenhum nome ou resposta individual é publicado.",
+    stats_scope_country: "Seu país",
+    stats_scope_global: "Global",
+    stats_scope_country_note: "Estatísticas agregadas de {country}. Categorias com menos de 5 registros são omitidas.",
+    stats_scope_global_note: "Visão global de todos os países participantes.",
+    stats_scope_insufficient: "Ainda não há percursos suficientes de {country} para publicar estatísticas preservando a privacidade. A visão global é exibida.",
+    country_context_label: "País",
+    country_select_action: "Selecionar país",
+    country_change: "Alterar",
+    country_gate_kicker: "Antes de começar",
+    country_gate_title: "De qual país você participa?",
+    country_gate_description: "Vamos adaptar marcos, níveis educacionais, casos e estatísticas a este contexto. Você poderá alterá-lo quando quiser.",
+    country_search_label: "Buscar país",
+    country_search_placeholder: "Buscar país…",
+    country_gate_confirm: "Continuar com este país",
+    country_gate_cancel: "Cancelar",
     stat_visits_label: "Sessões registradas",
     stat_completed_label: "Questionários concluídos",
     stat_average_label: "Pontuação média",
@@ -1033,9 +1078,24 @@ const TRANSLATIONS = {
     fw_especializado_intro: "Une lecture approfondie pour ceux qui cherchent, forment ou accompagnent les processus d'IA éducative.",
     fw_especializado_context: "À partir de la formation et de l'expérience située, ces cadres permettent de construire des critères partagés.",
     stats_kicker: "Données d'utilisation anonymes",
-    stats_title: "Statistiques globales",
+    stats_title: "Statistiques de la communauté",
     btn_refresh_stats: "Actualiser",
     stats_note: "Ces indicateurs montrent des données agrégées : sessions anonymes et questionnaires effectivement enregistrés dans la base D1.",
+    stats_scope_country: "Votre pays",
+    stats_scope_global: "Global",
+    stats_scope_country_note: "Statistiques agrégées pour {country}. Les catégories de moins de 5 enregistrements sont omises.",
+    stats_scope_global_note: "Vue globale de tous les pays participants.",
+    stats_scope_insufficient: "Il n'y a pas encore assez de parcours pour {country} pour publier des statistiques tout en préservant la confidentialité. La vue globale est affichée.",
+    country_context_label: "Pays",
+    country_select_action: "Sélectionner un pays",
+    country_change: "Modifier",
+    country_gate_kicker: "Avant de commencer",
+    country_gate_title: "Depuis quel pays participez-vous ?",
+    country_gate_description: "Nous adapterons les cadres, les niveaux d'enseignement, les cas et les statistiques à ce contexte. Vous pourrez le modifier à tout moment.",
+    country_search_label: "Rechercher un pays",
+    country_search_placeholder: "Rechercher un pays…",
+    country_gate_confirm: "Continuer avec ce pays",
+    country_gate_cancel: "Annuler",
     stat_visits_label: "Sessions enregistrées",
     stat_completed_label: "Questionnaires terminés",
     stat_average_label: "Score moyen",
@@ -1398,6 +1458,12 @@ function updateAppLanguage(lang = 'es') {
   if (typeof window.updateChatbotLanguage === 'function') {
     window.updateChatbotLanguage(lang);
   }
+  if (typeof updateCountryGlobalUI === 'function') {
+    updateCountryGlobalUI();
+  }
+  if (typeof updateStatsScopeUI === 'function') {
+    updateStatsScopeUI();
+  }
 }
 
 
@@ -1438,6 +1504,18 @@ const elements = {
   countryOtherWrapper: document.getElementById('countryOtherWrapper'),
   countryOtherInput: document.getElementById('countryOther'),
   countryFinalInput: document.getElementById('countryFinal'),
+  countryContextBtn: document.getElementById('countryContextBtn'),
+  countryContextFlag: document.getElementById('countryContextFlag'),
+  countryContextName: document.getElementById('countryContextName'),
+  countryGate: document.getElementById('countryGate'),
+  countryGateClose: document.getElementById('countryGateClose'),
+  countryGateCancel: document.getElementById('countryGateCancel'),
+  countryGateConfirm: document.getElementById('countryGateConfirm'),
+  countryGateSearch: document.getElementById('countryGateSearch'),
+  countryGateCards: document.getElementById('countryGateCards'),
+  countryGateOther: document.getElementById('countryGateOther'),
+  countryGateOtherInput: document.getElementById('countryGateOtherInput'),
+  countryGatePreview: document.getElementById('countryGatePreview'),
   familiaridadInicial: document.getElementById('familiaridadInicial'),
   familiaridadInicialWrapper: document.getElementById('familiaridadInicialWrapper'),
   recursosSimilaresRadios: document.querySelectorAll('input[name="recursosSimilares"]'),
@@ -1513,6 +1591,11 @@ const elements = {
   refreshStatsBtn: document.getElementById('refreshStatsBtn'),
   statsStatus: document.getElementById('statsStatus'),
   statsContent: document.getElementById('statsContent'),
+  statsCountryScopeBtn: document.getElementById('statsCountryScopeBtn'),
+  statsGlobalScopeBtn: document.getElementById('statsGlobalScopeBtn'),
+  statsCountryScopeFlag: document.getElementById('statsCountryScopeFlag'),
+  statsCountryScopeLabel: document.getElementById('statsCountryScopeLabel'),
+  statsScopeNote: document.getElementById('statsScopeNote'),
   statVisits: document.getElementById('statVisits'),
   statCompleted: document.getElementById('statCompleted'),
   statAverage: document.getElementById('statAverage'),
@@ -1848,6 +1931,198 @@ document.addEventListener('click', (evt) => {
 /* ========================================
    MANEJO DE PAÍS
    ======================================== */
+let countryGateSelection = { name: '', code: '' };
+let countryGateRequired = true;
+let countryGateLastFocus = null;
+
+function countryUiText(key, fallback) {
+  const language = window.state?.lang || 'es';
+  return TRANSLATIONS[language]?.[key] || TRANSLATIONS.es?.[key] || fallback;
+}
+
+function countryCodeFor(name) {
+  return window.CountryContext?.codeFor(name) || (name ? 'other' : '');
+}
+
+function persistCountryContext() {
+  if (!window.state?.country) {
+    window.appStorage.local.removeItem('app_country');
+    window.appStorage.local.removeItem('app_country_code');
+    return;
+  }
+  window.appStorage.local.setItem('app_country', window.state.country);
+  window.appStorage.local.setItem('app_country_code', window.state.countryCode || countryCodeFor(window.state.country));
+}
+
+function updateCountryGlobalUI() {
+  const name = window.state?.country || '';
+  const code = window.state?.countryCode || countryCodeFor(name);
+  const option = window.CountryContext?.getOption(name) || window.CountryContext?.getByCode(code);
+
+  if (elements.countryContextName) {
+    elements.countryContextName.textContent = name || countryUiText('country_select_action', 'Seleccionar país');
+  }
+  if (elements.countryContextFlag) {
+    if (option?.code) {
+      elements.countryContextFlag.src = `icons/flags/${option.code}.svg`;
+      elements.countryContextFlag.hidden = false;
+    } else {
+      elements.countryContextFlag.hidden = true;
+    }
+  }
+
+  if (typeof updateStatsScopeUI === 'function') updateStatsScopeUI();
+}
+
+function renderCountryGateSelection() {
+  if (!elements.countryGate) return;
+  const selectedName = countryGateSelection.name;
+  elements.countryGateCards?.querySelectorAll('.country-gate-card').forEach(card => {
+    const active = card.dataset.gateCountry === selectedName
+      || (selectedName && countryGateSelection.code === 'other' && card.dataset.gateCountry === 'Otro');
+    card.classList.toggle('active', active);
+    card.setAttribute('aria-pressed', String(active));
+  });
+
+  const isOther = countryGateSelection.code === 'other';
+  if (elements.countryGateOther) elements.countryGateOther.hidden = !isOther;
+  const finalName = isOther ? elements.countryGateOtherInput?.value.trim() : selectedName;
+  if (elements.countryGateConfirm) elements.countryGateConfirm.disabled = !finalName;
+
+  if (!elements.countryGatePreview) return;
+  if (!finalName) {
+    elements.countryGatePreview.hidden = true;
+    elements.countryGatePreview.replaceChildren();
+    return;
+  }
+  const context = window.CountryContext.get(finalName);
+  const title = document.createElement('strong');
+  title.textContent = context.title;
+  const summary = document.createElement('span');
+  summary.textContent = context.summary;
+  elements.countryGatePreview.replaceChildren(title, summary);
+  elements.countryGatePreview.hidden = false;
+}
+
+function initializeCountryGateCards() {
+  if (!elements.countryGateCards || !window.CountryContext) return;
+  elements.countryGateCards.replaceChildren();
+  window.CountryContext.countries.forEach(country => {
+    const context = country.name === 'Otro' ? null : window.CountryContext.get(country.name);
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'country-gate-card';
+    button.dataset.gateCountry = country.name;
+    button.setAttribute('aria-pressed', 'false');
+
+    const flag = document.createElement(country.code ? 'img' : 'span');
+    flag.className = 'country-gate-card-flag';
+    if (country.code) {
+      flag.src = `icons/flags/${country.code}.svg`;
+      flag.alt = '';
+      flag.loading = 'lazy';
+    } else {
+      flag.setAttribute('aria-hidden', 'true');
+      flag.textContent = country.flag;
+    }
+
+    const copy = document.createElement('span');
+    copy.className = 'country-gate-card-copy';
+    const name = document.createElement('span');
+    name.className = 'country-gate-card-name';
+    name.textContent = country.name === 'Otro' ? countryUiText('opt_other', 'Otro país') : country.name;
+    const badge = document.createElement('small');
+    badge.className = 'country-gate-card-badge';
+    badge.textContent = country.name === 'Otro'
+      ? countryUiText('label_country_other', 'Especificar país')
+      : context.hasNationalFramework ? 'Marco nacional integrado' : 'Base internacional UNESCO';
+    copy.append(name, badge);
+    button.append(flag, copy);
+    button.addEventListener('click', () => {
+      countryGateSelection = { name: country.name, code: country.code || 'other' };
+      if (country.name === 'Otro') {
+        if (elements.countryGateOtherInput && window.state?.countryCode !== 'other') {
+          elements.countryGateOtherInput.value = '';
+        }
+        window.setTimeout(() => elements.countryGateOtherInput?.focus(), 60);
+      }
+      renderCountryGateSelection();
+    });
+    elements.countryGateCards.appendChild(button);
+  });
+  renderCountryGateSelection();
+}
+
+function openCountryGate({ required = !window.state?.country } = {}) {
+  if (!elements.countryGate) return;
+  countryGateRequired = required;
+  countryGateLastFocus = document.activeElement;
+  const currentName = window.state?.country || '';
+  const currentCode = window.state?.countryCode || countryCodeFor(currentName);
+  const option = window.CountryContext?.getOption(currentName);
+  countryGateSelection = option
+    ? { name: option.name, code: option.code || 'other' }
+    : currentName ? { name: 'Otro', code: 'other' } : { name: '', code: '' };
+  if (elements.countryGateOtherInput) {
+    elements.countryGateOtherInput.value = currentCode === 'other' && !option ? currentName : '';
+  }
+  if (elements.countryGateSearch) elements.countryGateSearch.value = '';
+  elements.countryGateCards?.querySelectorAll('.country-gate-card').forEach(card => { card.hidden = false; });
+  elements.countryGate.hidden = false;
+  elements.countryGateClose.hidden = required;
+  elements.countryGateCancel.hidden = required;
+  document.body.classList.add('country-gate-open');
+  const header = document.querySelector('.app-header');
+  const container = document.querySelector('.container');
+  if (header) header.inert = true;
+  if (container) container.inert = true;
+  renderCountryGateSelection();
+  window.setTimeout(() => elements.countryGateSearch?.focus(), 40);
+}
+
+function closeCountryGate() {
+  if (!elements.countryGate || countryGateRequired) return;
+  elements.countryGate.hidden = true;
+  document.body.classList.remove('country-gate-open');
+  const header = document.querySelector('.app-header');
+  const container = document.querySelector('.container');
+  if (header) header.inert = false;
+  if (container) container.inert = false;
+  if (countryGateLastFocus && typeof countryGateLastFocus.focus === 'function') countryGateLastFocus.focus();
+}
+
+function confirmCountryGateSelection() {
+  const isOther = countryGateSelection.code === 'other';
+  const finalName = isOther ? elements.countryGateOtherInput?.value.trim() : countryGateSelection.name;
+  if (!finalName || !elements.countrySelect) {
+    elements.countryGateOtherInput?.focus();
+    return;
+  }
+
+  const option = window.CountryContext.getOption(finalName) || window.CountryContext.getByCode(countryGateSelection.code);
+  if (option && option.name !== 'Otro') {
+    elements.countrySelect.value = option.name;
+  } else {
+    elements.countrySelect.value = 'Otro';
+    if (elements.countryOtherInput) elements.countryOtherInput.value = finalName;
+  }
+  elements.countrySelect.dispatchEvent(new Event('change', { bubbles: true }));
+  persistCountryContext();
+  updateCountryGlobalUI();
+
+  elements.countryGate.hidden = true;
+  document.body.classList.remove('country-gate-open');
+  const header = document.querySelector('.app-header');
+  const container = document.querySelector('.container');
+  if (header) header.inert = false;
+  if (container) container.inert = false;
+  countryGateRequired = false;
+
+  if (window.state) window.state.statsScope = 'country';
+  cargarEstadisticasAnonimas();
+  if (elements.countryContextBtn) elements.countryContextBtn.focus({ preventScroll: true });
+}
+
 function renderCountrySelectionState() {
   if (!elements.countrySelect) return;
   const selected = elements.countrySelect.value;
@@ -1883,7 +2158,9 @@ function renderCountrySelectionState() {
 
 function initializeCountryCards() {
   if (!elements.countrySelect || !window.CountryContext) return;
-  const currentValue = elements.countrySelect.value;
+  const savedCountry = window.state?.country || '';
+  const savedOption = window.CountryContext.getOption(savedCountry);
+  const currentValue = elements.countrySelect.value || (savedOption ? savedOption.name : (savedCountry ? 'Otro' : ''));
   elements.countrySelect.replaceChildren();
   const placeholder = document.createElement('option');
   placeholder.value = '';
@@ -1898,6 +2175,9 @@ function initializeCountryCards() {
   });
   elements.countrySelect.value = currentValue && Array.from(elements.countrySelect.options).some(option => option.value === currentValue)
     ? currentValue : '';
+  if (elements.countryOtherInput && elements.countrySelect.value === 'Otro' && savedCountry) {
+    elements.countryOtherInput.value = savedCountry;
+  }
 
   if (elements.countryCards) {
     elements.countryCards.replaceChildren();
@@ -1955,6 +2235,7 @@ function initializeCountryCards() {
 }
 
 initializeCountryCards();
+initializeCountryGateCards();
 
 if (elements.countrySelect && elements.countryFinalInput) {
   const updateCountryFinal = () => {
@@ -1978,11 +2259,14 @@ if (elements.countrySelect && elements.countryFinalInput) {
 
     if (window.state) {
       window.state.country = elements.countryFinalInput.value;
+      window.state.countryCode = countryCodeFor(window.state.country);
+      persistCountryContext();
       if (['docente', 'estudiante'].includes(window.state.profile) && typeof updateNivelEducativo === 'function') {
         updateNivelEducativo(window.state.profile);
       }
     }
     renderCountrySelectionState();
+    updateCountryGlobalUI();
     if (typeof updateFrameworkAudience === 'function') {
       updateFrameworkAudience(window.state?.profile || null);
     }
@@ -1999,8 +2283,11 @@ if (elements.countrySelect && elements.countryFinalInput) {
         elements.countryFinalInput.value = elements.countryOtherInput.value.trim();
         if (window.state) {
           window.state.country = elements.countryFinalInput.value;
+          window.state.countryCode = countryCodeFor(window.state.country);
+          persistCountryContext();
         }
         renderCountrySelectionState();
+        updateCountryGlobalUI();
         if (typeof updateFrameworkAudience === 'function') {
           updateFrameworkAudience(window.state?.profile || null);
         }
@@ -2010,6 +2297,32 @@ if (elements.countrySelect && elements.countryFinalInput) {
   }
 
   updateCountryFinal();
+}
+
+if (elements.countryContextBtn) {
+  elements.countryContextBtn.addEventListener('click', () => openCountryGate({ required: false }));
+}
+if (elements.countryGateClose) elements.countryGateClose.addEventListener('click', closeCountryGate);
+if (elements.countryGateCancel) elements.countryGateCancel.addEventListener('click', closeCountryGate);
+if (elements.countryGateConfirm) elements.countryGateConfirm.addEventListener('click', confirmCountryGateSelection);
+if (elements.countryGateOtherInput) {
+  elements.countryGateOtherInput.addEventListener('input', renderCountryGateSelection);
+  elements.countryGateOtherInput.addEventListener('keydown', event => {
+    if (event.key === 'Enter' && !elements.countryGateConfirm?.disabled) confirmCountryGateSelection();
+  });
+}
+if (elements.countryGateSearch) {
+  elements.countryGateSearch.addEventListener('input', event => {
+    const query = event.target.value.trim().toLocaleLowerCase('es');
+    elements.countryGateCards?.querySelectorAll('.country-gate-card').forEach(card => {
+      card.hidden = Boolean(query) && !card.dataset.gateCountry.toLocaleLowerCase('es').includes(query);
+    });
+  });
+}
+if (elements.countryGate) {
+  elements.countryGate.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && !countryGateRequired) closeCountryGate();
+  });
 }
 
 /* ========================================
@@ -2641,6 +2954,7 @@ if (landingGoToDiagnostic) {
   landingGoToDiagnostic.addEventListener('click', (event) => {
     event.preventDefault();
     state.pendingEntry = null;
+    if (state.country && state.onboardingStep === 0) state.onboardingStep = 1;
     state.currentSlide = 1;
     updateCarousel();
     updateStartButtonState();
@@ -3061,7 +3375,6 @@ if (homeBtn) {
             state.evidence = 0;
             state.currentSlide = 0;
             state.onboardingStep = 0;
-            state.country = '';
             state.nivelEducativo = '';
             state.familiaridadInicial = '';
             state.recursosSimilares = '';
@@ -3079,10 +3392,6 @@ if (homeBtn) {
             // Reset nivel educativo
             hideNivelEducativo();
 
-            if (elements.countrySelect) elements.countrySelect.value = '';
-            if (elements.countryOtherWrapper) elements.countryOtherWrapper.style.display = 'none';
-            if (elements.countryOtherInput) elements.countryOtherInput.value = '';
-            if (elements.countryFinalInput) elements.countryFinalInput.value = '';
             if (elements.countrySearch) elements.countrySearch.value = '';
             renderCountrySelectionState();
 
@@ -3366,6 +3675,69 @@ const STATS_PROFILE_LABELS = {
   especializado: 'Docente/investigador/a',
 };
 
+function statsText(key, fallback, replacements = {}) {
+  const language = window.state?.lang || 'es';
+  let text = TRANSLATIONS[language]?.[key] || TRANSLATIONS.es?.[key] || fallback;
+  Object.entries(replacements).forEach(([name, value]) => {
+    text = text.replaceAll(`{${name}}`, value);
+  });
+  return text;
+}
+
+function setStatsScopeNote(message, warning = false) {
+  if (!elements.statsScopeNote) return;
+  elements.statsScopeNote.textContent = message || '';
+  elements.statsScopeNote.classList.toggle('is-warning', warning);
+}
+
+function updateStatsScopeUI() {
+  const hasCountry = Boolean(window.state?.country);
+  if (!hasCountry && window.state) window.state.statsScope = 'global';
+  const scope = window.state?.statsScope === 'global' ? 'global' : 'country';
+  const option = window.CountryContext?.getOption(window.state?.country);
+
+  if (elements.statsCountryScopeFlag) {
+    elements.statsCountryScopeFlag.textContent = option?.flag || '🌐';
+  }
+  if (elements.statsCountryScopeLabel) {
+    elements.statsCountryScopeLabel.textContent = window.state?.country || statsText('stats_scope_country', 'Tu país');
+  }
+  if (elements.statsCountryScopeBtn) {
+    elements.statsCountryScopeBtn.disabled = !hasCountry;
+    elements.statsCountryScopeBtn.classList.toggle('active', scope === 'country');
+    elements.statsCountryScopeBtn.setAttribute('aria-pressed', String(scope === 'country'));
+  }
+  if (elements.statsGlobalScopeBtn) {
+    elements.statsGlobalScopeBtn.classList.toggle('active', scope === 'global');
+    elements.statsGlobalScopeBtn.setAttribute('aria-pressed', String(scope === 'global'));
+  }
+
+  if (scope === 'country' && hasCountry) {
+    setStatsScopeNote(statsText(
+      'stats_scope_country_note',
+      'Estadísticas agregadas de {country}. Las categorías con menos de 5 registros se omiten.',
+      { country: window.state.country }
+    ));
+  } else {
+    setStatsScopeNote(statsText('stats_scope_global_note', 'Vista global de todos los países participantes.'));
+  }
+}
+
+function buildStatsRequestUrl(scope) {
+  const url = new URL(CONFIG.statsEndpoint, window.location.href);
+  if (scope === 'country' && window.state?.country) {
+    url.searchParams.set('country', window.state.countryCode || countryCodeFor(window.state.country));
+    url.searchParams.set('countryName', window.state.country);
+  }
+  return url.toString();
+}
+
+async function fetchStatsScope(scope) {
+  const response = await fetch(buildStatsRequestUrl(scope), { method: 'GET' });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return response.json();
+}
+
 function sanitizeStatsRows(rows, kind = 'generic') {
   return normalizeStatsCollection(rows)
     .filter(row => row && row.label)
@@ -3466,10 +3838,24 @@ async function cargarEstadisticasAnonimas() {
   if (elements.statsContent) elements.statsContent.classList.add('hidden');
 
   try {
-    const response = await fetch(CONFIG.statsEndpoint, { method: 'GET' });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const data = await response.json();
-    renderStats(data);
+    const requestedScope = state.statsScope === 'global' || !state.country ? 'global' : 'country';
+    const data = await fetchStatsScope(requestedScope);
+
+    if (requestedScope === 'country' && data.scope?.available === false) {
+      const globalData = await fetchStatsScope('global');
+      renderStats(globalData);
+      setStatsScopeNote(statsText(
+        'stats_scope_insufficient',
+        'Aún no hay suficientes recorridos de {country} para publicar estadísticas preservando la privacidad. Se muestra la vista global.',
+        { country: state.country }
+      ), true);
+    } else if (requestedScope === 'country' && data.scope?.type !== 'country') {
+      renderStats(data);
+      setStatsScopeNote(statsText('stats_scope_global_note', 'Vista global de todos los países participantes.'));
+    } else {
+      renderStats(data);
+      updateStatsScopeUI();
+    }
   } catch (error) {
     console.warn('No se pudieron cargar estadísticas anónimas:', error);
     elements.statsStatus.innerHTML = `
@@ -3487,6 +3873,24 @@ async function cargarEstadisticasAnonimas() {
 
 if (elements.refreshStatsBtn) {
   elements.refreshStatsBtn.addEventListener('click', cargarEstadisticasAnonimas);
+}
+if (elements.statsCountryScopeBtn) {
+  elements.statsCountryScopeBtn.addEventListener('click', () => {
+    if (!state.country) {
+      openCountryGate({ required: true });
+      return;
+    }
+    state.statsScope = 'country';
+    updateStatsScopeUI();
+    cargarEstadisticasAnonimas();
+  });
+}
+if (elements.statsGlobalScopeBtn) {
+  elements.statsGlobalScopeBtn.addEventListener('click', () => {
+    state.statsScope = 'global';
+    updateStatsScopeUI();
+    cargarEstadisticasAnonimas();
+  });
 }
 
 /* ========================================
@@ -3654,6 +4058,7 @@ function buildToolFeedbackPayload() {
     profile: state.profileBase || state.profile || '',
     profileKey: state.profileKey || '',
     country: state.country || '',
+    countryCode: state.countryCode || countryCodeFor(state.country),
     nivelEducativo: state.nivelEducativo || '',
     consentTracking: !!state.consentTracking
   };
@@ -3843,7 +4248,8 @@ document.addEventListener('DOMContentLoaded', () => {
   renderLocalHistory();
   initNeuralNetBackground();
 
-  // El inicio guiado explica el recorrido sin interrumpirlo con un modal.
+  updateCountryGlobalUI();
+  if (!state.country) openCountryGate({ required: true });
 });
 
 window.addEventListener('resize', () => {

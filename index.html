@@ -56,6 +56,14 @@
           <span class="btn-academic-title">Instalar</span>
         </span>
       </button>
+      <button type="button" class="country-context-btn" id="countryContextBtn" aria-haspopup="dialog" aria-controls="countryGate">
+        <img id="countryContextFlag" class="country-context-btn-flag" src="icons/flags/uy.svg" alt="" hidden>
+        <span class="country-context-btn-copy">
+          <small data-i18n="country_context_label">País</small>
+          <strong id="countryContextName" data-i18n="country_select_action">Seleccionar país</strong>
+        </span>
+        <span class="country-context-btn-change" data-i18n="country_change">Cambiar</span>
+      </button>
       <div class="lang-select-wrapper">
         <label for="languageSelect" class="sr-only">Idioma / Language</label>
         <select id="languageSelect" class="lang-select" aria-label="Seleccionar idioma">
@@ -70,6 +78,29 @@
       </button>
     </div>
   </header>
+
+  <section id="countryGate" class="country-gate" role="dialog" aria-modal="true" aria-labelledby="countryGateTitle" hidden>
+    <div class="country-gate-panel">
+      <button type="button" id="countryGateClose" class="country-gate-close" aria-label="Cerrar" hidden>×</button>
+      <div class="country-gate-heading">
+        <p class="section-kicker" data-i18n="country_gate_kicker">Antes de comenzar</p>
+        <h2 id="countryGateTitle" data-i18n="country_gate_title">¿Desde qué país participás?</h2>
+        <p data-i18n="country_gate_description">Vamos a adaptar marcos, niveles educativos, casos y estadísticas a este contexto. Podrás cambiarlo cuando quieras.</p>
+      </div>
+      <label class="sr-only" for="countryGateSearch" data-i18n="country_search_label">Buscar país</label>
+      <input id="countryGateSearch" class="input country-gate-search" type="search" autocomplete="country-name" data-i18n-placeholder="country_search_placeholder" placeholder="Buscar país…">
+      <div id="countryGateCards" class="country-gate-grid" role="group" aria-labelledby="countryGateTitle"></div>
+      <div id="countryGateOther" class="country-gate-other" hidden>
+        <label for="countryGateOtherInput" data-i18n="label_country_other">Especificá tu país</label>
+        <input id="countryGateOtherInput" class="input" type="text" maxlength="80" autocomplete="country-name" data-i18n-placeholder="placeholder_country_other" placeholder="Ingresá tu país">
+      </div>
+      <div id="countryGatePreview" class="country-gate-preview" role="status" aria-live="polite" hidden></div>
+      <div class="country-gate-actions">
+        <button type="button" id="countryGateCancel" class="btn btn-outline" data-i18n="country_gate_cancel" hidden>Cancelar</button>
+        <button type="button" id="countryGateConfirm" class="btn btn-primary" data-i18n="country_gate_confirm" disabled>Continuar con este país</button>
+      </div>
+    </div>
+  </section>
 
   <!-- ============================================
        CONTENEDOR PRINCIPAL
@@ -542,7 +573,7 @@
         <div class="stats-header">
           <div>
             <p class="section-kicker" data-i18n="stats_kicker">Datos anónimos de uso</p>
-            <h2 id="statsTitle" data-i18n="stats_title">Estadísticas globales</h2>
+            <h2 id="statsTitle" data-i18n="stats_title">Estadísticas de la comunidad</h2>
           </div>
           <button type="button" class="btn btn-outline" id="refreshStatsBtn" data-i18n="btn_refresh_stats">Actualizar</button>
         </div>
@@ -550,6 +581,15 @@
         <p class="stats-note" data-i18n="stats_note">
           Estos indicadores muestran datos agregados: sesiones anónimas y cuestionarios efectivamente guardados en la base D1. No se publican nombres, respuestas individuales ni datos identificables.
         </p>
+
+        <div class="stats-scope-controls" role="group" aria-label="Alcance de las estadísticas">
+          <button type="button" id="statsCountryScopeBtn" class="stats-scope-btn active" data-stats-scope="country" aria-pressed="true">
+            <span id="statsCountryScopeFlag" aria-hidden="true">🌐</span>
+            <span id="statsCountryScopeLabel" data-i18n="stats_scope_country">Tu país</span>
+          </button>
+          <button type="button" id="statsGlobalScopeBtn" class="stats-scope-btn" data-stats-scope="global" aria-pressed="false" data-i18n="stats_scope_global">Global</button>
+        </div>
+        <p id="statsScopeNote" class="stats-scope-note" role="status" aria-live="polite"></p>
 
         <div id="statsStatus" class="stats-status">Cargando estadísticas...</div>
 

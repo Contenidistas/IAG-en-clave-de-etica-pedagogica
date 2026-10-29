@@ -17,6 +17,72 @@ html[data-theme="dark"] body { --bg-main: #101321; }
 .app-header .btn-academic { box-shadow: none; background: transparent; }
 .app-header .btn-academic-label { display: none; }
 .app-header .btn-academic-title { font-size: .84rem; }
+.country-context-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  min-height: 42px;
+  padding: .45rem .7rem;
+  border: 1px solid var(--setup-line);
+  border-radius: 12px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.country-context-btn:hover { border-color: var(--setup-accent); }
+.country-context-btn-flag { width: 28px; height: 19px; border-radius: 3px; object-fit: cover; box-shadow: 0 0 0 1px rgb(15 23 42 / 12%); }
+.country-context-btn-copy { display: grid; gap: .05rem; line-height: 1.1; }
+.country-context-btn-copy small { color: var(--text-secondary); font-size: .62rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.country-context-btn-copy strong { max-width: 130px; overflow: hidden; font-size: .8rem; text-overflow: ellipsis; white-space: nowrap; }
+.country-context-btn-change { color: var(--setup-accent); font-size: .7rem; font-weight: 750; }
+body.country-gate-open { overflow: hidden; }
+.country-gate[hidden] { display: none !important; }
+.country-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: clamp(1rem, 3vw, 2.5rem);
+  overflow-y: auto;
+  background: rgb(15 18 32 / 72%);
+  backdrop-filter: blur(12px);
+}
+.country-gate-panel {
+  position: relative;
+  width: min(1040px, 100%);
+  max-height: calc(100vh - 2rem);
+  padding: clamp(1.2rem, 3vw, 2.2rem);
+  overflow-y: auto;
+  border: 1px solid var(--setup-line);
+  border-radius: 24px;
+  background: var(--bg-card);
+  box-shadow: 0 28px 80px rgb(8 10 24 / 30%);
+}
+.country-gate-close { position: absolute; top: .8rem; right: .9rem; width: 40px; height: 40px; border: 1px solid var(--setup-line); border-radius: 50%; background: var(--bg-main); color: var(--text-primary); font: 600 1.4rem/1 sans-serif; cursor: pointer; }
+.country-gate-heading { max-width: 720px; padding-right: 2.5rem; }
+.country-gate-heading h2 { margin: .25rem 0 .65rem; color: var(--text-primary); font-size: clamp(1.7rem, 4vw, 2.7rem); }
+.country-gate-heading p:last-child { margin: 0 0 1.2rem; color: var(--text-secondary); line-height: 1.55; }
+.country-gate-search { width: min(440px, 100%); min-height: 48px; margin-bottom: 1rem; border: 1px solid var(--setup-line); background: var(--bg-glass-solid); color: var(--text-primary); }
+.country-gate-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .7rem; max-height: min(44vh, 400px); padding: .15rem .2rem .4rem; overflow-y: auto; scrollbar-gutter: stable; }
+.country-gate-card { position: relative; display: flex; align-items: center; gap: .75rem; min-width: 0; min-height: 70px; padding: .8rem .85rem; border: 1px solid var(--setup-line); border-radius: 14px; background: var(--bg-glass-solid); color: var(--text-primary); font: inherit; text-align: left; cursor: pointer; transition: border-color .2s, background .2s, transform .2s; }
+.country-gate-card:hover { transform: translateY(-2px); border-color: var(--setup-accent); }
+.country-gate-card.active { border-color: var(--setup-accent); background: var(--surface-soft); box-shadow: inset 0 0 0 1px var(--setup-accent); }
+.country-gate-card.active::after { content: '✓'; position: absolute; top: .35rem; right: .45rem; display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: #5546a3; color: white; font-size: .7rem; font-weight: 800; }
+.country-gate-card[hidden] { display: none !important; }
+.country-gate-card-flag { flex: 0 0 30px; width: 30px; height: 20px; border-radius: 3px; object-fit: cover; box-shadow: 0 0 0 1px rgb(15 23 42 / 12%); font-size: 1.4rem; line-height: 20px; text-align: center; }
+.country-gate-card-copy { min-width: 0; }
+.country-gate-card-name { display: block; padding-right: .6rem; font-size: .88rem; font-weight: 750; line-height: 1.25; overflow-wrap: break-word; }
+.country-gate-card-badge { display: block; margin-top: .2rem; color: var(--text-secondary); font-size: .67rem; line-height: 1.25; }
+.country-gate-other { margin-top: 1rem; }
+.country-gate-other label { display: block; margin-bottom: .45rem; color: var(--text-primary); font-weight: 700; }
+.country-gate-other .input { width: min(440px, 100%); min-height: 48px; }
+.country-gate-preview { margin-top: 1rem; padding: .8rem 1rem; border-left: 3px solid var(--setup-accent); border-radius: 0 10px 10px 0; background: var(--surface-soft); color: var(--text-secondary); font-size: .84rem; line-height: 1.5; }
+.country-gate-preview strong { display: block; margin-bottom: .18rem; color: var(--text-primary); }
+.country-gate-actions { display: flex; justify-content: flex-end; gap: .7rem; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--setup-line); }
+.country-gate-actions .btn { min-height: 46px; }
 .container { max-width: 1180px; }
 .card { border-radius: 24px; box-shadow: 0 8px 32px rgb(25 23 44 / 4%); }
 .btn { transition: background .2s, box-shadow .2s, transform .2s; }
@@ -263,6 +329,14 @@ html[data-theme="dark"] body { --bg-main: #101321; }
   .header-actions { gap: .35rem; }
   .app-header .btn-academic { padding: .45rem; }
   .app-header .btn-academic-icon { display: none; }
+  .country-context-btn { order: 2; max-width: 190px; }
+  .country-context-btn-change { display: none; }
+  .country-gate { padding: 0; place-items: stretch; }
+  .country-gate-panel { min-height: 100%; max-height: none; border-radius: 0; }
+  .country-gate-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); max-height: 48vh; }
+  .country-gate-card { min-height: 64px; padding: .7rem; }
+  .country-gate-actions { position: sticky; bottom: -1.2rem; margin-inline: -1.2rem; padding: 1rem 1.2rem; background: var(--bg-card); }
+  .country-gate-actions .btn { flex: 1; }
   .container { padding: 1rem; }
   #screenIntro > .card:first-child { padding: 1.15rem; border-radius: 18px; }
   .landing-welcome-actions, .onboarding-flow .profile-choice-grid { grid-template-columns: 1fr; }

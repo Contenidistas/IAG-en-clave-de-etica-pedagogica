@@ -835,6 +835,9 @@ function sendVisitToServer() {
     timestamp: new Date().toISOString(),
     sessionId: getAnalyticsSessionId(),
     page: 'index',
+    country: state.country || '',
+    countryCode: state.countryCode || (window.CountryContext?.codeFor(state.country) ?? ''),
+    consentTracking: !!state.consentTracking,
     anonymous: true
   };
 
@@ -884,6 +887,7 @@ function buildResultPayload() {
     // Datos iniciales
     userName:           state.name || null,
     country:            state.country,
+    countryCode:        state.countryCode || (window.CountryContext?.codeFor(state.country) ?? ''),
     nivelEducativo:     state.nivelEducativo || null,
     familiaridadInicial: state.familiaridadInicial,
     recursosSimilares:   state.recursosSimilares,

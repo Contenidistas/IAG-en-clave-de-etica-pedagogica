@@ -195,10 +195,29 @@
     return getCountryContext(country).names.join(', ');
   }
 
+  function getCountryOption(country) {
+    const name = String(country || '').trim();
+    return COUNTRY_OPTIONS.find(option => option.name === name) || null;
+  }
+
+  function getCountryByCode(code) {
+    const normalized = String(code || '').trim().toLowerCase();
+    return COUNTRY_OPTIONS.find(option => option.code === normalized) || null;
+  }
+
+  function getCountryCode(country) {
+    const name = String(country || '').trim();
+    if (!name) return '';
+    return getCountryOption(name)?.code || 'other';
+  }
+
   window.CountryContext = {
     countries: COUNTRY_OPTIONS,
     contexts: CONTEXTS,
     get: getCountryContext,
+    getOption: getCountryOption,
+    getByCode: getCountryByCode,
+    codeFor: getCountryCode,
     getFrameworkNames,
     internationalReference: UNESCO_REFERENCE
   };

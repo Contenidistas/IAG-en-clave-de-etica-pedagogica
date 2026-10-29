@@ -52,7 +52,7 @@ test('a recommended case opens and returns inline without changing the student j
   assert.equal($('#recommendedCase').hidden, true);
 });
 
-async function app(t, { blockedStorage = false } = {}) {
+async function app(t, { blockedStorage = false, fetchImpl = null } = {}) {
   const errors = [];
   const console = new VirtualConsole();
   console.on('jsdomError', error => errors.push(error.message));
@@ -69,7 +69,7 @@ async function app(t, { blockedStorage = false } = {}) {
   w.matchMedia = () => ({ matches: true, addEventListener() {} });
   w.scrollTo = () => {};
   w.HTMLElement.prototype.scrollIntoView = () => {};
-  w.fetch = async () => ({ ok: true, json: async () => ({ summary: {}, opinions: [], profiles: [], countries: [], levels: [] }) });
+  w.fetch = fetchImpl || (async () => ({ ok: true, json: async () => ({ summary: {}, opinions: [], profiles: [], countries: [], levels: [] }) }));
   for (const file of ['storage.js', 'country-context.js', 'configuracion-ia.js', 'ethical-evidence.js', 'ui-ia.js', 'principle-network.js', 'juego-ia.js', 'chatbot-component.js']) {
     vm.runInContext(fs.readFileSync(path.join(root, file), 'utf8'), dom.getInternalVMContext(), { filename: file });
   }
@@ -133,6 +133,57 @@ test('country cards are the first required step and load the matching national f
   assert.equal($('#frameworkLinks a[href*="anep.edu.uy"]'), null);
   click('#onboardingNextBtn');
   assert.equal(w.state.onboardingStep, 1);
+});
+
+test('the initial country gate persists one global context and the diagnostic skips reselection', async t => {
+  const { w, $, click } = await app(t);
+  assert.equal($('#countryGate').hidden, false);
+  click('[data-gate-country="Colombia"]');
+  assert.equal($('#countryGateConfirm').disabled, false);
+  click('#countryGateConfirm');
+  assert.equal($('#countryGate').hidden, true);
+  assert.equal(w.state.country, 'Colombia');
+  assert.equal(w.state.countryCode, 'co');
+  assert.equal(w.localStorage.getItem('app_country'), 'Colombia');
+  assert.equal(w.localStorage.getItem('app_country_code'), 'co');
+  assert.equal($('#countryContextName').textContent, 'Colombia');
+
+  w.state.currentSlide = 0;
+  w.state.onboardingStep = 0;
+  click('#landingGoToDiagnostic');
+  assert.equal(w.state.onboardingStep, 1);
+  assert.equal($('#profileSelectorPanel').classList.contains('active'), true);
+});
+
+test('statistics request the selected country code and can switch back to the global layer', async t => {
+  const requests = [];
+  const fetchImpl = async url => {
+    const href = String(url);
+    requests.push(href);
+    const parsed = new URL(href, 'http://localhost/');
+    if (parsed.pathname.endsWith('/stats')) {
+      const isCountry = parsed.searchParams.has('country');
+      return {
+        ok: true,
+        json: async () => ({
+          scope: { type: isCountry ? 'country' : 'global', available: true },
+          summary: {}, levels: [], profiles: [], indicators: [], education: []
+        })
+      };
+    }
+    return { ok: true, json: async () => ({ opinions: [] }) };
+  };
+  const { w, click } = await app(t, { fetchImpl });
+  click('[data-gate-country="Uruguay"]');
+  click('#countryGateConfirm');
+  await new Promise(resolve => setImmediate(resolve));
+  assert.ok(requests.some(url => url.includes('/stats?') && url.includes('country=uy') && url.includes('countryName=Uruguay')));
+
+  click('#statsGlobalScopeBtn');
+  await new Promise(resolve => setImmediate(resolve));
+  const statsRequests = requests.filter(url => url.includes('/stats'));
+  assert.equal(new URL(statsRequests.at(-1)).searchParams.has('country'), false);
+  assert.equal(w.state.statsScope, 'global');
 });
 
 test('Dominican Republic uses national education levels and other countries use an explicit UNESCO fallback', async t => {

@@ -494,7 +494,7 @@
             </td>
             <td>${escapeHtml(row.profile || 'docente')}</td>
             <td>${escapeHtml(row.nivelEducativo || 'Secundaria')}</td>
-            <td>${escapeHtml(row.country || 'Uruguay')}</td>
+            <td>${escapeHtml(row.country || 'Sin determinar')}</td>
           </tr>
         `;
       }).join('');
@@ -824,9 +824,9 @@
     function renderComparative() {
       if (!els.comparativeTableBody) return;
 
-      const uyRows = state.completions.filter(r => (r.country || 'Uruguay') === 'Uruguay');
+      const uyRows = state.completions.filter(r => r.country === 'Uruguay');
       const caRows = state.completions.filter(r => r.country === 'Canadá');
-      const otherRows = state.completions.filter(r => r.country && r.country !== 'Uruguay' && r.country !== 'Canadá');
+      const otherRows = state.completions.filter(r => r.country !== 'Uruguay' && r.country !== 'Canadá');
 
       const calcStats = (rows) => {
         const count = rows.length;
@@ -866,7 +866,7 @@
       if (els.compOtherCount) els.compOtherCount.textContent = otherStats.count;
       if (els.compOtherScore) els.compOtherScore.textContent = otherStats.avgScore;
       
-      const otherCountriesList = Array.from(new Set(otherRows.map(r => r.country))).filter(Boolean).join(', ') || 'Ninguno';
+      const otherCountriesList = Array.from(new Set(otherRows.map(r => r.country || 'Sin determinar'))).join(', ') || 'Ninguno';
       if (els.compOtherCountries) els.compOtherCountries.textContent = otherCountriesList;
 
       // Actualizar insight de investigación
@@ -879,9 +879,9 @@
       }
 
       // Renderizar tabla comparativa
-      const labUyCount = state.feedback.filter(r => (r.country || 'Uruguay') === 'Uruguay' && r.suggestion && r.suggestion.startsWith('=CHOICE=')).length;
+      const labUyCount = state.feedback.filter(r => r.country === 'Uruguay' && r.suggestion && r.suggestion.startsWith('=CHOICE=')).length;
       const labCaCount = state.feedback.filter(r => r.country === 'Canadá' && r.suggestion && r.suggestion.startsWith('=CHOICE=')).length;
-      const labOtherCount = state.feedback.filter(r => r.country && r.country !== 'Uruguay' && r.country !== 'Canadá' && r.suggestion && r.suggestion.startsWith('=CHOICE=')).length;
+      const labOtherCount = state.feedback.filter(r => r.country !== 'Uruguay' && r.country !== 'Canadá' && r.suggestion && r.suggestion.startsWith('=CHOICE=')).length;
 
       els.comparativeTableBody.innerHTML = `
         <tr>
@@ -903,7 +903,7 @@
           <td>${labCaCount}</td>
         </tr>
         <tr>
-          <td><strong>🌐 Resto del Mundo</strong></td>
+          <td><strong>🌐 Otros / Sin determinar</strong></td>
           <td>${otherStats.count}</td>
           <td>${otherStats.docentesPct}%</td>
           <td>${otherStats.estudiantesPct}%</td>
@@ -918,8 +918,8 @@
       const rows = state.completions.map(r => ({
         id: r.id,
         timestamp: r.timestamp,
-        country: r.country || 'Uruguay',
-        countryStandardized: r.country === 'Uruguay' ? 'UY' : (r.country === 'Canadá' ? 'CA' : 'OTHER'),
+        country: r.country || 'Sin determinar',
+        countryStandardized: r.country === 'Uruguay' ? 'UY' : (r.country === 'Canadá' ? 'CA' : (r.country ? 'OTHER' : 'UNSPECIFIED')),
         profileKey: r.profileKey || r.profile,
         nivelEducativo: r.nivelEducativo || '',
         familiaridadInicial: r.familiaridadInicial || '',

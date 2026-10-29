@@ -120,11 +120,13 @@ Tablas:
 3. Crear la base: `wrangler d1 create iag-etica-db`.
 4. Copiar `wrangler.toml.example` como `wrangler.toml`.
 5. Pegar el `database_id` que devuelve Cloudflare.
-6. Crear tablas: `wrangler d1 execute iag-etica-db --file=database/schema.sql`.
+6. Crear o actualizar las tablas con las migraciones versionadas: `wrangler d1 migrations apply iag-etica-db --remote`.
 7. Configurar la clave privada del panel admin: `wrangler secret put ADMIN_KEY`.
 8. Configurar la clave de Gemini para el chatbot: `wrangler secret put GEMINI_API_KEY`.
 9. Desplegar API: `wrangler deploy`.
 10. Copiar la URL del Worker en `configuracion-ia.js`, propiedad `apiBaseUrl`.
+
+`database/schema.sql` conserva una instantánea completa del esquema para consulta o recuperación manual. En una base administrada por Wrangler se deben aplicar las migraciones; no hace falta ejecutar además el archivo de esquema.
 
 ## Backend legado en Google Sheets
 

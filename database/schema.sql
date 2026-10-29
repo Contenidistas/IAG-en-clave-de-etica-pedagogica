@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS events (
   profile_key TEXT,
   user_name TEXT,
   country TEXT,
+  country_code TEXT,
   nivel_educativo TEXT,
   familiaridad_inicial TEXT,
   recursos_similares TEXT,
@@ -42,6 +43,7 @@ CREATE TABLE IF NOT EXISTS feedback (
   profile TEXT,
   profile_key TEXT,
   country TEXT,
+  country_code TEXT,
   nivel_educativo TEXT,
   evidence INTEGER,
   likert_level TEXT,
@@ -52,6 +54,8 @@ CREATE TABLE IF NOT EXISTS feedback (
 CREATE INDEX IF NOT EXISTS idx_events_type ON events(event_type);
 CREATE INDEX IF NOT EXISTS idx_events_session ON events(session_id);
 CREATE INDEX IF NOT EXISTS idx_events_timestamp ON events(timestamp);
+CREATE INDEX IF NOT EXISTS idx_events_country_type ON events(country_code, event_type);
 CREATE INDEX IF NOT EXISTS idx_answers_event ON answers(event_id);
 CREATE INDEX IF NOT EXISTS idx_feedback_rating ON feedback(rating);
 CREATE INDEX IF NOT EXISTS idx_feedback_timestamp ON feedback(timestamp);
+CREATE INDEX IF NOT EXISTS idx_feedback_country ON feedback(country_code);

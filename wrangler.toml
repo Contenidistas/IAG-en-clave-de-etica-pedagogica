@@ -9,6 +9,7 @@ ALLOWED_ORIGINS = "https://contenidistas.github.io,https://santiherben.github.io
 binding = "DB"
 database_name = "iag-etica-db"
 database_id = "9b4f5ad2-9e9d-421b-a712-71803b883e23"
+migrations_dir = "database/migrations"
 
 [env.production]
 # Configuracion no sensible. Los secretos se cargan con:

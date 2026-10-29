@@ -30,6 +30,34 @@ const VALID_LIKERT_LEVELS = [
   'Prácticas consolidadas',
   'Nivel avanzado',
 ];
+const MIN_COUNTRY_COMPLETIONS = 10;
+const MIN_PUBLIC_BUCKET = 5;
+const COUNTRY_NAMES_BY_CODE = Object.freeze({
+  uy: 'Uruguay',
+  do: 'República Dominicana',
+  co: 'Colombia',
+  ar: 'Argentina',
+  bo: 'Bolivia',
+  br: 'Brasil',
+  cl: 'Chile',
+  cr: 'Costa Rica',
+  cu: 'Cuba',
+  ec: 'Ecuador',
+  sv: 'El Salvador',
+  gt: 'Guatemala',
+  hn: 'Honduras',
+  mx: 'México',
+  ni: 'Nicaragua',
+  pa: 'Panamá',
+  py: 'Paraguay',
+  pe: 'Perú',
+  pr: 'Puerto Rico',
+  ve: 'Venezuela',
+  ca: 'Canadá',
+  es: 'España',
+  us: 'Estados Unidos',
+  pt: 'Portugal',
+});
 
 export default {
   async fetch(request, env) {
@@ -53,7 +81,7 @@ export default {
       }
 
       if (request.method === 'GET' && url.pathname === '/stats') {
-        return json(await buildStats(env), 200, request, env);
+        return json(await buildStats(env, url.searchParams), 200, request, env);
       }
 
       if (request.method === 'GET' && url.pathname === '/opinions') {
@@ -124,10 +152,10 @@ async function handleEvent(request, env) {
   const eventResult = await env.DB.prepare(`
     INSERT INTO events (
       timestamp, event_type, session_id, page, anonymous, profile, profile_key,
-      user_name, country, nivel_educativo, familiaridad_inicial,
+      user_name, country, country_code, nivel_educativo, familiaridad_inicial,
       recursos_similares, consent_tracking, evidence, likert_level, raw_path
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).bind(
     timestamp,
     eventType,
@@ -138,6 +166,7 @@ async function handleEvent(request, env) {
     payload.profileKey,
     isCompletion ? payload.userName : '',
     payload.country,
+    payload.countryCode,
     payload.nivelEducativo,
     payload.familiaridadInicial,
     payload.recursosSimilares,
@@ -182,9 +211,9 @@ async function insertFeedback(env, eventId, data, timestamp) {
   await env.DB.prepare(`
     INSERT INTO feedback (
       event_id, timestamp, session_id, rating, suggestion, profile, profile_key,
-      country, nivel_educativo, evidence, likert_level
+      country, country_code, nivel_educativo, evidence, likert_level
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).bind(
     eventId,
     timestamp,
@@ -194,6 +223,7 @@ async function insertFeedback(env, eventId, data, timestamp) {
     data.profile,
     data.profileKey,
     data.country,
+    data.countryCode,
     data.nivelEducativo,
     null,
     ''
@@ -208,6 +238,7 @@ function validateEventPayload(eventType, data) {
     profileKey: normalizeProfileKey(data.profileKey),
     userName: boundedClean(data.userName, 120),
     country: boundedClean(data.country, 80),
+    countryCode: normalizeCountryCode(data.countryCode, data.country),
     nivelEducativo: boundedClean(data.nivelEducativo, 120),
     familiaridadInicial: boundedClean(data.familiaridadInicial, 80),
     recursosSimilares: boundedClean(data.recursosSimilares, 80),
@@ -217,6 +248,10 @@ function validateEventPayload(eventType, data) {
     rating: null,
     suggestion: '',
   };
+
+  if (COUNTRY_NAMES_BY_CODE[payload.countryCode]) {
+    payload.country = COUNTRY_NAMES_BY_CODE[payload.countryCode];
+  }
 
   if ((eventType === 'completion' || eventType === 'feedback') && data.consentTracking !== true) {
     const error = new Error('Consentimiento requerido');
@@ -253,6 +288,17 @@ function validateEventPayload(eventType, data) {
 function normalizeProfile(value) {
   const profile = clean(value);
   return VALID_PROFILES.includes(profile) ? profile : '';
+}
+
+function normalizeCountryCode(value, country) {
+  const code = clean(value).toLowerCase();
+  const countryName = boundedClean(country, 80);
+  if (COUNTRY_NAMES_BY_CODE[code]) return code;
+  if (code === 'other' && countryName) return 'other';
+  const matched = Object.entries(COUNTRY_NAMES_BY_CODE)
+    .find(([, name]) => name.toLocaleLowerCase('es') === countryName.toLocaleLowerCase('es'));
+  if (matched) return matched[0];
+  return countryName ? 'other' : '';
 }
 
 function normalizeProfileKey(value) {
@@ -296,8 +342,71 @@ function normalizePath(path) {
     }));
 }
 
-async function buildStats(env) {
-  const summaryRow = await env.DB.prepare(`
+function resolveStatsScope(searchParams) {
+  const requestedCode = clean(searchParams?.get('country')).toLowerCase();
+  const requestedName = boundedClean(searchParams?.get('countryName'), 80);
+  if (!requestedCode && !requestedName) {
+    return { type: 'global', available: true };
+  }
+
+  if (COUNTRY_NAMES_BY_CODE[requestedCode]) {
+    return {
+      type: 'country',
+      countryCode: requestedCode,
+      countryName: COUNTRY_NAMES_BY_CODE[requestedCode],
+      available: true,
+    };
+  }
+
+  if (requestedCode === 'other' && requestedName && requestedName !== 'Otro') {
+    return {
+      type: 'country',
+      countryCode: 'other',
+      countryName: requestedName,
+      available: true,
+    };
+  }
+
+  const matchedCode = Object.entries(COUNTRY_NAMES_BY_CODE)
+    .find(([, name]) => name.toLocaleLowerCase('es') === requestedName.toLocaleLowerCase('es'))?.[0];
+  if (matchedCode) {
+    return {
+      type: 'country',
+      countryCode: matchedCode,
+      countryName: COUNTRY_NAMES_BY_CODE[matchedCode],
+      available: true,
+    };
+  }
+
+  const error = new Error('País inválido');
+  error.status = 400;
+  throw error;
+}
+
+function countryFilter(scope, alias = '') {
+  if (scope.type !== 'country') return { sql: '', values: [] };
+  const prefix = alias ? `${alias}.` : '';
+  if (scope.countryCode === 'other') {
+    return {
+      sql: `((${prefix}country_code = ? AND ${prefix}country = ?) OR ((${prefix}country_code IS NULL OR ${prefix}country_code = '') AND ${prefix}country = ?))`,
+      values: ['other', scope.countryName, scope.countryName],
+    };
+  }
+  return {
+    sql: `(${prefix}country_code = ? OR ((${prefix}country_code IS NULL OR ${prefix}country_code = '') AND ${prefix}country = ?))`,
+    values: [scope.countryCode, scope.countryName],
+  };
+}
+
+function publicStatsRows(rows, scope) {
+  if (scope.type !== 'country') return rows;
+  return rows.filter(row => Number(row.count || 0) >= MIN_PUBLIC_BUCKET);
+}
+
+async function buildStats(env, searchParams) {
+  const scope = resolveStatsScope(searchParams);
+  const filter = countryFilter(scope);
+  const summaryStatement = env.DB.prepare(`
     SELECT
       COUNT(DISTINCT CASE WHEN event_type = 'visit' THEN session_id END) AS visits,
       SUM(CASE WHEN event_type = 'visit' THEN 1 ELSE 0 END) AS pageViews,
@@ -305,33 +414,60 @@ async function buildStats(env) {
       SUM(CASE WHEN event_type = 'feedback' THEN 1 ELSE 0 END) AS feedback,
       AVG(CASE WHEN event_type = 'completion' THEN evidence END) AS averageScore
     FROM events
-  `).first();
+    ${filter.sql ? `WHERE ${filter.sql}` : ''}
+  `);
+  const summaryRow = filter.values.length
+    ? await summaryStatement.bind(...filter.values).first()
+    : await summaryStatement.first();
 
-  const levels = await groupedRows(
+  const completed = Number(summaryRow?.completed || 0);
+  if (scope.type === 'country' && completed < MIN_COUNTRY_COMPLETIONS) {
+    return {
+      scope: {
+        ...scope,
+        available: false,
+        minSampleSize: MIN_COUNTRY_COMPLETIONS,
+        minBucketSize: MIN_PUBLIC_BUCKET,
+      },
+      updatedAt: new Date().toISOString(),
+    };
+  }
+
+  const levels = publicStatsRows(await groupedRows(
     env,
     'likert_level',
     `event_type = 'completion' AND likert_level IN (${VALID_LIKERT_LEVELS.map(() => '?').join(',')})`,
-    VALID_LIKERT_LEVELS
-  );
-  const profiles = await groupedRows(
+    VALID_LIKERT_LEVELS,
+    scope
+  ), scope);
+  const profiles = publicStatsRows(await groupedRows(
     env,
     'profile',
     `event_type = 'completion' AND profile IN (${VALID_PROFILES.map(() => '?').join(',')})`,
-    VALID_PROFILES
-  );
-  const indicators = await weakIndicators(env);
-  const education = await groupedRows(
+    VALID_PROFILES,
+    scope
+  ), scope);
+  const indicators = publicStatsRows(await weakIndicators(env, scope), scope);
+  const education = publicStatsRows(await groupedRows(
     env,
     'nivel_educativo',
-    `event_type = 'completion' AND nivel_educativo IS NOT NULL AND nivel_educativo != ''`
-  );
+    `event_type = 'completion' AND nivel_educativo IS NOT NULL AND nivel_educativo != ''`,
+    [],
+    scope
+  ), scope);
   const insight = buildPedagogicalInsight(indicators, levels, summaryRow);
 
   return {
+    scope: {
+      ...scope,
+      available: true,
+      minSampleSize: scope.type === 'country' ? MIN_COUNTRY_COMPLETIONS : undefined,
+      minBucketSize: scope.type === 'country' ? MIN_PUBLIC_BUCKET : undefined,
+    },
     summary: {
       visits: Number(summaryRow?.visits || 0),
       pageViews: Number(summaryRow?.pageViews || 0),
-      completed: Number(summaryRow?.completed || 0),
+      completed,
       feedback: Number(summaryRow?.feedback || 0),
       averageScore: Number(summaryRow?.averageScore || 0),
       topLevel: levels.length ? levels[0].label : '',
@@ -511,15 +647,17 @@ function requireAdmin(request, env) {
   }
 }
 
-async function groupedRows(env, column, whereClause, values = []) {
+async function groupedRows(env, column, whereClause, values = [], scope = { type: 'global' }) {
+  const filter = countryFilter(scope);
   const statement = env.DB.prepare(`
     SELECT ${column} AS label, COUNT(*) AS count
     FROM events
-    WHERE ${whereClause}
+    WHERE ${whereClause}${filter.sql ? ` AND ${filter.sql}` : ''}
     GROUP BY ${column}
     ORDER BY count DESC
   `);
-  const result = values.length ? await statement.bind(...values).all() : await statement.all();
+  const bindings = [...values, ...filter.values];
+  const result = bindings.length ? await statement.bind(...bindings).all() : await statement.all();
 
   return (result.results || []).map(row => ({
     label: row.label || 'Sin dato',
@@ -527,12 +665,18 @@ async function groupedRows(env, column, whereClause, values = []) {
   }));
 }
 
-async function weakIndicators(env) {
-  const result = await env.DB.prepare(`
-    SELECT question
-    FROM answers
-    WHERE answer IN ('No', 'A veces')
-  `).all();
+async function weakIndicators(env, scope = { type: 'global' }) {
+  const filter = countryFilter(scope, 'e');
+  const statement = env.DB.prepare(`
+    SELECT a.question
+    FROM answers a
+    INNER JOIN events e ON e.id = a.event_id
+    WHERE e.event_type = 'completion'
+      AND a.answer IN ('No', 'A veces')${filter.sql ? ` AND ${filter.sql}` : ''}
+  `);
+  const result = filter.values.length
+    ? await statement.bind(...filter.values).all()
+    : await statement.all();
 
   const counts = {};
   (result.results || []).forEach(row => {

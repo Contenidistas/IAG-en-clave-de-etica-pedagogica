@@ -339,7 +339,6 @@ if (elements.restartBtn) {
     state.evidence = 0;
     state.currentSlide = 0;
     state.onboardingStep = 0;
-    state.country = '';
     state.familiaridadInicial = '';
     state.recursosSimilares = '';
     state.consentTracking = false;
@@ -347,10 +346,6 @@ if (elements.restartBtn) {
     elements.chips.forEach(c => c.classList.remove('active'));
     elements.playerName.value = '';
 
-    if (elements.countrySelect) elements.countrySelect.value = '';
-    if (elements.countryOtherWrapper) elements.countryOtherWrapper.style.display = 'none';
-    if (elements.countryOtherInput) elements.countryOtherInput.value = '';
-    if (elements.countryFinalInput) elements.countryFinalInput.value = '';
     if (elements.countrySearch) elements.countrySearch.value = '';
     if (typeof renderCountrySelectionState === 'function') renderCountrySelectionState();
 
