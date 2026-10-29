@@ -464,7 +464,7 @@
   // ========== HTML ==========
   const chatbotHTML = `
     <div class="chatbot-wrapper">
-      <div class="chatbot-tooltip" id="chatbotTooltip">
+      <div class="chatbot-tooltip hidden" id="chatbotTooltip">
         <button class="chatbot-tooltip-close" id="chatbotTooltipClose" aria-label="Cerrar" type="button">Cerrar</button>
         <div class="chatbot-tooltip-title">Oportunidad de profundización</div>
         <p>Consultá al Asistente Pedagógico para resolver dudas sobre el uso crítico de IA.</p>
@@ -615,6 +615,10 @@ const addMessage = (content, type = 'bot', save = true) => {
     const currentNode = perfil && appState.currentId && appState.currentId !== 'FIN'
       ? perfil.nodos[appState.currentId]
       : null;
+    const frameworkForNode = node => typeof getNodeFrameworkContext === 'function'
+      ? getNodeFrameworkContext(node)
+      : { text: node.context, reference: node.anepRef };
+    const countryContext = window.CountryContext?.get(appState.country);
 
     const questions = perfil
       ? Object.entries(perfil.nodos)
@@ -623,7 +627,7 @@ const addMessage = (content, type = 'bot', save = true) => {
             id,
             pregunta: node.title,
             ayuda: node.help,
-            referencia: node.anepRef
+            referencia: frameworkForNode(node).reference
           }))
       : [];
     const nivelFinal = appConfig.likert
@@ -645,6 +649,12 @@ const addMessage = (content, type = 'bot', save = true) => {
       perfil: appState.profileBase || appState.profile || null,
       perfilRecorrido: profileKey || null,
       nivelEducativo: appState.nivelEducativo || null,
+      pais: appState.country || null,
+      marcosDelPais: countryContext ? {
+        titulo: countryContext.title,
+        sintesis: countryContext.synthesis,
+        referencias: countryContext.names
+      } : null,
       familiaridadInicial: appState.familiaridadInicial || null,
       recursosSimilares: appState.recursosSimilares || null,
       estadoDelRecorrido: {
@@ -661,8 +671,8 @@ const addMessage = (content, type = 'bot', save = true) => {
         id: appState.currentId,
         pregunta: currentNode.title,
         ayuda: currentNode.help,
-        contexto: currentNode.context,
-        referencia: currentNode.anepRef
+        contexto: frameworkForNode(currentNode).text,
+        referencia: frameworkForNode(currentNode).reference
       } : null,
       respuestasDelRecorrido,
       areasDeMejora,

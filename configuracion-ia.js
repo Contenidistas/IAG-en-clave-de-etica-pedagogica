@@ -49,7 +49,7 @@ likert: [
 { 
   id: 'Prácticas consolidadas', 
   min: 61, max: 80, 
-  desc: 'Se integra la herramienta con criterio. El trabajo muestra una lectura madura y, según los marcos de FING, ANEP, Udelar y Ceibal, se evidencia una validación activa de los resultados.',
+    desc: 'Se integra la herramienta con criterio. El trabajo muestra una lectura madura y una validación activa de los resultados, de acuerdo con los marcos seleccionados para el contexto.',
   color: '#60a5fa'
 },
 { 
@@ -634,7 +634,7 @@ const state = {
   path: [],             // Historial de respuestas
   evidence: 0,          // Puntaje acumulado
   currentSlide: 0,
-  country: 'Uruguay',
+  country: '',
   nivelEducativo: '',
   familiaridadInicial: '',
   recursosSimilares: '',

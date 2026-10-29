@@ -1,4 +1,4 @@
-const CACHE_NAME = 'iag-etica-pedagogica-v22';
+const CACHE_NAME = 'iag-etica-pedagogica-v23';
 
 const CORE_ASSETS = [
   './',
@@ -7,6 +7,7 @@ const CORE_ASSETS = [
   './styles.css',
   './experience.css',
   './storage.js',
+  './country-context.js',
   './principle-network.js',
   './ethical-evidence.js',
   './configuracion-ia.js',
@@ -19,7 +20,31 @@ const CORE_ASSETS = [
   './manifest.webmanifest',
   './icons/icon-192.png',
   './icons/icon-512.png',
-  './icons/maskable-icon-512.png'
+  './icons/maskable-icon-512.png',
+  './icons/flags/uy.svg',
+  './icons/flags/do.svg',
+  './icons/flags/co.svg',
+  './icons/flags/ar.svg',
+  './icons/flags/bo.svg',
+  './icons/flags/br.svg',
+  './icons/flags/cl.svg',
+  './icons/flags/cr.svg',
+  './icons/flags/cu.svg',
+  './icons/flags/ec.svg',
+  './icons/flags/sv.svg',
+  './icons/flags/gt.svg',
+  './icons/flags/hn.svg',
+  './icons/flags/mx.svg',
+  './icons/flags/ni.svg',
+  './icons/flags/pa.svg',
+  './icons/flags/py.svg',
+  './icons/flags/pe.svg',
+  './icons/flags/pr.svg',
+  './icons/flags/ve.svg',
+  './icons/flags/ca.svg',
+  './icons/flags/es.svg',
+  './icons/flags/us.svg',
+  './icons/flags/pt.svg'
 ];
 
 self.addEventListener('install', (event) => {

@@ -2,6 +2,10 @@
 function isForeignCountry() {
   return typeof window.state !== 'undefined' && window.state.country && window.state.country !== 'Uruguay';
 }
+
+function getReportCountryContext() {
+  return window.CountryContext.get(state.country);
+}
 /* ========================================
    GENERADOR DE PDF (jsPDF)
    ======================================== */
@@ -55,7 +59,8 @@ function obtenerPerfilReporte() {
 
 function construirRetroalimentacionMarco(nodo, respuesta) {
   const respuestaTexto = respuesta ? 'La respuesta afirmativa muestra una práctica alineada con los marcos de referencia.' : 'La respuesta negativa señala una oportunidad concreta de mejora y formación.';
-  const referencia = isForeignCountry() ? 'UNESCO (Guía para IA Generativa en Educación)' : (nodo.anepRef || 'ANEP / UNESCO / FING / Udelar / Ceibal');
+  const nodeFramework = typeof getNodeFrameworkContext === 'function' ? getNodeFrameworkContext(nodo) : null;
+  const referencia = nodeFramework?.reference || getReportCountryContext().names.join(', ');
   const titulo = (nodo.title || '').toLowerCase();
   let foco = 'conviene documentar el proceso, contrastar la información generada por IA con fuentes confiables y explicitar qué parte del trabajo corresponde a criterio humano';
 
@@ -75,12 +80,13 @@ function construirRetroalimentacionMarco(nodo, respuesta) {
     foco = 'antes de delegar tareas en la IA, conviene asegurar comprensión conceptual suficiente para evaluar la calidad, pertinencia y límites de la respuesta generada';
   }
 
-  const marcoNombre = isForeignCountry() ? 'las directrices globales de la UNESCO' : 'ANEP, UNESCO, FING, Udelar y Ceibal';
+  const marcoNombre = getReportCountryContext().names.join(', ');
   return `${respuestaTexto} Desde ${marcoNombre}, este punto debe leerse en clave de responsabilidad pedagógica: ${foco}. Referencia vinculada: ${referencia}.`;
 }
 
 function construirSintesisMarco(nivel) {
-  return `El resultado debe interpretarse como un punto de partida para la reflexión, no como una calificación cerrada. Desde UNESCO, el uso de IA en educación requiere transparencia, agencia humana, equidad y revisión crítica de posibles sesgos. Desde ANEP, implica formar ciudadanía digital, promover pensamiento crítico y evitar usos acríticos o indiscriminados. Desde FING, se refuerza la necesidad de definir restricciones claras por tarea, documentar prompts y decisiones, preservar la originalidad y poder explicar el proceso de trabajo. Desde Udelar, se incorporan principios recientes para leer la IAG como práctica académica responsable, trazable y situada. Desde Ceibal, se suma una mirada ética sobre IA para la educación, ciudadanía digital e inclusión. En este recorrido, el nivel "${nivel.id}" orienta qué acuerdos conviene fortalecer para sostener un uso ético, crítico y reflexivo de la IAG.`;
+  const country = getReportCountryContext();
+  return `El resultado debe interpretarse como un punto de partida para la reflexión, no como una calificación cerrada. ${country.synthesis} En este recorrido, el nivel "${nivel.id}" orienta qué acuerdos conviene fortalecer para sostener un uso ético, crítico y reflexivo de la IAG.`;
 }
 
 function obtenerTextoAcuerdoDidactico() {
@@ -107,7 +113,7 @@ function obtenerInformeCalidadReporte(nivel) {
     risks: ['Criterios a fortalecer según respuestas del recorrido.'],
     actions: ['Definir acuerdos explícitos de uso, declaración y verificación.'],
     rubric: ['Declaración de uso de IA.', 'Verificación de fuentes.', 'Aporte humano.', 'Cuidado de datos.'],
-    references: 'ANEP, UNESCO, FING, Udelar y Ceibal'
+    references: getReportCountryContext().names.join(', ')
   };
 }
 
@@ -162,6 +168,7 @@ if (elements.downloadBtn) {
       let y = 55;
       doc.text(`Participante: ${nombre}`, 15, y); y += 8;
       doc.text(`Perfil: ${perfilHumano}`, 15, y); y += 8;
+      doc.text(`País: ${state.country}`, 15, y); y += 8;
       doc.text(`Fecha: ${fecha}`, 15, y); y += 12;
 
       // Nivel
@@ -261,11 +268,9 @@ if (elements.downloadBtn) {
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(11);
       doc.setTextColor(55, 55, 55);
-      y = agregarTextoMultilinea(doc, 'ANEP: La inteligencia artificial en la educación (2024).', 15, y, 180, 6);
-      y = agregarTextoMultilinea(doc, 'UNESCO: Guía para el uso de IA generativa en educación e investigación.', 15, y, 180, 6);
-      y = agregarTextoMultilinea(doc, 'FING: Guía de ética para el uso de IA en unidades curriculares (2026).', 15, y, 180, 6);
-      y = agregarTextoMultilinea(doc, 'Udelar: 11 principios rectores para el desarrollo y uso responsable de IA.', 15, y, 180, 6);
-      y = agregarTextoMultilinea(doc, 'Ceibal: Uso ético de IA. Lineamientos para prácticas educativas críticas, reflexivas, seguras y responsables.', 15, y, 180, 6);
+      getReportCountryContext().references.forEach(reference => {
+        y = agregarTextoMultilinea(doc, `${reference.label}: ${reference.title}. ${reference.url}`, 15, y, 180, 6);
+      });
       y = agregarTextoMultilinea(doc, 'Artículo académico: https://horizontespedagogicos.ibero.edu.co/article/view/3235', 15, y, 180, 6);
       y = agregarTextoMultilinea(doc, 'Artículo académico: https://www.ucuauhtemoc.edu.mx/hubfs/revista-vol-6-num-1/Art%202%20Cuando%20el%20ocultamiento%20se%20hace%20visible.pdf', 15, y, 180, 6);
 
@@ -334,7 +339,7 @@ if (elements.restartBtn) {
     state.evidence = 0;
     state.currentSlide = 0;
     state.onboardingStep = 0;
-    state.country = 'Uruguay';
+    state.country = '';
     state.familiaridadInicial = '';
     state.recursosSimilares = '';
     state.consentTracking = false;
@@ -342,10 +347,12 @@ if (elements.restartBtn) {
     elements.chips.forEach(c => c.classList.remove('active'));
     elements.playerName.value = '';
 
-    if (elements.countrySelect) elements.countrySelect.value = 'Uruguay';
+    if (elements.countrySelect) elements.countrySelect.value = '';
     if (elements.countryOtherWrapper) elements.countryOtherWrapper.style.display = 'none';
     if (elements.countryOtherInput) elements.countryOtherInput.value = '';
-    if (elements.countryFinalInput) elements.countryFinalInput.value = 'Uruguay';
+    if (elements.countryFinalInput) elements.countryFinalInput.value = '';
+    if (elements.countrySearch) elements.countrySearch.value = '';
+    if (typeof renderCountrySelectionState === 'function') renderCountrySelectionState();
 
     if (elements.familiaridadInicial) elements.familiaridadInicial.value = '';
     if (elements.recursosSimilaresRadios && elements.recursosSimilaresRadios.length) {

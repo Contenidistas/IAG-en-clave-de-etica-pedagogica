@@ -217,10 +217,89 @@ function detectLanguage() {
   return 'es';
 }
 
+function detectCountry() {
+  return new URLSearchParams(window.location.search).get('country') || '';
+}
+
+function applyCountryFoundation(countryName) {
+  if (!window.CountryContext) return;
+  const context = window.CountryContext.get(countryName);
+  document.documentElement.dataset.country = countryName;
+  document.title = `Fundamentación · ${context.title}`;
+
+  const synthesis = document.getElementById('foundationCountrySynthesis');
+  if (synthesis) synthesis.textContent = context.synthesis;
+
+  const cards = document.getElementById('foundationCountryCards');
+  if (cards) {
+    cards.replaceChildren();
+    context.references.forEach(reference => {
+      const article = document.createElement('article');
+      const heading = document.createElement('h3');
+      heading.textContent = reference.label;
+      const description = document.createElement('p');
+      description.textContent = reference.title;
+      const link = document.createElement('a');
+      link.href = reference.url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = 'Consultar fuente oficial';
+      article.append(heading, description, link);
+      cards.appendChild(article);
+    });
+  }
+
+  const nationalPanel = document.getElementById('marco-agesic');
+  if (nationalPanel) {
+    nationalPanel.replaceChildren();
+    const kicker = document.createElement('p');
+    kicker.className = 'section-kicker';
+    kicker.textContent = context.hasNationalFramework ? 'Marcos nacionales integrados' : 'Base internacional disponible';
+    const heading = document.createElement('h2');
+    heading.id = 'agesic-title';
+    if (context.code) {
+      const flag = document.createElement('img');
+      flag.src = `icons/flags/${context.code}.svg`;
+      flag.alt = '';
+      flag.className = 'foundation-country-flag';
+      heading.appendChild(flag);
+    }
+    heading.appendChild(document.createTextNode(context.title));
+    const summary = document.createElement('p');
+    summary.textContent = context.summary;
+    const scope = document.createElement('p');
+    scope.textContent = context.hasNationalFramework
+      ? 'Las correspondencias que presenta la herramienta son una adaptación pedagógica para orientar la reflexión; no constituyen una evaluación oficial de cumplimiento.'
+      : 'La herramienta no reutiliza instituciones de otro país. Este contexto queda identificado para incorporar fuentes nacionales verificadas en una próxima ampliación.';
+    nationalPanel.append(kicker, heading, summary, scope);
+  }
+
+  const links = document.getElementById('foundationCountryLinks');
+  if (links) {
+    links.replaceChildren();
+    context.references.forEach(reference => {
+      const link = document.createElement('a');
+      link.href = reference.url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.className = 'framework-link';
+      const label = document.createElement('span');
+      label.className = 'framework-link-label';
+      label.textContent = reference.label;
+      const title = document.createElement('span');
+      title.className = 'framework-link-title';
+      title.textContent = reference.title;
+      link.append(label, title);
+      links.appendChild(link);
+    });
+  }
+}
+
 // ── Inicializar ──────────────────────────────────────────
 (function init() {
   const lang = detectLanguage();
   applyFwTranslations(lang);
+  applyCountryFoundation(detectCountry());
 })();
 
 // ── Botón volver ─────────────────────────────────────────

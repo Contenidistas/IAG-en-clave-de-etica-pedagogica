@@ -70,7 +70,7 @@ async function app(t, { blockedStorage = false } = {}) {
   w.scrollTo = () => {};
   w.HTMLElement.prototype.scrollIntoView = () => {};
   w.fetch = async () => ({ ok: true, json: async () => ({ summary: {}, opinions: [], profiles: [], countries: [], levels: [] }) });
-  for (const file of ['storage.js', 'configuracion-ia.js', 'ethical-evidence.js', 'ui-ia.js', 'principle-network.js', 'juego-ia.js', 'chatbot-component.js']) {
+  for (const file of ['storage.js', 'country-context.js', 'configuracion-ia.js', 'ethical-evidence.js', 'ui-ia.js', 'principle-network.js', 'juego-ia.js', 'chatbot-component.js']) {
     vm.runInContext(fs.readFileSync(path.join(root, file), 'utf8'), dom.getInternalVMContext(), { filename: file });
   }
   await new Promise(resolve => setTimeout(resolve, 150));
@@ -87,11 +87,13 @@ async function app(t, { blockedStorage = false } = {}) {
 
 test('profile selection is accessible and preserves a valid level on reselection', async t => {
   const { w, $, click, change } = await app(t);
+  change('#countrySelect', 'Uruguay');
+  click('#onboardingNextBtn');
   click('[data-profile="docente"]');
   assert.equal($('[data-profile="docente"]').getAttribute('aria-pressed'), 'true');
   assert.equal($('[data-profile="docente"]').tagName, 'BUTTON');
   click('#onboardingNextBtn');
-  assert.equal(w.state.onboardingStep, 1);
+  assert.equal(w.state.onboardingStep, 2);
   const level = $('#nivelEducativo').options[1].value;
   change('#nivelEducativo', level);
   click('#onboardingBackBtn');
@@ -103,22 +105,59 @@ test('profile selection is accessible and preserves a valid level on reselection
 
 test('other country is required and changing to a specialized profile never requests a level', async t => {
   const { w, $, click, change } = await app(t);
-  click('[data-profile="especializado"]');
-  click('#onboardingNextBtn');
-  assert.equal($('#nivelEducativoWrapper').classList.contains('active'), false);
   change('#countrySelect', 'Otro');
   click('#onboardingNextBtn');
-  assert.equal(w.state.onboardingStep, 1);
+  assert.equal(w.state.onboardingStep, 0);
   assert.equal($('#startGuidance').hidden, false);
   $('#countryOther').value = 'Costa Rica';
   $('#countryOther').dispatchEvent(new w.Event('input', { bubbles: true }));
   click('#onboardingNextBtn');
+  assert.equal(w.state.onboardingStep, 1);
+  click('[data-profile="especializado"]');
+  click('#onboardingNextBtn');
   assert.equal(w.state.onboardingStep, 2);
+  assert.equal($('#nivelEducativoWrapper').classList.contains('active'), false);
+});
+
+test('country cards are the first required step and load the matching national frameworks', async t => {
+  const { w, $, click } = await app(t);
+  assert.equal(w.state.onboardingStep, 0);
+  assert.equal(w.state.country, '');
+  assert.ok(w.document.querySelectorAll('.country-card').length >= 20);
+  click('[data-country="Colombia"]');
+  assert.equal(w.state.country, 'Colombia');
+  assert.equal($('[data-country="Colombia"]').getAttribute('aria-pressed'), 'true');
+  assert.equal($('[data-country="Colombia"] img').getAttribute('src'), 'icons/flags/co.svg');
+  assert.match($('#countryContextPreview').textContent, /Marcos de Colombia/);
+  assert.ok($('#frameworkLinks a[href*="mineducacion.gov.co"]'));
+  assert.equal($('#frameworkLinks a[href*="anep.edu.uy"]'), null);
+  click('#onboardingNextBtn');
+  assert.equal(w.state.onboardingStep, 1);
+});
+
+test('Dominican Republic uses national education levels and other countries use an explicit UNESCO fallback', async t => {
+  const { w, $, click, change } = await app(t);
+  click('[data-country="República Dominicana"]');
+  click('#onboardingNextBtn');
+  click('[data-profile="docente"]');
+  click('#onboardingNextBtn');
+  assert.match($('#nivelEducativo').textContent, /Nivel Primario/);
+  assert.ok($('#frameworkLinks a[href*="educando.edu.do"]'));
+
+  click('#onboardingBackBtn');
+  click('#onboardingBackBtn');
+  change('#countrySelect', 'Argentina');
+  assert.match($('#countryContextPreview').textContent, /base internacional|Marco internacional/i);
+  assert.equal($('#frameworkLinks a[href*="anep.edu.uy"]'), null);
+  assert.equal($('#frameworkLinks').querySelectorAll('a').length, 1);
+  assert.equal(w.state.country, 'Argentina');
 });
 
 test('all three profiles can reach the questionnaire without consent or another mode dialog', async t => {
   for (const profile of ['estudiante', 'docente', 'especializado']) {
     const { $, click, change } = await app(t);
+    change('#countrySelect', 'Uruguay');
+    click('#onboardingNextBtn');
     click(`[data-profile="${profile}"]`);
     click('#onboardingNextBtn');
     if (profile !== 'especializado') change('#nivelEducativo', $('#nivelEducativo').options[1].value);
@@ -134,6 +173,8 @@ test('all three profiles can reach the questionnaire without consent or another 
 
 test('anonymous-record consent is operable and stays synchronized with application state', async t => {
   const { w, $, click, change } = await app(t);
+  change('#countrySelect', 'Uruguay');
+  click('#onboardingNextBtn');
   click('[data-profile="docente"]');
   click('#onboardingNextBtn');
   change('#nivelEducativo', $('#nivelEducativo').options[1].value);
@@ -167,6 +208,8 @@ test('anonymous-record consent is operable and stays synchronized with applicati
 
 test('changing language preserves the education level and updates setup copy', async t => {
   const { $, click, change } = await app(t);
+  change('#countrySelect', 'Uruguay');
+  click('#onboardingNextBtn');
   click('[data-profile="docente"]');
   click('#onboardingNextBtn');
   change('#nivelEducativo', $('#nivelEducativo').options[1].value);
@@ -187,6 +230,8 @@ test('back from the first step returns home; hidden slides cannot receive keyboa
 
 test('blocked storage does not prevent setup, preferences or chatbot initialization', async t => {
   const { w, $, click, change } = await app(t, { blockedStorage: true });
+  change('#countrySelect', 'Brasil');
+  click('#onboardingNextBtn');
   click('[data-profile="estudiante"]');
   click('#onboardingNextBtn');
   change('#languageSelect', 'pt');
@@ -207,6 +252,8 @@ test('landing cards respond to keyboard activation', async t => {
 
 test('student routing is stable when educational labels are translated', async t => {
   const { w, $, click, change } = await app(t);
+  change('#countrySelect', 'Uruguay');
+  click('#onboardingNextBtn');
   click('[data-profile="estudiante"]');
   click('#onboardingNextBtn');
   change('#nivelEducativo', $('#nivelEducativo').options[1].value);
@@ -219,11 +266,14 @@ test('student routing is stable when educational labels are translated', async t
 });
 
 test('the case laboratory remains reachable directly from home', async t => {
-  const { w, click } = await app(t);
+  const { w, click, change } = await app(t);
   click('#onboardingBackBtn');
   click('#landingGoToCases');
+  change('#countrySelect', 'Colombia');
+  click('#onboardingNextBtn');
   click('#btnConfirmDocenteProfile');
   assert.equal(w.document.body.classList.contains('laboratorio-active'), true);
+  assert.equal(w.state.country, 'Colombia');
 });
 
 test('new styles parse, element IDs are unique, and every cached asset exists', async t => {
@@ -239,7 +289,7 @@ test('new styles parse, element IDs are unique, and every cached asset exists', 
   for (const asset of assets) assert.ok(fs.existsSync(path.join(root, asset)), asset);
 });
 
-test('combined styles keep the setup stepper in a padded three-column grid', async t => {
+test('combined styles keep the setup stepper in a padded four-column grid', async t => {
   const { w, $ } = await app(t);
   for (const file of ['styles.css', 'experience.css']) {
     const style = w.document.createElement('style');
@@ -248,7 +298,7 @@ test('combined styles keep the setup stepper in a padded three-column grid', asy
   }
   const steps = w.getComputedStyle($('#onboardingDots'));
   assert.equal(steps.display, 'grid');
-  assert.equal(steps.gridTemplateColumns, 'repeat(3, minmax(0, 1fr))');
+  assert.equal(steps.gridTemplateColumns, 'repeat(4, minmax(0, 1fr))');
   const panel = w.getComputedStyle($('#onboardingProgress'));
   assert.ok(parseFloat(panel.paddingLeft) > 0);
   assert.ok(parseFloat(panel.paddingTop) > 0);
@@ -354,6 +404,7 @@ test('a multi-axis answer updates both nodes; changing or removing it recomputes
 
 test('hover and focus show actual answers, rationale and primary-source links without HTML injection', async t => {
   const { w, $ } = await app(t);
+  w.state.country = 'Uruguay';
   w.state.profileKey = 'docente';
   w.state.path = [{ id: 'g1', question: '<img src=x onerror=alert(1)> ¿Verificás?', answerKey: 'no', answer: 'No' }];
   const graph = $('#principleGraph');

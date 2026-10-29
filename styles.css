@@ -433,6 +433,16 @@ body.quiz-active .app-header {
   padding: 0.5rem;
 }
 
+.foundation-country-flag {
+  width: 36px;
+  height: 24px;
+  margin-right: 0.65rem;
+  border-radius: 4px;
+  object-fit: cover;
+  vertical-align: -0.15em;
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.14);
+}
+
 /* ========== 4) CONTENEDOR PRINCIPAL ========== */
 .container {
   max-width: 1200px;

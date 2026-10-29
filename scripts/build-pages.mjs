@@ -15,6 +15,7 @@ const publicFiles = [
   'experience.css',
   'admin.css',
   'storage.js',
+  'country-context.js',
   'configuracion-ia.js',
   'canonical-redirect.js',
   'ethical-evidence.js',

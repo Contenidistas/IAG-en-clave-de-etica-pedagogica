@@ -112,3 +112,38 @@ for (const [axis, guidance] of Object.entries(AGESIC_AXIS_GUIDANCE)) {
     label: `Agesic · Principio ${guidance.principle}`, url: AGESIC_PRINCIPLES_URL
   });
 }
+
+const INTERNATIONAL_ETHICAL_BASE = {
+  transparencia: 'UNESCO recomienda reglas claras, información comprensible y responsabilidad humana en el uso educativo de la IA.',
+  verificacion: 'UNESCO advierte que los resultados de la IA generativa pueden ser incorrectos o sesgados y requieren evaluación humana.',
+  privacidad: 'UNESCO aborda los riesgos para la privacidad de datos y propone un uso centrado en las personas.',
+  equidad: 'UNESCO considera la inclusión, la diversidad y el acceso equitativo como condiciones del uso educativo de IA.',
+  agencia: 'UNESCO sitúa la agencia humana, el pensamiento crítico y la responsabilidad en el centro de la educación con IA.'
+};
+
+function getEthicalFrameworkGuidance(axis) {
+  const selectedCountry = window.state?.country || '';
+  const country = window.CountryContext?.get(selectedCountry);
+  const original = ETHICAL_FRAMEWORK_GUIDANCE[axis];
+  if (!country || country.country === 'Uruguay') {
+    return {
+      ...original,
+      countryNote: original.agesic || '',
+      interpretation: 'Orientación pedagógica basada en tus respuestas y en los marcos citados; no es una calificación oficial. La vinculación con Agesic es una adaptación educativa de la Estrategia Nacional de IA 2024–2030.'
+    };
+  }
+
+  const local = country.axisGuidance?.[axis] || {};
+  const international = window.CountryContext.internationalReference;
+  const sources = [...(local.sources || []), international]
+    .filter((source, index, list) => list.findIndex(item => item.url === source.url) === index);
+  return {
+    basis: local.basis || INTERNATIONAL_ETHICAL_BASE[axis],
+    action: original.action,
+    sources,
+    countryNote: local.note || country.summary,
+    interpretation: country.hasNationalFramework
+      ? `Orientación pedagógica basada en tus respuestas y en los marcos citados para ${country.country}; no es una evaluación oficial de cumplimiento.`
+      : `Orientación pedagógica basada en UNESCO. Aún no se incorporó un marco nacional curado para ${country.country}.`
+  };
+}

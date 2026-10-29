@@ -102,7 +102,7 @@
                     </div>
                     <div class="landing-card-content">
                       <h3 data-i18n="card_game_title">Autodiagnóstico</h3>
-                      <p data-i18n="card_game_desc">Evaluá tus prácticas de aula con base en los marcos ANEP, Ceibal, UNESCO y Udelar.</p>
+                      <p data-i18n="card_game_desc">Evaluá tus prácticas con marcos éticos y educativos adaptados a tu país.</p>
                       <span class="landing-card-btn" data-i18n="card_game_btn">Comenzar autodiagnóstico →</span>
                     </div>
                   </div>
@@ -128,7 +128,7 @@
                   <article class="intro-feature-card">
                     <span>02</span>
                     <h3>Marcos de referencia</h3>
-                    <p>Articula aportes de UNESCO, ANEP, FING, Udelar, Ceibal y Agesic para orientar decisiones pedagógicas.</p>
+                    <p>Articula la guía de UNESCO con marcos nacionales verificados para orientar decisiones pedagógicas situadas.</p>
                   </article>
                   <article class="intro-feature-card">
                     <span>03</span>
@@ -161,8 +161,8 @@
 
                 <div class="setup-progress-panel" id="onboardingProgress">
                   <div class="setup-progress-copy">
-                    <span id="onboardingStepCounter">Paso 1 de 3</span>
-                    <strong id="onboardingStepTitle" tabindex="-1">Punto de partida</strong>
+                    <span id="onboardingStepCounter">Paso 1 de 4</span>
+                    <strong id="onboardingStepTitle" tabindex="-1">Tu país</strong>
                   </div>
                   <div class="setup-progress-steps" id="onboardingDots" aria-label="Progreso del inicio guiado"></div>
                 </div>
@@ -205,41 +205,31 @@
                   <p id="profilePreview" class="profile-preview" role="status" data-i18n="setup_profile_hint">Elegí el rol que mejor represente tu práctica hoy. Podés cambiarlo antes de comenzar.</p>
                 </div>
 
-                <!-- Selector de país -->
-                <div id="countryWrapper" class="onboarding-step" data-onboarding-step="contexto" style="max-width: 500px; margin: 1rem auto;">
-                  <label for="countrySelect" style="display:block; margin-bottom:0.5rem; font-weight:600; text-align:center;" data-i18n="label_country">País</label>
-                  <select id="countrySelect" name="pais" class="input select-country-dropdown" style="display:block; width:100%;">
-                    <option value="Uruguay" selected>🇺🇾 Uruguay</option>
-                    <option value="Argentina">🇦🇷 Argentina</option>
-                    <option value="Brasil">🇧🇷 Brasil</option>
-                    <option value="Chile">🇨🇱 Chile</option>
-                    <option value="Colombia">🇨🇴 Colombia</option>
-                    <option value="México">🇲🇽 México</option>
-                    <option value="Paraguay">🇵🇾 Paraguay</option>
-                    <option value="Perú">🇵🇪 Perú</option>
-                    <option value="Bolivia">🇧🇴 Bolivia</option>
-                    <option value="Ecuador">🇪🇨 Ecuador</option>
-                    <option value="Venezuela">🇻🇪 Venezuela</option>
-                    <option value="España">🇪🇸 España</option>
-                    <option value="Estados Unidos">🇺🇸 Estados Unidos</option>
-                    <option value="Reino Unido">🇬🇧 Reino Unido</option>
-                    <option value="Canadá">🇨🇦 Canadá</option>
-                    <option value="Francia">🇫🇷 Francia</option>
-                    <option value="Portugal">🇵🇹 Portugal</option>
-                    <option value="Italia">🇮🇹 Italia</option>
-                    <option value="Alemania">🇩🇪 Alemania</option>
-                    <option value="Otro" data-i18n="opt_other">🌐 Otro (especificar)</option>
+                <!-- El país es el primer dato obligatorio: define niveles y marcos -->
+                <div id="countryWrapper" class="onboarding-step country-step" data-onboarding-step="pais">
+                  <div class="country-step-heading">
+                    <p class="section-kicker">Contexto del recorrido</p>
+                    <h3 id="countryQuestion">¿Desde qué país participás?</h3>
+                    <p>La selección adapta los niveles educativos y los marcos de referencia. Podrás cambiarla antes de comenzar.</p>
+                  </div>
+                  <label class="sr-only" for="countrySearch">Buscar país</label>
+                  <input id="countrySearch" class="input country-search" type="search" autocomplete="country-name" placeholder="Buscar país…" />
+                  <div id="countryCards" class="country-card-grid" role="group" aria-labelledby="countryQuestion"></div>
+                  <label class="sr-only" for="countrySelect" data-i18n="label_country">País</label>
+                  <select id="countrySelect" name="pais" class="input select-country-dropdown country-native-select" aria-hidden="true" tabindex="-1">
+                    <option value="">Seleccioná tu país</option>
                   </select>
+                  <div id="countryContextPreview" class="country-context-preview" role="status" aria-live="polite" hidden></div>
                 </div>
 
                 <!-- Campo "Otro país" (aparece si selecciona "Otro") -->
-                <div id="countryOtherWrapper" class="onboarding-step" data-onboarding-step="contexto" style="max-width: 400px; margin: 0 auto 1rem auto; display:none;">
+                <div id="countryOtherWrapper" class="onboarding-step" data-onboarding-step="pais" style="max-width: 500px; margin: 0 auto 1rem auto; display:none;">
                   <label for="countryOther" style="display:block; margin-bottom:0.5rem; font-weight:600;" data-i18n="label_country_other">Especificá tu país</label>
                   <input type="text" id="countryOther" class="input" placeholder="Ingresá tu país" data-i18n-placeholder="placeholder_country_other" />
                 </div>
 
                 <!-- Campo oculto para guardar el país final -->
-                <input type="hidden" id="countryFinal" value="Uruguay" />
+                <input type="hidden" id="countryFinal" value="" />
 
                 <!-- Campo de nivel educativo (aparece dinámicamente según perfil) -->
                 <div id="nivelEducativoWrapper" class="onboarding-step" data-onboarding-step="contexto" style="max-width: 500px; margin: 1.5rem auto; display: none;">
@@ -375,7 +365,7 @@
             Una propuesta construida desde investigación, formación docente, experiencia de aula y marcos uruguayos recientes para pensar el uso ético, crítico y reflexivo de la IA.
           </p>
           <div class="framework-hero-actions">
-            <a href="fundamentacion.html" class="framework-read-more" data-i18n="fw_read_full">Leer fundamentación completa</a>
+            <a href="fundamentacion.html" class="framework-read-more" id="frameworkFoundationLink" data-i18n="fw_read_full">Leer fundamentación completa</a>
             <button type="button" class="framework-read-more framework-toggle-btn" id="toggleFrameworkBtn">Ver marcos</button>
           </div>
         </div>
@@ -392,7 +382,7 @@
           <span data-i18n="fw_compact_items">transparencia, verificación, privacidad, sesgos y aporte humano.</span>
         </div>
 
-        <div class="framework-links" aria-label="Accesos directos a marcos de referencia">
+        <div class="framework-links" id="frameworkLinks" aria-label="Accesos directos a marcos de referencia">
           <a href="https://www.gub.uy/agencia-gobierno-electronico-sociedad-informacion-conocimiento/comunicacion/publicaciones/estrategia-nacional-inteligencia-artificial-del-uruguay-2024-2030" target="_blank" rel="noopener noreferrer" class="framework-link" lang="es">
             <span class="framework-link-label">Agesic</span>
             <span class="framework-link-title">Estrategia Nacional de IA 2024–2030</span>
@@ -1056,11 +1046,13 @@
     <p>
       <span data-i18n="footer_created_by">Creado por</span> <strong>Prof. Esp. Santiago Hernández</strong> <span data-i18n="and_word">y</span> <strong>Prof. Mag. Diego Daluz</strong><br>
       <span data-i18n="footer_based_on">Basado en marcos de</span>
+      <span id="footerFrameworks">
       <a href="https://www.anep.edu.uy/sites/default/files/images/2024/noticias/julio/240709/Documento%20IA.pdf" target="_blank" rel="noopener noreferrer">ANEP</a>,
       <a href="https://unesdoc.unesco.org/ark:/48223/pf0000389227" target="_blank" rel="noopener noreferrer">UNESCO</a>,
       <a href="https://www.fing.edu.uy/sites/default/files/2026-02/guia-de-etica-fing_2026.pdf" target="_blank" rel="noopener noreferrer">FING</a>,
       <a href="https://fcea.udelar.edu.uy/institucional/novedades/9667-politica-institucional-de-inteligencia-artificial-de-la-universidad-de-la-republica.html" target="_blank" rel="noopener noreferrer">Udelar</a> <span data-i18n="and_word">y</span>
       <a href="https://ceibal.edu.uy/politicas/buenas-practicas-uso-ia-educacion/" target="_blank" rel="noopener noreferrer">Ceibal</a>
+      </span>
     </p>
     <p style="margin-top: 0.75rem; font-size: 0.85rem; opacity: 0.8;">
       🔄 <span data-i18n="footer_updated_text">Sitio en constante actualización con nuevas funcionalidades y mejoras</span>
@@ -1092,6 +1084,7 @@
        SCRIPTS JAVASCRIPT
        ========================================== -->
   <script src="storage.js"></script>
+  <script src="country-context.js"></script>
   <script src="configuracion-ia.js"></script>
   <script src="ethical-evidence.js"></script>
   <script src="ui-ia.js"></script>

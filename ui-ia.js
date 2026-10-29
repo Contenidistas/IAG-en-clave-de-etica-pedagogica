@@ -2,6 +2,12 @@
 function isForeignCountry() {
   return typeof window.state !== 'undefined' && window.state.country && window.state.country !== 'Uruguay';
 }
+
+function getActiveCountryContext() {
+  return window.CountryContext
+    ? window.CountryContext.get(window.state && window.state.country)
+    : { country: window.state?.country || '', hasNationalFramework: false, title: 'Marco internacional de referencia', names: ['UNESCO'], summary: '', references: [] };
+}
 /* ========================================
    ELEMENTOS DEL DOM (ACTUALIZADO CON NIVEL EDUCATIVO)
    ======================================== */
@@ -25,7 +31,7 @@ const TRANSLATIONS = {
     footer_ia_declaration: "Declaración de uso de IA",
     modal_ia_disclosure_title: "Declaración de uso de IA",
     modal_ia_disclosure_p1: "Esta herramienta fue construida con asistencia de inteligencia artificial generativa en tareas de ideación, redacción, revisión de interfaz, organización de código y mejora progresiva de la experiencia de usuario.",
-    modal_ia_disclosure_p2: "El uso de IA se realizó bajo criterios de transparencia, supervisión humana, protección de datos, verificación, pertinencia pedagógica y mejora continua, coherentes con los marcos de ANEP, UNESCO, FING, Udelar y Ceibal integrados en la propia herramienta.",
+    modal_ia_disclosure_p2: "El uso de IA se realizó bajo criterios de transparencia, supervisión humana, protección de datos, verificación, pertinencia pedagógica y mejora continua, coherentes con los marcos internacionales y nacionales integrados en la herramienta.",
     modal_ia_disclosure_l1_title: "Responsabilidad humana:",
     modal_ia_disclosure_l1_text: "las decisiones pedagógicas, conceptuales y de diseño fueron revisadas y validadas por los autores.",
     modal_ia_disclosure_l2_title: "Trazabilidad:",
@@ -123,12 +129,13 @@ const TRANSLATIONS = {
     hero_title: "IAG en clave de ética pedagógica",
     hero_subtitle: "Un espacio de autoevaluación y reflexión ética para revisar tus prácticas docentes e incorporar el uso crítico de la inteligencia artificial generativa de acuerdo a marcos de referencia actuales.",
     card_game_title: "Autodiagnóstico",
-    card_game_desc: "Evaluá tus prácticas de aula con base en los marcos ANEP, Ceibal, UNESCO y Udelar.",
+    card_game_desc: "Evaluá tus prácticas con marcos éticos y educativos adaptados a tu país.",
     card_game_btn: "Comenzar autodiagnóstico →",
     card_lab_title: "Laboratorio de casos",
     card_lab_desc: "Explorá y resolvé de forma interactiva dilemas éticos y situados en formato taller.",
     card_lab_btn: "Abrir modo taller →",
 
+    step_pais: "País",
     step_perfil: "Perfil",
     step_contexto: "Contexto",
     step_cierre: "Uso y privacidad",
@@ -1358,7 +1365,8 @@ function updateAppLanguage(lang = 'es') {
 
   // 6. Títulos de ONBOARDING_STEP_META
   if (typeof ONBOARDING_STEP_META !== 'undefined' && ONBOARDING_STEP_META) {
-    if (ONBOARDING_STEP_META.perfil) ONBOARDING_STEP_META.perfil.title = t.step_perfil;
+    if (ONBOARDING_STEP_META.pais) ONBOARDING_STEP_META.pais.title = t.step_pais || setupText('pais');
+    if (ONBOARDING_STEP_META.profile) ONBOARDING_STEP_META.profile.title = t.step_perfil;
     if (ONBOARDING_STEP_META.contexto) ONBOARDING_STEP_META.contexto.title = t.step_contexto;
     if (ONBOARDING_STEP_META.cierre) ONBOARDING_STEP_META.cierre.title = t.step_cierre;
   }
@@ -1411,6 +1419,9 @@ const elements = {
   frameworkAudienceTitle: document.getElementById('frameworkAudienceTitle'),
   frameworkAudienceIntro: document.getElementById('frameworkAudienceIntro'),
   frameworkContextText: document.getElementById('frameworkContextText'),
+  frameworkLinks: document.getElementById('frameworkLinks'),
+  frameworkFoundationLink: document.getElementById('frameworkFoundationLink'),
+  footerFrameworks: document.getElementById('footerFrameworks'),
   toggleFrameworkBtn: document.getElementById('toggleFrameworkBtn'),
   aiUseDisclosureBtn: document.getElementById('aiUseDisclosureBtn'),
 
@@ -1421,6 +1432,9 @@ const elements = {
 
   // Caracterización
   countrySelect: document.getElementById('countrySelect'),
+  countrySearch: document.getElementById('countrySearch'),
+  countryCards: document.getElementById('countryCards'),
+  countryContextPreview: document.getElementById('countryContextPreview'),
   countryOtherWrapper: document.getElementById('countryOtherWrapper'),
   countryOtherInput: document.getElementById('countryOther'),
   countryFinalInput: document.getElementById('countryFinal'),
@@ -1576,6 +1590,40 @@ const NIVELES_POR_PAIS = {
       { key: 'level_terciaria_tecnica', default: 'Educación Terciaria Técnica' },
       { key: 'level_formacion_docente', default: 'Formación Docente' },
       { key: 'level_universitaria', default: 'Universitaria' }
+    ]
+  },
+  'Colombia': {
+    framework: 'MEN Colombia / CONPES 4144 / UNESCO',
+    docente: [
+      { key: 'level_co_pre_school', default: 'Educación inicial y preescolar' },
+      { key: 'level_co_primary', default: 'Educación básica primaria' },
+      { key: 'level_co_secondary', default: 'Educación básica secundaria y media' },
+      { key: 'level_co_technical', default: 'Educación técnica y tecnológica' },
+      { key: 'level_co_higher', default: 'Educación superior' }
+    ],
+    estudiante: [
+      { key: 'level_co_secondary', default: 'Educación básica secundaria y media' },
+      { key: 'level_co_technical', default: 'Educación técnica y tecnológica' },
+      { key: 'level_co_teacher', default: 'Formación docente' },
+      { key: 'level_co_undergrad', default: 'Pregrado universitario' },
+      { key: 'level_co_postgrad', default: 'Posgrado' }
+    ]
+  },
+  'República Dominicana': {
+    framework: 'MINERD / Estrategia Nacional de Educación Digital / UNESCO',
+    docente: [
+      { key: 'level_do_initial', default: 'Nivel Inicial' },
+      { key: 'level_do_primary', default: 'Nivel Primario' },
+      { key: 'level_do_secondary', default: 'Nivel Secundario' },
+      { key: 'level_do_technical', default: 'Educación técnico-profesional' },
+      { key: 'level_do_higher', default: 'Educación superior' }
+    ],
+    estudiante: [
+      { key: 'level_do_secondary', default: 'Nivel Secundario' },
+      { key: 'level_do_technical', default: 'Educación técnico-profesional' },
+      { key: 'level_do_teacher', default: 'Formación docente' },
+      { key: 'level_do_undergrad', default: 'Grado universitario' },
+      { key: 'level_do_postgrad', default: 'Posgrado' }
     ]
   }
 };
@@ -1800,6 +1848,114 @@ document.addEventListener('click', (evt) => {
 /* ========================================
    MANEJO DE PAÍS
    ======================================== */
+function renderCountrySelectionState() {
+  if (!elements.countrySelect) return;
+  const selected = elements.countrySelect.value;
+  elements.countryCards?.querySelectorAll('.country-card').forEach(card => {
+    const active = card.dataset.country === selected;
+    card.classList.toggle('active', active);
+    card.setAttribute('aria-pressed', String(active));
+  });
+
+  if (!elements.countryContextPreview) return;
+  const finalCountry = elements.countryFinalInput?.value || '';
+  if (!selected || (selected === 'Otro' && !finalCountry)) {
+    elements.countryContextPreview.hidden = true;
+    elements.countryContextPreview.replaceChildren();
+    return;
+  }
+  const context = window.CountryContext.get(finalCountry);
+  const title = document.createElement('strong');
+  title.className = 'country-context-title';
+  if (context.code) {
+    const flag = document.createElement('img');
+    flag.src = `icons/flags/${context.code}.svg`;
+    flag.alt = '';
+    flag.className = 'country-context-flag';
+    title.appendChild(flag);
+  }
+  title.appendChild(document.createTextNode(context.title));
+  const description = document.createElement('span');
+  description.textContent = context.summary;
+  elements.countryContextPreview.replaceChildren(title, description);
+  elements.countryContextPreview.hidden = false;
+}
+
+function initializeCountryCards() {
+  if (!elements.countrySelect || !window.CountryContext) return;
+  const currentValue = elements.countrySelect.value;
+  elements.countrySelect.replaceChildren();
+  const placeholder = document.createElement('option');
+  placeholder.value = '';
+  placeholder.textContent = 'Seleccioná tu país';
+  elements.countrySelect.appendChild(placeholder);
+
+  window.CountryContext.countries.forEach(country => {
+    const option = document.createElement('option');
+    option.value = country.name;
+    option.textContent = `${country.flag} ${country.name === 'Otro' ? 'Otro país' : country.name}`;
+    elements.countrySelect.appendChild(option);
+  });
+  elements.countrySelect.value = currentValue && Array.from(elements.countrySelect.options).some(option => option.value === currentValue)
+    ? currentValue : '';
+
+  if (elements.countryCards) {
+    elements.countryCards.replaceChildren();
+    window.CountryContext.countries.forEach(country => {
+      const context = country.name === 'Otro' ? null : window.CountryContext.get(country.name);
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'country-card';
+      button.dataset.country = country.name;
+      button.setAttribute('aria-pressed', 'false');
+
+      const flag = document.createElement(country.code ? 'img' : 'span');
+      flag.className = 'country-card-flag';
+      if (country.code) {
+        flag.src = `icons/flags/${country.code}.svg`;
+        flag.alt = '';
+        flag.loading = 'lazy';
+      } else {
+        flag.setAttribute('aria-hidden', 'true');
+        flag.textContent = country.flag;
+      }
+
+      const copy = document.createElement('span');
+      copy.className = 'country-card-copy';
+      const name = document.createElement('span');
+      name.className = 'country-card-name';
+      name.textContent = country.name === 'Otro' ? 'Otro país' : country.name;
+      const badge = document.createElement('small');
+      badge.className = 'country-card-badge';
+      badge.textContent = country.name === 'Otro'
+        ? 'Especificar país'
+        : context.hasNationalFramework ? 'Marco nacional integrado' : 'Base internacional UNESCO';
+      copy.append(name, badge);
+      button.append(flag, copy);
+      button.addEventListener('click', () => {
+        elements.countrySelect.value = country.name;
+        elements.countrySelect.dispatchEvent(new Event('change', { bubbles: true }));
+        if (country.name === 'Otro') {
+          window.setTimeout(() => elements.countryOtherInput?.focus(), 80);
+        }
+      });
+      elements.countryCards.appendChild(button);
+    });
+  }
+
+  if (elements.countrySearch) {
+    elements.countrySearch.addEventListener('input', event => {
+      const query = event.target.value.trim().toLocaleLowerCase('es');
+      elements.countryCards?.querySelectorAll('.country-card').forEach(card => {
+        card.hidden = Boolean(query) && !card.dataset.country.toLocaleLowerCase('es').includes(query);
+      });
+    });
+  }
+  renderCountrySelectionState();
+}
+
+initializeCountryCards();
+
 if (elements.countrySelect && elements.countryFinalInput) {
   const updateCountryFinal = () => {
     const value = elements.countrySelect.value;
@@ -1826,6 +1982,10 @@ if (elements.countrySelect && elements.countryFinalInput) {
         updateNivelEducativo(window.state.profile);
       }
     }
+    renderCountrySelectionState();
+    if (typeof updateFrameworkAudience === 'function') {
+      updateFrameworkAudience(window.state?.profile || null);
+    }
   };
 
   elements.countrySelect.addEventListener('change', () => {
@@ -1839,6 +1999,10 @@ if (elements.countrySelect && elements.countryFinalInput) {
         elements.countryFinalInput.value = elements.countryOtherInput.value.trim();
         if (window.state) {
           window.state.country = elements.countryFinalInput.value;
+        }
+        renderCountrySelectionState();
+        if (typeof updateFrameworkAudience === 'function') {
+          updateFrameworkAudience(window.state?.profile || null);
         }
         updateStartButtonState();
       }
@@ -2098,30 +2262,66 @@ const FRAMEWORK_AUDIENCE_COPY = {
 function updateFrameworkAudience(perfil) {
   if (!elements.frameworkCard) return;
   const audience = perfil || 'none';
-  const isForeign = isForeignCountry();
   const lang = (window.state && window.state.lang) || 'es';
   const t = TRANSLATIONS[lang] || TRANSLATIONS['es'];
+  const context = getActiveCountryContext();
+  const selectedCountry = window.state?.country || '';
 
-  const baseTitle = isForeign
-    ? (t.fw_foreign_title || 'Marco Internacional de la UNESCO')
-    : (t.fw_base_title || 'Marcos de UNESCO, ANEP, FING, Udelar, Ceibal y Agesic');
-
-  let title = t[`fw_${audience}_title`] || baseTitle;
+  const audienceTitle = t[`fw_${audience}_title`];
+  let title = audienceTitle && selectedCountry ? `${audienceTitle} · ${context.country}` : context.title;
   let intro = t[`fw_${audience}_intro`] || (t.fw_base_intro || 'Una propuesta construida desde investigación, formación docente...');
-  let context = t[`fw_${audience}_context`] || (isForeign ? (t.fw_foreign_context || 'Para países fuera de Uruguay, la herramienta adapta las referencias priorizando la UNESCO.') : (t.fw_base_context || 'Estas herramientas requieren criterios compartidos...'));
+  let contextText = selectedCountry
+    ? context.summary
+    : 'Seleccioná tu país al iniciar el recorrido para cargar los marcos de referencia correspondientes.';
   let buttonText = audience === 'especializado' ? (t.fw_btn_hide || 'Ocultar marcos') : (t.fw_btn_view || 'Ver marcos');
 
-  if (isForeign && audience === 'none') {
-    title = t.fw_foreign_title || 'Marco Internacional de la UNESCO';
-  }
-
   elements.frameworkCard.dataset.audience = audience;
+  elements.frameworkCard.dataset.country = selectedCountry;
   elements.frameworkCard.classList.toggle('framework-expanded', audience === 'especializado');
 
   if (elements.frameworkAudienceTitle) elements.frameworkAudienceTitle.textContent = title;
   if (elements.frameworkAudienceIntro) elements.frameworkAudienceIntro.textContent = intro;
-  if (elements.frameworkContextText) elements.frameworkContextText.textContent = context;
+  if (elements.frameworkContextText) elements.frameworkContextText.textContent = contextText;
   if (elements.toggleFrameworkBtn) elements.toggleFrameworkBtn.textContent = buttonText;
+
+  if (elements.frameworkLinks) {
+    elements.frameworkLinks.replaceChildren();
+    context.references.forEach(reference => {
+      const link = document.createElement('a');
+      link.href = reference.url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.className = 'framework-link';
+      const label = document.createElement('span');
+      label.className = 'framework-link-label';
+      label.textContent = reference.label;
+      const linkTitle = document.createElement('span');
+      linkTitle.className = 'framework-link-title';
+      linkTitle.textContent = reference.title;
+      link.append(label, linkTitle);
+      elements.frameworkLinks.appendChild(link);
+    });
+  }
+
+  if (elements.frameworkFoundationLink) {
+    const parameters = new URLSearchParams();
+    if (selectedCountry) parameters.set('country', selectedCountry);
+    if (lang) parameters.set('lang', lang);
+    elements.frameworkFoundationLink.href = `fundamentacion.html${parameters.size ? `?${parameters.toString()}` : ''}`;
+  }
+
+  if (elements.footerFrameworks) {
+    elements.footerFrameworks.replaceChildren();
+    context.references.forEach((reference, index) => {
+      if (index) elements.footerFrameworks.append(document.createTextNode(index === context.references.length - 1 ? ' y ' : ', '));
+      const link = document.createElement('a');
+      link.href = reference.url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = reference.label;
+      elements.footerFrameworks.appendChild(link);
+    });
+  }
 }
 if (elements.nextSlide) {
   elements.nextSlide.addEventListener('click', () => { 
@@ -2169,17 +2369,19 @@ function scrollToDiagnosticStart() {
 
 function focusInitialField(targetKey) {
   const targetMap = {
+    pais: elements.countryCards || elements.countrySelect,
     profile: elements.profileSelectorPanel,
     nivel: elements.nivelEducativoWrapper,
     contexto: elements.playerName || elements.countrySelect,
-    country: isCountryOtherVisible() ? elements.countryOtherInput : elements.countrySelect,
+    country: isCountryOtherVisible() ? elements.countryOtherInput : (elements.countryCards || elements.countrySelect),
     familiaridad: elements.familiaridadInicialWrapper,
     recursos: elements.recursosSimilaresWrapper,
     start: elements.startBtn
   };
   const focusMap = {
+    pais: elements.countryCards?.querySelector('.country-card') || elements.countrySearch || elements.countrySelect,
     profile: elements.chips?.[0],
-    country: isCountryOtherVisible() ? elements.countryOtherInput : elements.countrySelect,
+    country: isCountryOtherVisible() ? elements.countryOtherInput : (elements.countrySearch || elements.countryCards?.querySelector('.country-card') || elements.countrySelect),
     nivel: elements.nivelEducativo,
     contexto: elements.playerName || elements.countrySelect,
     familiaridad: elements.familiaridadInicial,
@@ -2204,7 +2406,7 @@ function renderStartGuidance(missingItems, ready) {
   if (!elements.startGuidance || !elements.startGuidanceList) return;
 
   // Validation stays next to the active step, without duplicating navigation.
-  const stepTargets = [['profile'], ['nivel', 'country'], ['familiaridad', 'recursos']];
+  const stepTargets = [['country'], ['profile'], ['nivel', 'contexto'], ['familiaridad', 'recursos']];
   const targets = stepTargets[state.onboardingStep || 0] || [];
   const currentMissing = missingItems.filter(item => targets.includes(item.target));
   elements.startGuidance.hidden = !state.onboardingAttempted || currentMissing.length === 0;
@@ -2220,16 +2422,22 @@ function renderStartGuidance(missingItems, ready) {
 
 function setupText(key) {
   const texts = {
-    es: { profile: 'Tu perfil', contexto: 'Tu contexto', cierre: 'Antes de empezar', back: 'Volver al inicio', next: 'Continuar', missing: 'Revisá estos datos para continuar', setup_title: 'Un recorrido a tu medida', setup_intro: 'Contanos desde dónde participás. Vamos a adaptar las preguntas y la devolución a tu contexto.', setup_profile_hint: 'Elegí el rol que mejor represente tu práctica hoy. Podés cambiarlo antes de comenzar.', setup_consent: 'Quiero aportar mi recorrido al registro anónimo (opcional)', estudiante: 'Vas a explorar cómo estudiar, crear y reconocer el aporte de la IA en tus trabajos.', docente: 'Vas a revisar consignas, evaluación y acuerdos para el uso de IA en el aula.', especializado: 'Vas a profundizar en investigación, marcos éticos y criterios institucionales.' },
-    en: { profile: 'Your role', contexto: 'Your context', cierre: 'Before you start', back: 'Back to home', next: 'Continue', missing: 'Check these details to continue', setup_title: 'A journey shaped around you', setup_intro: 'Tell us about your role. We will adapt the questions and feedback to your context.', setup_profile_hint: 'Choose the role that best reflects your practice today. You can change it before starting.', setup_consent: 'Contribute my journey to anonymous records (optional)', estudiante: 'Explore studying, creating and acknowledging AI contributions in your work.', docente: 'Review assignments, assessment and agreements for using AI in the classroom.', especializado: 'Explore research, ethical frameworks and institutional criteria.' },
-    pt: { profile: 'Seu perfil', contexto: 'Seu contexto', cierre: 'Antes de começar', back: 'Voltar ao início', next: 'Continuar', missing: 'Confira estes dados para continuar', setup_title: 'Um percurso para você', setup_intro: 'Conte de onde você participa. Vamos adaptar as perguntas e a devolutiva ao seu contexto.', setup_profile_hint: 'Escolha o papel que melhor representa sua prática hoje. Você pode mudar antes de começar.', setup_consent: 'Quero contribuir com meu percurso para o registro anônimo (opcional)', estudiante: 'Explore como estudar, criar e reconhecer a contribuição da IA nos seus trabalhos.', docente: 'Revise atividades, avaliação e acordos para o uso de IA em sala de aula.', especializado: 'Aprofunde pesquisa, referenciais éticos e critérios institucionais.' },
-    fr: { profile: 'Votre profil', contexto: 'Votre contexte', cierre: 'Avant de commencer', back: 'Retour à l’accueil', next: 'Continuer', missing: 'Vérifiez ces informations pour continuer', setup_title: 'Un parcours à votre mesure', setup_intro: 'Présentez votre rôle. Nous adapterons les questions et le bilan à votre contexte.', setup_profile_hint: 'Choisissez le rôle qui correspond à votre pratique. Vous pourrez le modifier avant de commencer.', setup_consent: 'Contribuer au registre anonyme avec mon parcours (facultatif)', estudiante: 'Explorez comment étudier, créer et reconnaître les apports de l’IA.', docente: 'Examinez les consignes, l’évaluation et les accords sur l’IA en classe.', especializado: 'Approfondissez la recherche, les cadres éthiques et les critères institutionnels.' }
+    es: { pais: 'Tu país', profile: 'Tu perfil', contexto: 'Tu contexto', cierre: 'Antes de empezar', back: 'Volver al inicio', next: 'Continuar', missing: 'Revisá estos datos para continuar', setup_title: 'Un recorrido a tu medida', setup_intro: 'Contanos desde dónde participás. Vamos a adaptar las preguntas y la devolución a tu contexto.', setup_profile_hint: 'Elegí el rol que mejor represente tu práctica hoy. Podés cambiarlo antes de comenzar.', setup_consent: 'Quiero aportar mi recorrido al registro anónimo (opcional)', estudiante: 'Vas a explorar cómo estudiar, crear y reconocer el aporte de la IA en tus trabajos.', docente: 'Vas a revisar consignas, evaluación y acuerdos para el uso de IA en el aula.', especializado: 'Vas a profundizar en investigación, marcos éticos y criterios institucionales.' },
+    en: { pais: 'Your country', profile: 'Your role', contexto: 'Your context', cierre: 'Before you start', back: 'Back to home', next: 'Continue', missing: 'Check these details to continue', setup_title: 'A journey shaped around you', setup_intro: 'Tell us where you are participating from. We will adapt the questions and feedback to your context.', setup_profile_hint: 'Choose the role that best reflects your practice today. You can change it before starting.', setup_consent: 'Contribute my journey to anonymous records (optional)', estudiante: 'Explore studying, creating and acknowledging AI contributions in your work.', docente: 'Review assignments, assessment and agreements for using AI in the classroom.', especializado: 'Explore research, ethical frameworks and institutional criteria.' },
+    pt: { pais: 'Seu país', profile: 'Seu perfil', contexto: 'Seu contexto', cierre: 'Antes de começar', back: 'Voltar ao início', next: 'Continuar', missing: 'Confira estes dados para continuar', setup_title: 'Um percurso para você', setup_intro: 'Conte de onde você participa. Vamos adaptar as perguntas e a devolutiva ao seu contexto.', setup_profile_hint: 'Escolha o papel que melhor representa sua prática hoje. Você pode mudar antes de começar.', setup_consent: 'Quero contribuir com meu percurso para o registro anônimo (opcional)', estudiante: 'Explore como estudar, criar e reconhecer a contribuição da IA nos seus trabalhos.', docente: 'Revise atividades, avaliação e acordos para o uso de IA em sala de aula.', especializado: 'Aprofunde pesquisa, referenciais éticos e critérios institucionais.' },
+    fr: { pais: 'Votre pays', profile: 'Votre profil', contexto: 'Votre contexte', cierre: 'Avant de commencer', back: 'Retour à l’accueil', next: 'Continuer', missing: 'Vérifiez ces informations pour continuer', setup_title: 'Un parcours à votre mesure', setup_intro: 'Indiquez d’où vous participez. Nous adapterons les questions et le bilan à votre contexte.', setup_profile_hint: 'Choisissez le rôle qui correspond à votre pratique. Vous pourrez le modifier avant de commencer.', setup_consent: 'Contribuer au registre anonyme avec mon parcours (facultatif)', estudiante: 'Explorez comment étudier, créer et reconnaître les apports de l’IA.', docente: 'Examinez les consignes, l’évaluation et les accords sur l’IA en classe.', especializado: 'Approfondissez la recherche, les cadres éthiques et les critères institutionnels.' }
   };
   const language = state.lang || 'es';
   return (texts[language] || texts.es)[key] || texts.es[key] || key;
 }
 
 const ONBOARDING_STEP_META = {
+  pais: {
+    title: 'Tu país',
+    target: 'pais',
+    isValid: () => !!elements.countrySelect?.value
+      && (elements.countrySelect.value !== 'Otro' || !!elements.countryOtherInput?.value.trim())
+  },
   profile: {
     title: 'Punto de partida',
     target: 'profile',
@@ -2241,8 +2449,7 @@ const ONBOARDING_STEP_META = {
     isValid: () => {
       const levelOk = !(state.profile === 'docente' || state.profile === 'estudiante')
         || (elements.nivelEducativo && elements.nivelEducativo.value.trim() !== '');
-      const countryOk = !!elements.countrySelect?.value && (elements.countrySelect.value !== 'Otro' || !!elements.countryOtherInput?.value.trim());
-      return levelOk && countryOk;
+      return levelOk;
     }
   },
   cierre: {
@@ -2258,7 +2465,7 @@ const ONBOARDING_STEP_META = {
 };
 
 function getOnboardingStepKeys() {
-  return ['profile', 'contexto', 'cierre'];
+  return ['pais', 'profile', 'contexto', 'cierre'];
 }
 
 function syncOnboardingStepBounds() {
@@ -2316,7 +2523,9 @@ function updateOnboardingUI() {
     const isLast = state.onboardingStep === keys.length - 1;
     const lang = (window.state && window.state.lang) || 'es';
     const t = TRANSLATIONS[lang] || TRANSLATIONS['es'];
-    elements.onboardingNextBtn.textContent = isLast ? (t.btn_start_game || 'Iniciar cuestionario') : setupText('next');
+    elements.onboardingNextBtn.textContent = state.pendingEntry === 'cases' && activeKey === 'pais'
+      ? (t.card_lab_btn || 'Abrir laboratorio')
+      : isLast ? (t.btn_start_game || 'Iniciar cuestionario') : setupText('next');
   }
 
   const preview = document.getElementById('profilePreview');
@@ -2342,8 +2551,10 @@ function focusCurrentOnboardingStep() {
   const keys = syncOnboardingStepBounds();
   const activeKey = keys[state.onboardingStep] || keys[0];
   let target = ONBOARDING_STEP_META[activeKey]?.target || activeKey;
-  if (activeKey === 'contexto') {
-    target = !elements.countrySelect?.value || (isCountryOtherVisible() && !elements.countryOtherInput?.value.trim()) ? 'country' : 'nivel';
+  if (activeKey === 'pais') {
+    target = 'country';
+  } else if (activeKey === 'contexto') {
+    target = 'nivel';
   } else if (activeKey === 'cierre') {
     target = !elements.familiaridadInicial?.value ? 'familiaridad' : 'recursos';
   }
@@ -2356,6 +2567,12 @@ function advanceOnboarding() {
     state.onboardingAttempted = true;
     updateStartButtonState();
     focusCurrentOnboardingStep();
+    return;
+  }
+
+  if ((keys[state.onboardingStep] || keys[0]) === 'pais' && state.pendingEntry === 'cases') {
+    state.pendingEntry = null;
+    if (typeof abrirLaboratorioCasos === 'function') abrirLaboratorioCasos();
     return;
   }
 
@@ -2423,6 +2640,7 @@ const landingGoToCases = document.getElementById('landingGoToCases');
 if (landingGoToDiagnostic) {
   landingGoToDiagnostic.addEventListener('click', (event) => {
     event.preventDefault();
+    state.pendingEntry = null;
     state.currentSlide = 1;
     updateCarousel();
     updateStartButtonState();
@@ -2433,6 +2651,15 @@ if (landingGoToDiagnostic) {
 if (landingGoToCases) {
   landingGoToCases.addEventListener('click', (event) => {
     event.preventDefault();
+    if (!state.country) {
+      state.pendingEntry = 'cases';
+      state.currentSlide = 1;
+      state.onboardingStep = 0;
+      updateCarousel();
+      updateStartButtonState();
+      scrollToDiagnosticStart();
+      return;
+    }
     if (typeof abrirLaboratorioCasos === 'function') {
       abrirLaboratorioCasos();
     }
@@ -2442,6 +2669,7 @@ if (landingGoToCases) {
 if (goToDiagnosticBtn) {
   goToDiagnosticBtn.addEventListener('click', (event) => {
     event.preventDefault();
+    state.pendingEntry = null;
     state.currentSlide = 1;
     updateCarousel();
     updateStartButtonState();
@@ -2456,9 +2684,10 @@ if (elements.startGuidance) {
     
     const target = button.dataset.guideTarget;
     let targetStepIndex = -1;
-    if (target === 'profile') targetStepIndex = 0;
-    else if (target === 'nivel' || target === 'contexto') targetStepIndex = 1;
-    else if (target === 'familiaridad' || target === 'recursos' || target === 'cierre' || target === 'start') targetStepIndex = 2;
+    if (target === 'country' || target === 'pais') targetStepIndex = 0;
+    else if (target === 'profile') targetStepIndex = 1;
+    else if (target === 'nivel' || target === 'contexto') targetStepIndex = 2;
+    else if (target === 'familiaridad' || target === 'recursos' || target === 'cierre' || target === 'start') targetStepIndex = 3;
     
     if (targetStepIndex >= 0) {
       state.onboardingStep = targetStepIndex;
@@ -2476,6 +2705,15 @@ const btnVerCasosDirecto = document.getElementById('btnVerCasosDirecto');
 if (goToCasesBtn) {
   goToCasesBtn.addEventListener('click', (event) => {
     event.preventDefault();
+    if (!state.country) {
+      state.pendingEntry = 'cases';
+      state.currentSlide = 1;
+      state.onboardingStep = 0;
+      updateCarousel();
+      updateStartButtonState();
+      scrollToDiagnosticStart();
+      return;
+    }
     if (typeof abrirLaboratorioCasos === 'function') {
       abrirLaboratorioCasos();
     }
@@ -2485,6 +2723,15 @@ if (goToCasesBtn) {
 if (btnVerCasosDirecto) {
   btnVerCasosDirecto.addEventListener('click', (event) => {
     event.preventDefault();
+    if (!state.country) {
+      state.pendingEntry = 'cases';
+      state.currentSlide = 1;
+      state.onboardingStep = 0;
+      updateCarousel();
+      updateStartButtonState();
+      scrollToDiagnosticStart();
+      return;
+    }
     if (typeof abrirLaboratorioCasos === 'function') {
       abrirLaboratorioCasos();
     }
@@ -2696,8 +2943,12 @@ if (elements.infoBtn) {
   elements.infoBtn.addEventListener('click', () => {
     const lang = (window.state && window.state.lang) || 'es';
     const t = TRANSLATIONS[lang] || TRANSLATIONS['es'];
+    const context = getActiveCountryContext();
+    const references = context.references.map(reference =>
+      `<li><a href="${escapeHtml(reference.url)}" target="_blank" rel="noopener noreferrer"><strong>${escapeHtml(reference.label)}:</strong> ${escapeHtml(reference.title)}</a></li>`
+    ).join('');
     modal.show(t.modal_info_title || 'Marcos sobre IA en Educación', `
-      <p>${t.modal_info_desc || 'Este cuestionario está basado en documentos y orientaciones de UNESCO, ANEP, FING, Udelar y Ceibal.'}</p>
+      <p>${escapeHtml(context.summary)}</p>
       <h4>${t.modal_info_principles || 'Principios clave:'}</h4>
       <ul>
         <li>${t.modal_info_p1 || 'Verificación de información con fuentes confiables'}</li>
@@ -2707,6 +2958,8 @@ if (elements.infoBtn) {
         <li>${t.modal_info_p5 || 'Protección de datos y privacidad'}</li>
         <li>${t.modal_info_p6 || 'Desarrollo de pensamiento crítico'}</li>
       </ul>
+      <h4>Referencias para ${escapeHtml(context.country)}</h4>
+      <ul>${references}</ul>
     `);
   });
 }
@@ -2808,7 +3061,7 @@ if (homeBtn) {
             state.evidence = 0;
             state.currentSlide = 0;
             state.onboardingStep = 0;
-            state.country = 'Uruguay';
+            state.country = '';
             state.nivelEducativo = '';
             state.familiaridadInicial = '';
             state.recursosSimilares = '';
@@ -2826,10 +3079,12 @@ if (homeBtn) {
             // Reset nivel educativo
             hideNivelEducativo();
 
-            if (elements.countrySelect) elements.countrySelect.value = 'Uruguay';
+            if (elements.countrySelect) elements.countrySelect.value = '';
             if (elements.countryOtherWrapper) elements.countryOtherWrapper.style.display = 'none';
             if (elements.countryOtherInput) elements.countryOtherInput.value = '';
-            if (elements.countryFinalInput) elements.countryFinalInput.value = 'Uruguay';
+            if (elements.countryFinalInput) elements.countryFinalInput.value = '';
+            if (elements.countrySearch) elements.countrySearch.value = '';
+            renderCountrySelectionState();
 
             if (elements.familiaridadInicial) elements.familiaridadInicial.value = '';
             if (elements.recursosSimilaresRadios && elements.recursosSimilaresRadios.length) {
@@ -2840,10 +3095,6 @@ if (homeBtn) {
             // Reset custom select chips in UI
             document.querySelectorAll('.select-chips').forEach(container => {
               container.querySelectorAll('.select-chip').forEach(c => c.classList.remove('active'));
-              if (container.id === 'countryChips') {
-                const uruguayChip = container.querySelector('[data-value="Uruguay"]');
-                if (uruguayChip) uruguayChip.classList.add('active');
-              }
             });
 
             updateStartButtonState();

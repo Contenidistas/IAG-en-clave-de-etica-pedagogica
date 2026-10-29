@@ -2,6 +2,28 @@
 function isForeignCountry() {
   return typeof window.state !== 'undefined' && window.state.country && window.state.country !== 'Uruguay';
 }
+
+function getJourneyCountryContext() {
+  return window.CountryContext.get(state.country);
+}
+
+function getJourneyFrameworkNames() {
+  return getJourneyCountryContext().names.join(', ');
+}
+
+function getNodeFrameworkContext(node) {
+  const country = getJourneyCountryContext();
+  if (country.country === 'Uruguay') {
+    return { text: node.context, reference: node.anepRef || getJourneyFrameworkNames() };
+  }
+  const axis = node.ethicalEvidence?.axes?.[0];
+  const guidance = typeof getEthicalFrameworkGuidance === 'function' && axis
+    ? getEthicalFrameworkGuidance(axis) : null;
+  return {
+    text: [guidance?.basis, guidance?.countryNote].filter(Boolean).join(' ') || country.synthesis,
+    reference: guidance?.sources?.map(source => source.label).join(' · ') || getJourneyFrameworkNames()
+  };
+}
 /* ========================================
    UTILIDAD: Normalizar preguntas del perfil
    - Asegura que todas las preguntas empiecen con "¿"
@@ -38,11 +60,15 @@ function resolverProfileKey(profile, nivelEducativo, levelKey = '') {
     const levelRoutes = {
       level_media_basica: 'estudiante_media', level_media_superior: 'estudiante_media',
       level_ca_sec: 'estudiante_media', level_int_secondary: 'estudiante_media',
+      level_co_secondary: 'estudiante_media', level_do_secondary: 'estudiante_media',
       level_formacion_docente: 'estudiante_formacion', level_ca_teacher_prog: 'estudiante_formacion',
-      level_int_teacher_training: 'estudiante_formacion',
+      level_int_teacher_training: 'estudiante_formacion', level_co_teacher: 'estudiante_formacion',
+      level_do_teacher: 'estudiante_formacion',
       level_universitaria: 'estudiante_universitaria', level_ca_undergrad: 'estudiante_universitaria',
       level_ca_grad: 'estudiante_universitaria', level_int_undergrad: 'estudiante_universitaria',
-      level_int_postgrad: 'estudiante_universitaria'
+      level_int_postgrad: 'estudiante_universitaria', level_co_undergrad: 'estudiante_universitaria',
+      level_co_postgrad: 'estudiante_universitaria', level_do_undergrad: 'estudiante_universitaria',
+      level_do_postgrad: 'estudiante_universitaria'
     };
     if (levelRoutes[levelKey]) return levelRoutes[levelKey];
     if (!nivel) return 'estudiante';   // genérico si no eligió
@@ -100,10 +126,10 @@ function iniciarJuego() {
     ? elements.consentTracking.checked
     : false;
 
-  // ✅ País final (Uruguay por defecto)
+  // ✅ País final (selección obligatoria en el primer paso)
   const countryVal = elements.countryFinalInput
-    ? (elements.countryFinalInput.value || 'Uruguay')
-    : 'Uruguay';
+    ? elements.countryFinalInput.value
+    : state.country;
 
   // ✅ Nivel de familiaridad con el tema
   const familiaridadVal = elements.familiaridadInicial
@@ -496,10 +522,11 @@ function renderQuestion() {
   elements.contextBtn.onclick = () => {
     const lang = (window.state && window.state.lang) || 'es';
     const t = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[lang]) ? TRANSLATIONS[lang] : {};
+    const framework = getNodeFrameworkContext(nodo);
     modal.show(t.modal_frameworks_title || 'Marcos de referencia', `
       <p><strong>${t.modal_fw_foundation || 'Fundamentación:'}</strong></p>
-      <p>${nodo.context}</p>
-      <p style="margin-top: 1rem;"><strong>${t.modal_fw_reference || 'Referencia:'}</strong> ${nodo.anepRef}</p>
+      <p>${escapeGameHtml(framework.text)}</p>
+      <p style="margin-top: 1rem;"><strong>${t.modal_fw_reference || 'Referencia:'}</strong> ${escapeGameHtml(framework.reference)}</p>
     `);
   };
 }
@@ -967,7 +994,7 @@ function mostrarResultados() {
           <div class="mt-1">${badge}</div>
           <p style="font-size: 0.9rem; margin: 0.25rem 0 0;">${escapeGameHtml(item.feedback)}</p>
           <p style="font-size: 0.85rem; margin: 0.25rem 0 0; opacity: 0.7;">
-            Referencia: ${escapeGameHtml(nodo.anepRef)}
+            Referencia: ${escapeGameHtml(getNodeFrameworkContext(nodo).reference)}
           </p>
         </div>
       `;
@@ -1320,9 +1347,8 @@ function abrirLaboratorioCasos() {
           modal.hide();
           state.profile = 'docente';
           state.profileKey = 'docente';
-          state.country = 'Uruguay';
           state.consentTracking = false;
-          state.nivelEducativo = 'Secundaria';
+          state.nivelEducativo = state.nivelEducativo || 'Educación secundaria';
           
           const consentCheckbox = document.getElementById('consentTracking');
           if (consentCheckbox) consentCheckbox.checked = false;
@@ -2006,7 +2032,7 @@ function cargarCasoInteractivo(caseId, target = elements.situatedCases, onReturn
         profile: state.profile || 'docente',
         profileKey: state.profileKey || 'docente',
         sessionId: typeof getAnalyticsSessionId === 'function' ? getAnalyticsSessionId() : 'anonimo',
-        country: state.country || 'Uruguay',
+        country: state.country || 'No indicado',
         nivelEducativo: state.nivelEducativo || 'Secundaria'
       };
       
@@ -2050,7 +2076,7 @@ function cargarCasoInteractivo(caseId, target = elements.situatedCases, onReturn
           profile: state.profile || 'docente',
           profileKey: state.profileKey || 'docente',
           sessionId: typeof getAnalyticsSessionId === 'function' ? getAnalyticsSessionId() : 'anonimo',
-          country: state.country || 'Uruguay',
+          country: state.country || 'No indicado',
           nivelEducativo: state.nivelEducativo || 'Secundaria'
         };
         
@@ -2180,7 +2206,7 @@ function renderizarDevolucionFinal(nivel) {
       texto: prioridad
         ? prioridad.feedback
         : 'Consolidá las prácticas ya alineadas y compartí criterios claros de uso, límites y verificación.',
-      ref: prioridad ? obtenerReferenciaDePaso(prioridad) : 'ANEP / UNESCO / FING / Udelar / Ceibal'
+      ref: prioridad ? obtenerReferenciaDePaso(prioridad) : getJourneyFrameworkNames()
     },
     {
       titulo: 'Fortaleza detectada',
@@ -2192,7 +2218,7 @@ function renderizarDevolucionFinal(nivel) {
     {
       titulo: 'Siguiente paso',
       texto: 'Elegí un acuerdo didáctico, documentá cómo se usa la IA y verificá los resultados antes de incorporarlos a una producción o actividad.',
-      ref: 'Marcos ANEP, UNESCO, FING, Udelar y Ceibal'
+      ref: `Marcos de ${getJourneyFrameworkNames()}`
     }
   ];
 
@@ -2252,7 +2278,7 @@ function construirInformeCalidad(nivel) {
       'Aporte humano: decisiones propias, contextualización y revisión final.',
       'Cuidado de datos: ausencia de información sensible o identificable.'
     ],
-    references: isForeignCountry() ? 'UNESCO (Guía para IA Generativa en Educación e Investigación)' : 'ANEP, UNESCO, FING, Udelar y Ceibal'
+    references: getJourneyFrameworkNames()
   };
 }
 
@@ -2307,7 +2333,7 @@ window.getQualityReportData = function getQualityReportData() {
 function obtenerReferenciaDePaso(paso) {
   const perfil = CONFIG.perfiles[state.profileKey];
   const nodo = perfil && perfil.nodos ? perfil.nodos[paso.id] : null;
-  return nodo && nodo.anepRef ? nodo.anepRef : 'Marcos de referencia';
+  return nodo ? getNodeFrameworkContext(nodo).reference : getJourneyFrameworkNames();
 }
 
 const ETHICAL_COMPASS_AXES = [
@@ -2523,7 +2549,7 @@ Seguimiento
 ${formatoActual.cierre} El objetivo es fortalecer un uso ético, crítico, reflexivo, seguro y responsable de la IA.
 
 Referencias orientadoras
-ANEP, UNESCO, FING, Udelar y Ceibal.`;
+${getJourneyFrameworkNames()}.`;
 }
 
 function renderizarAcuerdoDidactico(nivel) {
@@ -2588,7 +2614,10 @@ function generarMensajeAutomaticoDeConsejos() {
     
     // Las respuestas y el perfil ya viajan en el contexto del chatbot.
     // Repetirlos aquí podía superar el límite de 800 caracteres de /chat.
-    return `Acabo de completar el recorrido y obtuve nivel "${nivel.id}" con ${state.evidence} puntos. Usá las áreas de mejora y las respuestas de mi recorrido incluidas en el contexto para proponer 3 sugerencias priorizadas, concretas y aplicables a mi perfil. Si no hay respuestas "No" o "A veces", sugerí cómo profundizar mis prácticas. Basate en los marcos UNESCO, ANEP, FING, Udelar y Ceibal.`;
+    const frameworkNames = typeof getJourneyFrameworkNames === 'function'
+      ? getJourneyFrameworkNames() : 'los marcos de referencia incluidos en el contexto';
+    const country = state.country || 'el país seleccionado';
+    return `Acabo de completar el recorrido y obtuve nivel "${nivel.id}" con ${state.evidence} puntos. Usá las áreas de mejora y las respuestas de mi recorrido incluidas en el contexto para proponer 3 sugerencias priorizadas, concretas y aplicables a mi perfil. Si no hay respuestas "No" o "A veces", sugerí cómo profundizar mis prácticas. Basate en los marcos seleccionados para ${country}: ${frameworkNames}.`;
   } catch (err) {
     console.error('❌ Error generando mensaje automático:', err);
     return '';
@@ -2799,7 +2828,7 @@ async function descargarCasoFichaPDF(caso) {
     
     doc.setFontSize(8);
     doc.setTextColor(156, 163, 175);
-    doc.text("Herramienta IAG en clave de ética pedagógica - ANEP / Ceibal / Udelar / FING", 15, 287);
+    doc.text(`Herramienta IAG en clave de ética pedagógica - ${getJourneyFrameworkNames()}`, 15, 287, { maxWidth: 180 });
     doc.text("Recurso evolutivo y abierto para formación docente.", 132, 287);
 
     doc.save(`Guia_Taller_Caso_${caso.id}.pdf`);

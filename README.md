@@ -16,9 +16,9 @@ Los recorridos estan definidos en `configuracion-ia.js`. La resolucion de perfil
 
 ## Experiencia principal
 
-1. La persona ingresa a la app y elige perfil.
-2. La pantalla adapta la densidad de marcos: estudiante ve una version compacta; docente ve una version intermedia; docente/investigador/a ve una fundamentacion mas completa.
-3. Se completan datos minimos: nivel educativo cuando corresponde, pais, familiaridad inicial, uso previo de recursos similares y consentimiento opcional de registro anonimo.
+1. La persona ingresa a la app y selecciona su pais mediante tarjetas con banderas.
+2. La app carga los niveles educativos y marcos correspondientes; cuando no existe un contexto nacional curado, usa y declara la base internacional de UNESCO.
+3. Se elige el perfil y se completan los datos minimos: nivel educativo cuando corresponde, familiaridad inicial, uso previo de recursos similares y consentimiento opcional de registro anonimo.
 4. El cuestionario recorre un arbol de decision con respuestas `Si`, `A veces`, `No` y `No aplica`.
 5. Durante el recorrido se muestra criterio activo, motivo del nodo, mapa de decision y grafo vivo por ejes: transparencia, verificacion, datos, equidad y agencia humana.
 6. Al finalizar se abre un panel por pestanas con sintesis, brujula, acuerdo, casos situados, recursos y recorrido.
@@ -86,15 +86,14 @@ El panel `admin.html` no se cachea desde el service worker para mantener la admi
 
 ## Marcos de referencia
 
-La herramienta enlaza y utiliza como orientacion:
+La herramienta usa una base internacional comun de UNESCO y contextos nacionales curados en `country-context.js`:
 
-- ANEP: documento sobre inteligencia artificial en educacion.
-- UNESCO: guia para el uso de IA generativa en educacion e investigacion.
-- FING: guia de etica para el uso de IA en unidades curriculares.
-- Udelar: politica institucional de inteligencia artificial y 11 principios rectores.
-- Ceibal: buenas practicas para el uso de IA en educacion.
+- Uruguay: ANEP, Ceibal, Udelar, FING y Agesic.
+- Colombia: Decalogo de IA para la Educacion Superior del Ministerio de Educacion y Politica Nacional de IA (CONPES 4144).
+- Republica Dominicana: Estrategia Nacional de Educacion Digital y Estrategia Nacional de Inteligencia Artificial.
+- Otros paises: base UNESCO identificada explicitamente, sin reutilizar instituciones de otro pais.
 
-La interfaz muestra estos marcos de forma progresiva para evitar carga textual innecesaria.
+La interfaz muestra estos marcos de forma progresiva y los reutiliza en la fundamentacion, la red de principios, el asistente y los reportes.
 
 ## Backend con base de datos
 

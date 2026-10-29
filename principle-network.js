@@ -61,7 +61,9 @@ function crearPrincipleGraphSvg(target, nodes) {
 }
 
 function renderNetworkEvidence(target, node) {
-  const guidance = ETHICAL_FRAMEWORK_GUIDANCE[node.id];
+  const guidance = typeof getEthicalFrameworkGuidance === 'function'
+    ? getEthicalFrameworkGuidance(node.id)
+    : ETHICAL_FRAMEWORK_GUIDANCE[node.id];
   const responses = node.responses || [];
   const latest = responses[responses.length - 1];
   const escape = escapeGameHtml;
@@ -93,11 +95,11 @@ function renderNetworkEvidence(target, node) {
       : '<p class="en-empty">Este recorrido todavía no aporta respuestas específicas sobre este eje.</p>'}
     ${responses.length > 1 ? `<details class="en-response-history"><summary>Ver las ${responses.length} respuestas · ${escape(counts)}</summary><ul class="en-response-list">${responses.map(responseHtml).join('')}</ul></details>` : ''}
     <div class="en-framework"><span class="en-section-label">Lectura desde los marcos</span><p>${escape(guidance.basis)}</p>
-      <p class="en-agesic">${escape(guidance.agesic)}</p>
+      <p class="en-agesic">${escape(guidance.countryNote || guidance.agesic || '')}</p>
       <div class="en-source-links">${guidance.sources.map(source => `<a href="${escape(source.url)}" target="_blank" rel="noopener noreferrer">${escape(source.label)} ↗</a>`).join('')}</div>
     </div>
     <div class="en-action"><span class="en-section-label">${node.className === 'done' ? 'Para sostener esta práctica' : node.className === 'pending' ? 'Para explorar este eje' : 'Siguiente paso posible'}</span><p>${escape(guidance.action)}</p></div>
-    <p class="en-interpretation">Orientación pedagógica basada en tus respuestas y en los marcos citados; no es una calificación oficial. La vinculación con Agesic es una adaptación educativa de la Estrategia Nacional de IA 2024–2030.</p>`;
+    <p class="en-interpretation">${escape(guidance.interpretation || 'Orientación pedagógica basada en tus respuestas y en los marcos citados; no es una calificación oficial.')}</p>`;
 }
 
 function renderPrincipleGraph(target, statusTarget, options = {}) {
@@ -137,7 +139,7 @@ function renderPrincipleGraph(target, statusTarget, options = {}) {
       element.setAttribute('aria-pressed', String(selectedHere));
     });
     target.querySelectorAll('.en-link').forEach(link => link.classList.toggle('is-preview', link.dataset.criterion === node.id));
-    const detailKey = JSON.stringify([state.lang, node.id, node.status, node.responses]);
+    const detailKey = JSON.stringify([state.lang, state.country, node.id, node.status, node.responses]);
     if (target._networkDetailKey !== detailKey) {
       target._networkDetailKey = detailKey;
       renderNetworkEvidence(target, node);
