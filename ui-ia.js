@@ -2354,11 +2354,52 @@ if (elements.countrySelect && elements.countryFinalInput) {
       if (['docente', 'estudiante'].includes(window.state.profile) && typeof updateNivelEducativo === 'function') {
         updateNivelEducativo(window.state.profile);
       }
+
+      if (window.state.country === 'Estados Unidos') {
+        if (window.ProgramContext && typeof window.ProgramContext.ensurePilotForCountry === 'function') {
+          window.ProgramContext.ensurePilotForCountry('Estados Unidos');
+        }
+        if (window.ProgramContext?.current?.active) {
+          window.state.programCode = window.ProgramContext.current.programCode;
+          window.state.cohortCode = window.ProgramContext.current.cohortCode;
+          window.state.measurementPhase = window.ProgramContext.current.measurementPhase;
+          window.state.participantId = window.ProgramContext.current.participantId;
+        }
+        if (window.state.lang !== 'en') {
+          window.state.lang = 'en';
+          if (elements.languageSelect) elements.languageSelect.value = 'en';
+          if (window.appStorage?.local) window.appStorage.local.setItem('app_lang', 'en');
+          if (typeof updateAppLanguage === 'function') {
+            updateAppLanguage('en');
+          }
+        }
+      } else {
+        window.state.programCode = '';
+        window.state.cohortCode = '';
+        window.state.measurementPhase = '';
+        window.state.participantId = '';
+        if (window.state.lang === 'en' && ['Uruguay', 'Argentina', 'Colombia', 'México', 'Chile', 'República Dominicana', 'España'].includes(window.state.country)) {
+          window.state.lang = 'es';
+          if (elements.languageSelect) elements.languageSelect.value = 'es';
+          if (window.appStorage?.local) window.appStorage.local.setItem('app_lang', 'es');
+          if (typeof updateAppLanguage === 'function') {
+            updateAppLanguage('es');
+          }
+        }
+        const card = document.getElementById('programContextCard');
+        if (card) card.hidden = true;
+      }
     }
     renderCountrySelectionState();
     updateCountryGlobalUI();
     if (typeof updateFrameworkAudience === 'function') {
       updateFrameworkAudience(window.state?.profile || null);
+    }
+    if (window.ProgramContext) {
+      window.ProgramContext.render(document, window.state?.lang || 'es', window.state?.country);
+    }
+    if (typeof updateOnboardingUI === 'function') {
+      updateOnboardingUI();
     }
   };
 
@@ -2374,12 +2415,24 @@ if (elements.countrySelect && elements.countryFinalInput) {
         if (window.state) {
           window.state.country = elements.countryFinalInput.value;
           window.state.countryCode = countryCodeFor(window.state.country);
+          window.state.programCode = '';
+          window.state.cohortCode = '';
+          window.state.measurementPhase = '';
+          window.state.participantId = '';
           persistCountryContext();
         }
         renderCountrySelectionState();
         updateCountryGlobalUI();
         if (typeof updateFrameworkAudience === 'function') {
           updateFrameworkAudience(window.state?.profile || null);
+        }
+        const card = document.getElementById('programContextCard');
+        if (card) card.hidden = true;
+        if (window.ProgramContext) {
+          window.ProgramContext.render(document, window.state?.lang || 'es', window.state?.country);
+        }
+        if (typeof updateOnboardingUI === 'function') {
+          updateOnboardingUI();
         }
         updateStartButtonState();
       }
@@ -2672,10 +2725,7 @@ function updateFrameworkAudience(perfil) {
   const t = TRANSLATIONS[lang] || TRANSLATIONS['es'];
   const context = getActiveCountryContext();
   const selectedCountry = window.state?.country || '';
-  const programActive = Boolean(
-    window.ProgramContext?.current?.active
-    || window.state?.programCode === 'uy-us-ai-literacy-2027'
-  );
+  const programActive = isProgramPilotActive();
   const bilateral = window.CountryContext?.bilateralUyUs || null;
   const partnerCountry = selectedCountry === 'Estados Unidos' ? 'Uruguay' : 'Estados Unidos';
   const partnerReferences = programActive && window.CountryContext
@@ -2827,11 +2877,16 @@ function focusInitialField(targetKey) {
   window.setTimeout(() => target.classList.remove('field-guidance-highlight'), 1800);
 }
 
+function isProgramPilotActive() {
+  return Boolean(window.state?.country === 'Estados Unidos');
+}
+window.isProgramPilotActive = isProgramPilotActive;
+
 function renderStartGuidance(missingItems, ready) {
   if (!elements.startGuidance || !elements.startGuidanceList) return;
 
   // Validation stays next to the active step, without duplicating navigation.
-  const isProgram = Boolean(window.ProgramContext?.current?.active || state.programCode);
+  const isProgram = isProgramPilotActive();
   const stepTargets = isProgram
     ? [['country'], ['profile'], ['nivel', 'contexto'], ['programa'], ['familiaridad', 'recursos']]
     : [['country'], ['profile'], ['nivel', 'contexto'], ['familiaridad', 'recursos']];
@@ -2884,7 +2939,7 @@ const ONBOARDING_STEP_META = {
     title: 'Alfabetización IA',
     target: 'programa',
     isValid: () => {
-      const isProgram = Boolean(window.ProgramContext?.current?.active || state.programCode);
+      const isProgram = isProgramPilotActive();
       if (!isProgram) return true;
       return typeof window.LiteracyInstrument?.isComplete === 'function' && window.LiteracyInstrument.isComplete();
     }
@@ -2902,7 +2957,7 @@ const ONBOARDING_STEP_META = {
 };
 
 function getOnboardingStepKeys() {
-  const isProgram = Boolean(window.ProgramContext?.current?.active || state.programCode);
+  const isProgram = isProgramPilotActive();
   return isProgram
     ? ['pais', 'profile', 'contexto', 'programa', 'cierre']
     : ['pais', 'profile', 'contexto', 'cierre'];
@@ -3150,7 +3205,7 @@ if (elements.startGuidance) {
     else if (target === 'nivel' || target === 'contexto') targetStepIndex = 2;
     else if (target === 'programa') targetStepIndex = 3;
     else if (target === 'familiaridad' || target === 'recursos' || target === 'cierre' || target === 'start') {
-      const isProg = Boolean(window.ProgramContext?.current?.active || state.programCode);
+      const isProg = isProgramPilotActive();
       targetStepIndex = isProg ? 4 : 3;
     }
     
@@ -3298,7 +3353,7 @@ function updateStartButtonState() {
   }
 
   // 5) Instrumento de alfabetización IA (en modo programa)
-  const isProgram = Boolean(window.ProgramContext?.current?.active || state.programCode);
+  const isProgram = isProgramPilotActive();
   let literacyOk = true;
   if (isProgram) {
     literacyOk = typeof window.LiteracyInstrument?.isComplete === 'function' && window.LiteracyInstrument.isComplete();

@@ -625,7 +625,9 @@ autoria: {
    Agregá esto al objeto state existente:
    ======================================== */
 
-const activeProgramContext = window.ProgramContext?.current || {};
+const initialCountry = window.appStorage.local.getItem('app_country') || '';
+const isUSInitial = initialCountry === 'Estados Unidos';
+const activeProgramContext = (isUSInitial && window.ProgramContext?.current) || {};
 
 const state = {
   lang: window.appStorage.local.getItem('app_lang') || 'es',
@@ -636,17 +638,17 @@ const state = {
   path: [],             // Historial de respuestas
   evidence: 0,          // Puntaje acumulado
   currentSlide: 0,
-  country: window.appStorage.local.getItem('app_country') || '',
+  country: initialCountry,
   countryCode: window.appStorage.local.getItem('app_country_code') || '',
   statsScope: 'country',
   nivelEducativo: '',
   familiaridadInicial: '',
   recursosSimilares: '',
   consentTracking: false,
-  programCode: activeProgramContext.active ? activeProgramContext.programCode : '',
-  cohortCode: activeProgramContext.active ? activeProgramContext.cohortCode : '',
-  measurementPhase: activeProgramContext.active ? activeProgramContext.measurementPhase : '',
-  participantId: activeProgramContext.active ? activeProgramContext.participantId : '',
+  programCode: (isUSInitial && activeProgramContext.active) ? activeProgramContext.programCode : '',
+  cohortCode: (isUSInitial && activeProgramContext.active) ? activeProgramContext.cohortCode : '',
+  measurementPhase: (isUSInitial && activeProgramContext.active) ? activeProgramContext.measurementPhase : '',
+  participantId: (isUSInitial && activeProgramContext.active) ? activeProgramContext.participantId : '',
   activeResultTab: 'resumen',
   agreementFormat: 'aula'
 };

@@ -116,15 +116,40 @@
     return value[lang] || value.es;
   }
 
-  function render(root, langValue) {
+  function ensurePilotForCountry(countryName) {
+    if (countryName === 'Estados Unidos') {
+      if (!api.current || !api.current.active) {
+        const programCode = 'uy-us-ai-literacy-2027';
+        const cohortCode = 'pilot-us';
+        const measurementPhase = 'baseline';
+        api.current = Object.freeze({
+          active: true,
+          programCode,
+          cohortCode,
+          measurementPhase,
+          participantId: participantIdFor(programCode, cohortCode),
+          program: PROGRAMS[programCode],
+        });
+      }
+    }
+  }
+
+  function render(root, langValue, countryValue) {
     const card = root && root.getElementById('programContextCard');
     if (!card) return;
+    const country = countryValue !== undefined
+      ? countryValue
+      : (typeof window !== 'undefined' && window.state && window.state.country);
+    const isUS = country === 'Estados Unidos';
     const context = api.current;
-    card.hidden = !context.active;
-    if (!context.active) return;
+    if (!isUS || !context || !context.active) {
+      card.hidden = true;
+      return;
+    }
+    card.hidden = false;
 
-    const lang = COPY[langValue] ? langValue : 'es';
-    const copy = COPY[lang];
+    const lang = COPY[langValue] ? langValue : 'en';
+    const copy = COPY[lang] || COPY.en;
     root.getElementById('programContextEyebrow').textContent = copy.eyebrow;
     root.getElementById('programContextTitle').textContent = translated(context.program.title, lang);
     root.getElementById('programContextDescription').textContent = translated(context.program.description, lang);
@@ -136,7 +161,7 @@
   }
 
   function payload(state) {
-    if (!state || !state.programCode) return {};
+    if (!state || !state.programCode || state.country !== 'Estados Unidos') return {};
     return {
       programCode: state.programCode,
       cohortCode: state.cohortCode,
@@ -149,6 +174,7 @@
     programs: PROGRAMS,
     current: null,
     read,
+    ensurePilotForCountry,
     render,
     payload,
   };

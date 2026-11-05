@@ -896,7 +896,7 @@ function buildResultPayload() {
     recursosSimilares:   state.recursosSimilares,
     consentTracking:     state.consentTracking,
     ...(window.ProgramContext ? window.ProgramContext.payload(state) : {}),
-    ...(window.LiteracyInstrument ? window.LiteracyInstrument.payload() : {}),
+    ...(window.LiteracyInstrument && state.country === 'Estados Unidos' ? window.LiteracyInstrument.payload() : {}),
 
     // Resultado global
     evidence:   state.evidence,
@@ -2617,8 +2617,8 @@ function renderizarBrujulaEtica(nivel) {
 
 function configurarModoProgramaEnResultados() {
   const isProgram = Boolean(
-    window.ProgramContext?.current?.active
-    || state.programCode === 'uy-us-ai-literacy-2027'
+    state.country === 'Estados Unidos'
+    && (window.ProgramContext?.current?.active || state.programCode === 'uy-us-ai-literacy-2027')
   );
   const instInput = document.getElementById('agreementInstitutionInput');
   const configDetails = document.getElementById('agreementCustomConfigDetails');
@@ -2706,7 +2706,7 @@ function construirAcuerdoDidactico(nivel) {
     : 'La comprensión, la explicación del proceso y la producción final quedan bajo responsabilidad de quien entrega la tarea.';
 
   const lineaInstitucion = institucionRaw ? `\nInstitución / cohorte: ${institucionRaw}` : '';
-  const bloqueBinacional = (formato === 'binacional' || window.ProgramContext?.current?.active)
+  const bloqueBinacional = (formato === 'binacional' || (window.ProgramContext?.current?.active && state.country === 'Estados Unidos'))
     ? `\nArticulación bilateral Uruguay–Estados Unidos\n- Gobernanza y derechos de decisión (IES / ANEP): definir qué actores autorizan herramientas, comunican criterios a estudiantes y familias, y auditan su pertinencia.\n- Gestión de riesgos generativos (NIST AI RMF / UNESCO): documentar riesgos de confabulación, sesgos y dependencia cognitiva antes de escalar el uso en evaluación.\n- Supervisión docente y privacidad (U.S. Dept. of Ed / Agesic-Ceibal): sostener el principio human-in-the-loop y prohibir el ingreso de datos estudiantiles identificables.\n`
     : '';
 

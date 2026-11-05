@@ -90,14 +90,24 @@ test('a program link activates cohort and measurement context without exposing i
     url: 'http://localhost/?program=uy-us-ai-literacy-2027&cohort=liceo-01&phase=final'
   });
 
+  // Initially without country, pilot card is hidden and payload has no programCode
+  assert.equal($('#programContextCard').hidden, true);
+  const initialPayload = w.buildResultPayload();
+  assert.equal(initialPayload.programCode, undefined);
+
+  // When selecting Estados Unidos, pilot activates, language changes to English, card becomes visible
+  change('#countrySelect', 'Estados Unidos');
+  assert.equal(w.state.country, 'Estados Unidos');
+  assert.equal(w.state.lang, 'en');
+  assert.equal($('#languageSelect').value, 'en');
   assert.equal(w.state.programCode, 'uy-us-ai-literacy-2027');
   assert.equal(w.state.cohortCode, 'liceo-01');
   assert.equal(w.state.measurementPhase, 'final');
   assert.match(w.state.participantId, /^p-[a-z0-9-]+$/);
   assert.equal($('#programContextCard').hidden, false);
-  assert.match($('#programContextTitle').textContent, /Uruguay–Estados Unidos/);
-  assert.equal($('#programContextPhase').textContent, 'Evaluación final');
-  assert.match($('#programContextPrivacy').textContent, /sin guardar correo/i);
+  assert.match($('#programContextTitle').textContent, /Uruguay–United States/);
+  assert.equal($('#programContextPhase').textContent, 'Final assessment');
+  assert.match($('#programContextPrivacy').textContent, /without storing your email/i);
 
   const payload = w.buildResultPayload();
   assert.equal(payload.programCode, 'uy-us-ai-literacy-2027');
@@ -105,9 +115,12 @@ test('a program link activates cohort and measurement context without exposing i
   assert.equal(payload.measurementPhase, 'final');
   assert.equal(payload.participantId, w.state.participantId);
 
-  change('#languageSelect', 'en');
-  assert.match($('#programContextTitle').textContent, /Uruguay–United States/);
-  assert.equal($('#programContextPhase').textContent, 'Final assessment');
+  // Switching away to another country (e.g. Uruguay) deactivates the pilot card and switches language back to Spanish
+  change('#countrySelect', 'Uruguay');
+  assert.equal($('#programContextCard').hidden, true);
+  assert.equal(w.state.lang, 'es');
+  const payloadUy = w.buildResultPayload();
+  assert.equal(payloadUy.programCode, undefined);
 });
 
 test('profile selection is accessible and preserves a valid level on reselection', async t => {
@@ -605,11 +618,14 @@ test('program mode includes the 8-item AI literacy instrument (lit-v1), blocks p
     url: 'http://localhost/?program=uy-us-ai-literacy-2027&cohort=pilot-a&phase=baseline'
   });
 
+  // Paso 0: País - seleccionar Estados Unidos activa el piloto y cambia a inglés
+  click('[data-country="Estados Unidos"]');
+  assert.equal(w.state.country, 'Estados Unidos');
+  assert.equal(w.state.lang, 'en');
+  assert.equal($('#languageSelect').value, 'en');
+
   const keys = w.getOnboardingStepKeys();
   assert.equal(keys.join(','), 'pais,profile,contexto,programa,cierre');
-
-  // Paso 0: País
-  click('[data-country="Uruguay"]');
   click('#onboardingNextBtn');
   assert.equal(w.state.onboardingStep, 1);
 
@@ -622,7 +638,7 @@ test('program mode includes the 8-item AI literacy instrument (lit-v1), blocks p
   change('#nivelEducativo', $('#nivelEducativo').options[1].value);
   click('#onboardingNextBtn');
   assert.equal(w.state.onboardingStep, 3);
-  assert.match($('#onboardingStepTitle').textContent, /Alfabetización IA/);
+  assert.equal($('#onboardingStepTitle').textContent, 'AI Literacy');
   assert.equal($('.onboarding-flow').classList.contains('has-program-step'), true);
 
   // El contenedor del instrumento contiene las 8 preguntas (5 situaciones + 3 prácticas)
