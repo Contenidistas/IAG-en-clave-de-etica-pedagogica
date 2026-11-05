@@ -82,7 +82,9 @@
             <button class="tab active" type="button" role="tab" aria-selected="true" data-tab="completions">Recorridos</button>
             <button class="tab" type="button" role="tab" aria-selected="false" data-tab="feedback">Valoraciones</button>
             <button class="tab" type="button" role="tab" aria-selected="false" data-tab="labFeedback">Laboratorio</button>
-            <button class="tab" type="button" role="tab" aria-selected="false" data-tab="comparative">📊 Comparativa UY vs CA</button>
+            <button class="tab" type="button" role="tab" aria-selected="false" data-tab="analysis">Análisis cuantitativo</button>
+            <button class="tab" type="button" role="tab" aria-selected="false" data-tab="inference">Análisis inferencial</button>
+            <button class="tab" type="button" role="tab" aria-selected="false" data-tab="programEval">Monitoreo M&amp;E</button>
           </div>
           <label class="sr-only" for="searchInput">Buscar en registros</label>
           <input id="searchInput" class="input" type="search" placeholder="Buscar...">
@@ -106,6 +108,14 @@
           <select id="countryFilter" class="select">
             <option value="">Todos los países</option>
           </select>
+          <label class="sr-only" for="programFilter">Filtrar por programa</label>
+          <select id="programFilter" class="select">
+            <option value="">Todos los programas</option>
+          </select>
+          <label class="sr-only" for="phaseFilter">Filtrar por momento de medición</label>
+          <select id="phaseFilter" class="select">
+            <option value="">Todos los momentos</option>
+          </select>
           <label class="sr-only" for="levelFilter">Filtrar por resultado</label>
           <select id="levelFilter" class="select">
             <option value="">Todos los resultados</option>
@@ -118,11 +128,347 @@
           <button id="exportCompletionsBtn" class="btn" type="button">CSV recorridos filtrados</button>
           <button id="exportFeedbackBtn" class="btn" type="button">CSV valoraciones filtradas</button>
           <button id="exportLabFeedbackBtn" class="btn" type="button">CSV laboratorio filtrado</button>
-          <button id="exportComparativeCsvBtn" class="btn primary" type="button">📊 CSV Dataset Investigación (UY vs CA)</button>
           <button id="exportAnswersBtn" class="btn" type="button">CSV respuestas filtradas</button>
         </div>
 
         <div id="status" class="status" aria-live="polite">Esperando datos...</div>
+
+        <div id="analysisView" class="analysis-view hidden">
+          <section class="analysis-builder" aria-labelledby="analysisTitle">
+            <div class="analysis-heading">
+              <div>
+                <span class="analysis-eyebrow">Exploración cuantitativa</span>
+                <h3 id="analysisTitle">Construir una comparación</h3>
+                <p>Selecciona variables e indicadores. La muestra respeta la búsqueda, el programa, el momento, el país, el perfil, la formación y las fechas elegidas arriba.</p>
+              </div>
+              <div class="analysis-actions" aria-label="Exportar análisis">
+                <button id="exportAnalysisPngBtn" class="btn primary" type="button">Exportar PNG</button>
+                <button id="exportAnalysisSvgBtn" class="btn" type="button">Exportar SVG</button>
+                <button id="exportAnalysisCsvBtn" class="btn" type="button">Exportar CSV</button>
+              </div>
+            </div>
+
+            <div class="analysis-controls">
+              <label>
+                <span>Fuente</span>
+                <select id="analysisSource" class="select">
+                  <option value="completions">Recorridos completados</option>
+                  <option value="feedback">Valoraciones</option>
+                </select>
+              </label>
+              <label>
+                <span>Variable principal</span>
+                <select id="analysisDimension" class="select"></select>
+              </label>
+              <label>
+                <span>Comparar según</span>
+                <select id="analysisCompare" class="select"></select>
+              </label>
+              <label>
+                <span>Indicador</span>
+                <select id="analysisMetric" class="select"></select>
+              </label>
+              <label>
+                <span>Gráfico</span>
+                <select id="analysisChartType" class="select">
+                  <option value="bars">Barras agrupadas</option>
+                  <option value="stacked">Barras apiladas</option>
+                  <option value="radar">Radar / tela de araña</option>
+                  <option value="scatter">Dispersión</option>
+                  <option value="line">Líneas</option>
+                  <option value="heatmap">Mapa de calor</option>
+                </select>
+              </label>
+              <label id="analysisXAxisControl" class="hidden">
+                <span>Eje X de dispersión</span>
+                <select id="analysisXAxis" class="select"></select>
+              </label>
+              <label id="analysisYAxisControl" class="hidden">
+                <span>Eje Y de dispersión</span>
+                <select id="analysisYAxis" class="select"></select>
+              </label>
+              <label>
+                <span>Orden</span>
+                <select id="analysisOrder" class="select">
+                  <option value="value">Mayor resultado primero</option>
+                  <option value="alphabetical">Orden alfabético</option>
+                </select>
+              </label>
+            </div>
+          </section>
+
+          <section class="analysis-results" aria-live="polite">
+            <div class="analysis-summary" aria-label="Resumen del análisis">
+              <article>
+                <span>Muestra filtrada</span>
+                <strong id="analysisSampleSize">0</strong>
+              </article>
+              <article>
+                <span>Categorías</span>
+                <strong id="analysisCategoryCount">0</strong>
+              </article>
+              <article>
+                <span>Series comparadas</span>
+                <strong id="analysisSeriesCount">0</strong>
+              </article>
+              <p id="analysisSummaryText">Carga datos para comenzar el análisis.</p>
+            </div>
+            <div id="analysisEmpty" class="analysis-empty hidden">No hay registros que coincidan con los filtros actuales.</div>
+            <div id="analysisChart" class="analysis-chart" aria-label="Gráfico del análisis"></div>
+
+            <details id="analysisDataDetails" class="analysis-data">
+              <summary>Ver tabla de datos del gráfico</summary>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th id="analysisDimensionHeading">Variable</th>
+                      <th id="analysisCompareHeading">Comparación</th>
+                      <th id="analysisMetricHeading">Valor</th>
+                      <th id="analysisFourthHeading">N</th>
+                    </tr>
+                  </thead>
+                  <tbody id="analysisDataBody"></tbody>
+                </table>
+              </div>
+            </details>
+          </section>
+        </div>
+
+        <div id="inferenceView" class="analysis-view hidden">
+          <section class="analysis-builder" aria-labelledby="inferenceTitle">
+            <div class="analysis-heading">
+              <div>
+                <span class="analysis-eyebrow">Exploración inferencial</span>
+                <h3 id="inferenceTitle">Buscar relaciones relevantes</h3>
+                <p>Dos análisis para responder preguntas concretas: asociación entre categorías y comparación de puntajes entre grupos. Los resultados son exploratorios y no implican causalidad.</p>
+              </div>
+              <div class="analysis-actions" aria-label="Exportar análisis inferencial">
+                <button id="exportInferencePngBtn" class="btn primary" type="button">Exportar PNG</button>
+                <button id="exportInferenceSvgBtn" class="btn" type="button">Exportar SVG</button>
+                <button id="exportInferenceCsvBtn" class="btn" type="button">Exportar CSV</button>
+              </div>
+            </div>
+
+            <div class="analysis-controls">
+              <label>
+                <span>Pregunta</span>
+                <select id="inferenceMode" class="select">
+                  <option value="association">¿Hay relación entre dos variables?</option>
+                  <option value="groups">¿Difiere un puntaje entre grupos?</option>
+                </select>
+              </label>
+              <label>
+                <span>Fuente</span>
+                <select id="inferenceSource" class="select">
+                  <option value="completions">Recorridos completados</option>
+                  <option value="feedback">Valoraciones</option>
+                </select>
+              </label>
+              <label id="inferenceVariableAControl">
+                <span>Primera variable</span>
+                <select id="inferenceVariableA" class="select"></select>
+              </label>
+              <label id="inferenceVariableBControl">
+                <span>Segunda variable</span>
+                <select id="inferenceVariableB" class="select"></select>
+              </label>
+              <label id="inferenceGroupControl" class="hidden">
+                <span>Agrupar por</span>
+                <select id="inferenceGroup" class="select"></select>
+              </label>
+              <label id="inferenceOutcomeControl" class="hidden">
+                <span>Resultado numérico</span>
+                <select id="inferenceOutcome" class="select"></select>
+              </label>
+            </div>
+          </section>
+
+          <section class="analysis-results" aria-live="polite">
+            <div class="analysis-summary inference-summary" aria-label="Resumen inferencial">
+              <article>
+                <span>Muestra analizada</span>
+                <strong id="inferenceSampleSize">0</strong>
+              </article>
+              <article>
+                <span>Técnica</span>
+                <strong id="inferenceMethod">—</strong>
+              </article>
+              <article>
+                <span>Valor p</span>
+                <strong id="inferencePValue">—</strong>
+              </article>
+              <article>
+                <span>Tamaño del efecto</span>
+                <strong id="inferenceEffect">—</strong>
+              </article>
+              <p id="inferenceSummaryText">Carga datos para comenzar el análisis.</p>
+            </div>
+            <div id="inferenceWarning" class="inference-warning hidden"></div>
+            <div id="inferenceEmpty" class="analysis-empty hidden">No hay una muestra suficiente para esta comparación.</div>
+            <div id="inferenceChart" class="analysis-chart" aria-label="Gráfico del análisis inferencial"></div>
+
+            <details id="inferenceDataDetails" class="analysis-data">
+              <summary>Ver datos y diagnósticos del análisis</summary>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th id="inferenceHeadingA">Variable A</th>
+                      <th id="inferenceHeadingB">Variable B</th>
+                      <th id="inferenceHeadingC">Observado</th>
+                      <th id="inferenceHeadingD">Esperado</th>
+                      <th id="inferenceHeadingE">Residuo</th>
+                      <th id="inferenceHeadingF" class="hidden">Q3</th>
+                    </tr>
+                  </thead>
+                  <tbody id="inferenceDataBody"></tbody>
+                </table>
+              </div>
+            </details>
+          </section>
+        </div>
+
+        <div id="programEvalView" class="analysis-view hidden">
+          <section class="analysis-builder" aria-labelledby="programEvalTitle">
+            <div class="analysis-heading">
+              <div>
+                <span class="analysis-eyebrow">Programa Binacional Uruguay–EE. UU. · Monitoreo y Evaluación (M&amp;E)</span>
+                <h3 id="programEvalTitle">Seguimiento longitudinal Pre/Post y metas de cohorte</h3>
+                <p>Compara el diagnóstico inicial (baseline), la evaluación final (final) y el seguimiento a 60–90 días (followup) por cohorte e identificador seudónimo (<code>participantId</code>), sin almacenar datos personales.</p>
+              </div>
+              <div class="analysis-actions" aria-label="Exportar monitoreo M&E">
+                <button id="exportProgramEvalReportBtn" class="btn primary" type="button">Informe M&amp;E (.md)</button>
+                <button id="exportProgramEvalCsvBtn" class="btn" type="button">Exportar cohortes (.csv)</button>
+                <button id="resetProgramTargetsBtn" class="btn" type="button">Restaurar metas 2027</button>
+              </div>
+            </div>
+
+            <div class="analysis-controls program-eval-controls" aria-label="Configuración de metas del programa">
+              <label>
+                <span>Meta participantes únicos</span>
+                <input id="programTargetParticipants" class="input" type="number" min="1" max="100000" step="1" value="300">
+              </label>
+              <label>
+                <span>Meta instituciones / cohortes</span>
+                <input id="programTargetCohorts" class="input" type="number" min="1" max="1000" step="1" value="10">
+              </label>
+              <label>
+                <span>Meta finalización Pre→Post (%)</span>
+                <input id="programTargetCompletion" class="input" type="number" min="1" max="100" step="1" value="80">
+              </label>
+              <label>
+                <span>Meta mejora Pre/Post (%)</span>
+                <input id="programTargetImprovement" class="input" type="number" min="1" max="500" step="1" value="20">
+              </label>
+            </div>
+
+            <details id="cohortLinkBuilderDetails" class="program-link-builder">
+              <summary>Generador de enlaces por cohorte e intervención (Inicial · Final · Seguimiento)</summary>
+              <div class="program-link-builder-body">
+                <div class="program-link-inputs">
+                  <label>
+                    <span>Programa</span>
+                    <select id="cohortLinkProgramSelect" class="select">
+                      <option value="uy-us-ai-literacy-2027">uy-us-ai-literacy-2027 (Laboratorio UY–EE. UU.)</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>Código de cohorte / institución (sin espacios ni tildes)</span>
+                    <input id="cohortLinkCodeInput" class="input" type="text" maxlength="48" value="cfe-montevideo-01" placeholder="ej. liceo-salto-01">
+                  </label>
+                </div>
+                <div class="program-link-list">
+                  <div class="program-link-row">
+                    <span class="program-link-stage">1. Diagnóstico inicial (baseline)</span>
+                    <input id="cohortLinkBaselineInput" class="input" type="text" readonly aria-label="Enlace diagnóstico inicial">
+                    <button id="copyBaselineLinkBtn" class="btn" type="button" data-copy-cohort-phase="baseline">Copiar</button>
+                  </div>
+                  <div class="program-link-row">
+                    <span class="program-link-stage">2. Evaluación post-taller (final)</span>
+                    <input id="cohortLinkFinalInput" class="input" type="text" readonly aria-label="Enlace evaluación final">
+                    <button id="copyFinalLinkBtn" class="btn" type="button" data-copy-cohort-phase="final">Copiar</button>
+                  </div>
+                  <div class="program-link-row">
+                    <span class="program-link-stage">3. Seguimiento 60–90 días (followup)</span>
+                    <input id="cohortLinkFollowupInput" class="input" type="text" readonly aria-label="Enlace seguimiento">
+                    <button id="copyFollowupLinkBtn" class="btn" type="button" data-copy-cohort-phase="followup">Copiar</button>
+                  </div>
+                </div>
+                <p id="cohortLinkStatus" class="muted program-link-status" aria-live="polite">Compartí el enlace de cada momento con tu grupo; el navegador conservará un ID seudónimo local para emparejar Pre/Post.</p>
+              </div>
+            </details>
+
+            <div class="program-eval-stages" aria-label="Etapas del recorrido de intervención">
+              <article class="program-stage-card">
+                <span class="program-stage-tag">Momento 1 · Baseline</span>
+                <strong>Diagnóstico inicial</strong>
+                <div class="program-stage-metrics" id="programEvalStageBaseline">0 recorridos · Prom. —</div>
+              </article>
+              <article class="program-stage-card">
+                <span class="program-stage-tag">Momento 2 · Final</span>
+                <strong>Evaluación post-taller</strong>
+                <div class="program-stage-metrics" id="programEvalStageFinal">0 recorridos · Prom. —</div>
+              </article>
+              <article class="program-stage-card">
+                <span class="program-stage-tag">Momento 3 · Follow-up</span>
+                <strong>Seguimiento 60–90 días</strong>
+                <div class="program-stage-metrics" id="programEvalStageFollowup">0 recorridos · Prom. —</div>
+              </article>
+            </div>
+          </section>
+
+          <section class="analysis-results" aria-live="polite">
+            <div class="analysis-summary program-eval-summary" aria-label="Indicadores de monitoreo frente a metas 2027">
+              <article>
+                <span id="programEvalParticipantsLabel">Participantes únicos (Meta 300)</span>
+                <strong id="programEvalParticipants">0</strong>
+              </article>
+              <article>
+                <span id="programEvalCohortsLabel">Cohortes activas (Meta 10)</span>
+                <strong id="programEvalCohorts">0</strong>
+              </article>
+              <article>
+                <span id="programEvalCompletionLabel">Finalización Pre→Post (Meta 80%)</span>
+                <strong id="programEvalCompletionRate">—</strong>
+              </article>
+              <article>
+                <span id="programEvalImprovementLabel">Cambio Pre/Post (Meta +20%)</span>
+                <strong id="programEvalAggregateDelta">—</strong>
+              </article>
+              <article>
+                <span>Cambio pareado (ID seudónimo)</span>
+                <strong id="programEvalPairedDelta">—</strong>
+              </article>
+              <article>
+                <span>Alfabetización IA (lit-v1 pareado)</span>
+                <strong id="programEvalLiteracyDelta">—</strong>
+              </article>
+              <p id="programEvalSummaryText">Carga datos de programa para evaluar indicadores longitudinales.</p>
+            </div>
+
+            <div id="programEvalEmpty" class="analysis-empty hidden">No hay registros asociados a un programa o cohorte para los filtros seleccionados.</div>
+
+            <div id="programEvalTableWrap" class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Cohorte / Institución</th>
+                    <th>Programa</th>
+                    <th>País(es)</th>
+                    <th>Participantes</th>
+                    <th>Inicial (N / Ética [Lit.])</th>
+                    <th>Final (N / Ética [Lit.])</th>
+                    <th>Seguimiento (N / Ética [Lit.])</th>
+                    <th>Pareados (N)</th>
+                    <th>Cambio Δ Ética / Lit.</th>
+                  </tr>
+                </thead>
+                <tbody id="programEvalCohortBody"></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
 
         <div id="completionsView" class="split hidden">
           <div class="table-wrap">
@@ -190,6 +536,9 @@
       </section>
     </div>
   </main>
+  <script src="country-context.js"></script>
+  <script src="admin-analysis.js"></script>
+  <script src="admin-inference.js"></script>
   <script src="admin.js"></script>
 </body>
 </html>

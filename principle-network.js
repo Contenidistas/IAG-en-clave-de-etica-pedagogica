@@ -96,6 +96,7 @@ function renderNetworkEvidence(target, node) {
     ${responses.length > 1 ? `<details class="en-response-history"><summary>Ver las ${responses.length} respuestas · ${escape(counts)}</summary><ul class="en-response-list">${responses.map(responseHtml).join('')}</ul></details>` : ''}
     <div class="en-framework"><span class="en-section-label">Lectura desde los marcos</span><p>${escape(guidance.basis)}</p>
       <p class="en-agesic">${escape(guidance.countryNote || guidance.agesic || '')}</p>
+      ${guidance.bilateralNote ? `<p class="en-bilateral">${escape(guidance.bilateralNote)}</p>` : ''}
       <div class="en-source-links">${guidance.sources.map(source => `<a href="${escape(source.url)}" target="_blank" rel="noopener noreferrer">${escape(source.label)} ↗</a>`).join('')}</div>
     </div>
     <div class="en-action"><span class="en-section-label">${node.className === 'done' ? 'Para sostener esta práctica' : node.className === 'pending' ? 'Para explorar este eje' : 'Siguiente paso posible'}</span><p>${escape(guidance.action)}</p></div>
@@ -139,7 +140,7 @@ function renderPrincipleGraph(target, statusTarget, options = {}) {
       element.setAttribute('aria-pressed', String(selectedHere));
     });
     target.querySelectorAll('.en-link').forEach(link => link.classList.toggle('is-preview', link.dataset.criterion === node.id));
-    const detailKey = JSON.stringify([state.lang, state.country, node.id, node.status, node.responses]);
+    const detailKey = JSON.stringify([state.lang, state.country, state.programCode, node.id, node.status, node.responses]);
     if (target._networkDetailKey !== detailKey) {
       target._networkDetailKey = detailKey;
       renderNetworkEvidence(target, node);

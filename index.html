@@ -207,6 +207,23 @@
                   Contanos desde dónde participás. Vamos a adaptar las preguntas y la devolución a tu contexto.
                 </p>
 
+                <section id="programContextCard" class="program-context-card" aria-labelledby="programContextTitle" hidden>
+                  <span id="programContextEyebrow" class="program-context-eyebrow">Modo programa piloto</span>
+                  <h3 id="programContextTitle"></h3>
+                  <p id="programContextDescription"></p>
+                  <dl class="program-context-meta">
+                    <div>
+                      <dt id="programContextCohortLabel">Cohorte</dt>
+                      <dd id="programContextCohort"></dd>
+                    </div>
+                    <div>
+                      <dt id="programContextPhaseLabel">Momento de medición</dt>
+                      <dd id="programContextPhase"></dd>
+                    </div>
+                  </dl>
+                  <p id="programContextPrivacy" class="program-context-privacy"></p>
+                </section>
+
                 <div class="setup-progress-panel" id="onboardingProgress">
                   <div class="setup-progress-copy">
                     <span id="onboardingStepCounter">Paso 1 de 4</span>
@@ -297,6 +314,11 @@
                   <label for="playerName" style="display: block; margin-bottom: 0.5rem; font-weight: 600;" data-i18n="label_name">Tu nombre (opcional)</label>
                   <input type="text" id="playerName" class="input" maxlength="80" autocomplete="nickname" placeholder="Ingresá tu nombre o un seudónimo" data-i18n-placeholder="placeholder_name" />
                 </div>
+
+                <!-- Instrumento breve pre/post (solo en modo programa) -->
+                <section id="literacyInstrumentWrapper" class="onboarding-step literacy-step" data-onboarding-step="programa" aria-labelledby="literacyInstrumentTitle">
+                  <div id="literacyInstrumentItems" class="literacy-instrument"></div>
+                </section>
 
                 <!-- Nivel de familiaridad con el tema -->
                 <div id="familiaridadInicialWrapper" class="onboarding-step" data-onboarding-step="cierre" style="max-width: 500px; margin: 1.5rem auto;">
@@ -966,7 +988,34 @@
             <button type="button" class="agreement-format-btn" data-agreement-format="estudiante">Estudiante</button>
             <button type="button" class="agreement-format-btn" data-agreement-format="institucional">Institucional</button>
             <button type="button" class="agreement-format-btn" data-agreement-format="virtual">Aula virtual</button>
+            <button type="button" class="agreement-format-btn" data-agreement-format="binacional">Protocolo UY–EE. UU.</button>
           </div>
+          <details id="agreementCustomConfigDetails" class="agreement-config-details">
+            <summary>Configurar parámetros específicos del acuerdo o protocolo (centro, plazos y evidencia)</summary>
+            <div class="agreement-config-grid">
+              <label>
+                <span>Institución, centro o espacio educativo (opcional)</span>
+                <input type="text" id="agreementInstitutionInput" class="input" maxlength="90" placeholder="Ej. Instituto Normal / Liceo 1 / Distrito escolar" />
+              </label>
+              <label>
+                <span>Horizonte de revisión y seguimiento</span>
+                <select id="agreementHorizonSelect" class="input">
+                  <option value="30 días (al cierre de la unidad o actividad)">30 días (al cierre de la unidad o actividad)</option>
+                  <option value="60 días (seguimiento intermedio de cohorte)">60 días (seguimiento intermedio de cohorte)</option>
+                  <option value="90 días (evaluación trimestral / post-intervención)">90 días (evaluación trimestral / post-intervención)</option>
+                </select>
+              </label>
+              <label>
+                <span>Evidencia práctica comprometida</span>
+                <select id="agreementCommitmentSelect" class="input">
+                  <option value="Declaración explícita de uso de IA y registro breve de consultas (prompts)">Declaración de uso y registro de prompts</option>
+                  <option value="Auditoría previa de privacidad (sin datos personales ni sensibles de estudiantes)">Auditoría previa de privacidad estudiantil</option>
+                  <option value="Contrastación obligatoria con al menos dos fuentes académicas o institucionales">Contrastación con dos fuentes independientes</option>
+                  <option value="Instancia oral o bitácora de proceso que evidencie autoría y criterio propio">Defensa oral o bitácora de proceso</option>
+                </select>
+              </label>
+            </div>
+          </details>
           <textarea id="agreementBuilderText" class="input agreement-builder-textarea" rows="12" aria-label="Acuerdo didáctico generado"></textarea>
           <div class="agreement-builder-actions">
             <button class="btn btn-primary" id="copyAgreementBtn" type="button">Copiar acuerdo</button>
@@ -975,6 +1024,54 @@
             <p id="agreementBuilderStatus" class="agreement-builder-status" aria-live="polite"></p>
           </div>
         </div>
+
+        <!-- Kit de taller y facilitación (plegable en web abierta, desplegado en modo programa) -->
+        <details id="workshopKitDetails" class="card workshop-kit-card mb-3">
+          <summary class="workshop-kit-summary">
+            <div>
+              <p class="section-kicker">Metodología replicable · 4 momentos</p>
+              <h3>Kit de taller y facilitación (Programa / Cohorte)</h3>
+            </div>
+            <span class="agreement-builder-badge">Configurable</span>
+          </summary>
+          <div class="workshop-kit-body">
+            <p class="agreement-builder-copy">
+              Configurá una guía de taller lista para implementar en tu institución combinando diagnóstico inicial (baseline), discusión de casos comparados Uruguay–EE. UU., acuerdo aplicable y evaluación final / seguimiento a 60–90 días.
+            </p>
+            <div class="agreement-config-grid">
+              <label>
+                <span>Destinatarios del taller</span>
+                <select id="workshopAudienceSelect" class="input">
+                  <option value="docentes">Docentes y formadores</option>
+                  <option value="estudiantes">Estudiantes de educación media y superior</option>
+                  <option value="directivos">Equipos directivos y referentes institucionales</option>
+                </select>
+              </label>
+              <label>
+                <span>Duración estimada</span>
+                <select id="workshopDurationSelect" class="input">
+                  <option value="60">60 minutos (Taller focalizado)</option>
+                  <option value="90" selected>90 minutos (Laboratorio completo Pre/Post)</option>
+                  <option value="120">120 minutos (Jornada con protocolo institucional)</option>
+                </select>
+              </label>
+              <label>
+                <span>Enfoque principal</span>
+                <select id="workshopFocusSelect" class="input">
+                  <option value="binacional">Comparado Uruguay–EE. UU. (ANEP/Ceibal + NIST/Ed.gov/IES)</option>
+                  <option value="aula">Práctica de aula, diseño de consignas y autoría</option>
+                  <option value="gobernanza">Gobernanza de datos, privacidad y equidad</option>
+                </select>
+              </label>
+            </div>
+            <textarea id="workshopKitText" class="input agreement-builder-textarea" rows="10" readonly aria-label="Guía de taller generada"></textarea>
+            <div class="agreement-builder-actions">
+              <button class="btn btn-primary" id="downloadWorkshopKitBtn" type="button">Descargar kit de taller (.md)</button>
+              <button class="btn btn-outline" id="copyWorkshopKitBtn" type="button">Copiar guía</button>
+              <p id="workshopKitStatus" class="agreement-builder-status" aria-live="polite"></p>
+            </div>
+          </div>
+        </details>
 
         <!-- Casos situados -->
         <div class="card situated-cases-card mb-3" id="situatedCasesSection">
@@ -1142,6 +1239,8 @@
        ========================================== -->
   <script src="storage.js"></script>
   <script src="country-context.js"></script>
+  <script src="program-context.js"></script>
+  <script src="literacy-instrument.js"></script>
   <script src="configuracion-ia.js"></script>
   <script src="ethical-evidence.js"></script>
   <script src="ui-ia.js"></script>

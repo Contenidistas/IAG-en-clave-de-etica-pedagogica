@@ -8,7 +8,7 @@
    ======================================== */
 const CONFIG = {
   debug: false,
-  schemaVersion: '2026-10-29.1',
+  schemaVersion: '2026-11-05.1',
   apiBaseUrl: 'https://iag-etica-api.suscripcionessh.workers.dev',
   get dataEndpoint() {
     return `${this.apiBaseUrl}/events`;
@@ -625,6 +625,8 @@ autoria: {
    Agregá esto al objeto state existente:
    ======================================== */
 
+const activeProgramContext = window.ProgramContext?.current || {};
+
 const state = {
   lang: window.appStorage.local.getItem('app_lang') || 'es',
   profile: null,        // docente | estudiante | especializado
@@ -641,6 +643,10 @@ const state = {
   familiaridadInicial: '',
   recursosSimilares: '',
   consentTracking: false,
+  programCode: activeProgramContext.active ? activeProgramContext.programCode : '',
+  cohortCode: activeProgramContext.active ? activeProgramContext.cohortCode : '',
+  measurementPhase: activeProgramContext.active ? activeProgramContext.measurementPhase : '',
+  participantId: activeProgramContext.active ? activeProgramContext.participantId : '',
   activeResultTab: 'resumen',
   agreementFormat: 'aula'
 };

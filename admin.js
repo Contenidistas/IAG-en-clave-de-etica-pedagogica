@@ -9,6 +9,11 @@
       answers: [],
       selectedCompletions: new Set(),
       selectedFeedback: new Set(),
+      analysisModel: null,
+      analysisConfigured: false,
+      inferenceModel: null,
+      inferenceConfigured: false,
+      programEvalModel: null,
     };
 
     const els = {
@@ -40,6 +45,8 @@
       familiarityFilter: document.getElementById('familiarityFilter'),
       resourcesFilter: document.getElementById('resourcesFilter'),
       countryFilter: document.getElementById('countryFilter'),
+      programFilter: document.getElementById('programFilter'),
+      phaseFilter: document.getElementById('phaseFilter'),
       levelFilter: document.getElementById('levelFilter'),
       dateFromFilter: document.getElementById('dateFromFilter'),
       dateToFilter: document.getElementById('dateToFilter'),
@@ -54,26 +61,102 @@
       exportCompletionsBtn: document.getElementById('exportCompletionsBtn'),
       exportFeedbackBtn: document.getElementById('exportFeedbackBtn'),
       exportAnswersBtn: document.getElementById('exportAnswersBtn'),
-      exportComparativeCsvBtn: document.getElementById('exportComparativeCsvBtn'),
-      comparativeView: document.getElementById('comparativeView'),
-      comparativeTableBody: document.getElementById('comparativeTableBody'),
-      compUyCount: document.getElementById('compUyCount'),
-      compUyScore: document.getElementById('compUyScore'),
-      compUyProfiles: document.getElementById('compUyProfiles'),
-      compCaCount: document.getElementById('compCaCount'),
-      compCaScore: document.getElementById('compCaScore'),
-      compCaProfiles: document.getElementById('compCaProfiles'),
-      compOtherCount: document.getElementById('compOtherCount'),
-      compOtherScore: document.getElementById('compOtherScore'),
-      compOtherCountries: document.getElementById('compOtherCountries'),
-      comparativeInsightText: document.getElementById('comparativeInsightText'),
       exportCutZipBtn: document.getElementById('exportCutZipBtn'),
+      analysisView: document.getElementById('analysisView'),
+      analysisSource: document.getElementById('analysisSource'),
+      analysisDimension: document.getElementById('analysisDimension'),
+      analysisCompare: document.getElementById('analysisCompare'),
+      analysisMetric: document.getElementById('analysisMetric'),
+      analysisChartType: document.getElementById('analysisChartType'),
+      analysisXAxisControl: document.getElementById('analysisXAxisControl'),
+      analysisXAxis: document.getElementById('analysisXAxis'),
+      analysisYAxisControl: document.getElementById('analysisYAxisControl'),
+      analysisYAxis: document.getElementById('analysisYAxis'),
+      analysisOrder: document.getElementById('analysisOrder'),
+      analysisSampleSize: document.getElementById('analysisSampleSize'),
+      analysisCategoryCount: document.getElementById('analysisCategoryCount'),
+      analysisSeriesCount: document.getElementById('analysisSeriesCount'),
+      analysisSummaryText: document.getElementById('analysisSummaryText'),
+      analysisEmpty: document.getElementById('analysisEmpty'),
+      analysisChart: document.getElementById('analysisChart'),
+      analysisDataDetails: document.getElementById('analysisDataDetails'),
+      analysisDataBody: document.getElementById('analysisDataBody'),
+      analysisDimensionHeading: document.getElementById('analysisDimensionHeading'),
+      analysisCompareHeading: document.getElementById('analysisCompareHeading'),
+      analysisMetricHeading: document.getElementById('analysisMetricHeading'),
+      analysisFourthHeading: document.getElementById('analysisFourthHeading'),
+      exportAnalysisPngBtn: document.getElementById('exportAnalysisPngBtn'),
+      exportAnalysisSvgBtn: document.getElementById('exportAnalysisSvgBtn'),
+      exportAnalysisCsvBtn: document.getElementById('exportAnalysisCsvBtn'),
+      inferenceView: document.getElementById('inferenceView'),
+      inferenceMode: document.getElementById('inferenceMode'),
+      inferenceSource: document.getElementById('inferenceSource'),
+      inferenceVariableAControl: document.getElementById('inferenceVariableAControl'),
+      inferenceVariableA: document.getElementById('inferenceVariableA'),
+      inferenceVariableBControl: document.getElementById('inferenceVariableBControl'),
+      inferenceVariableB: document.getElementById('inferenceVariableB'),
+      inferenceGroupControl: document.getElementById('inferenceGroupControl'),
+      inferenceGroup: document.getElementById('inferenceGroup'),
+      inferenceOutcomeControl: document.getElementById('inferenceOutcomeControl'),
+      inferenceOutcome: document.getElementById('inferenceOutcome'),
+      inferenceSampleSize: document.getElementById('inferenceSampleSize'),
+      inferenceMethod: document.getElementById('inferenceMethod'),
+      inferencePValue: document.getElementById('inferencePValue'),
+      inferenceEffect: document.getElementById('inferenceEffect'),
+      inferenceSummaryText: document.getElementById('inferenceSummaryText'),
+      inferenceWarning: document.getElementById('inferenceWarning'),
+      inferenceEmpty: document.getElementById('inferenceEmpty'),
+      inferenceChart: document.getElementById('inferenceChart'),
+      inferenceDataDetails: document.getElementById('inferenceDataDetails'),
+      inferenceDataBody: document.getElementById('inferenceDataBody'),
+      inferenceHeadingA: document.getElementById('inferenceHeadingA'),
+      inferenceHeadingB: document.getElementById('inferenceHeadingB'),
+      inferenceHeadingC: document.getElementById('inferenceHeadingC'),
+      inferenceHeadingD: document.getElementById('inferenceHeadingD'),
+      inferenceHeadingE: document.getElementById('inferenceHeadingE'),
+      inferenceHeadingF: document.getElementById('inferenceHeadingF'),
+      exportInferencePngBtn: document.getElementById('exportInferencePngBtn'),
+      exportInferenceSvgBtn: document.getElementById('exportInferenceSvgBtn'),
+      exportInferenceCsvBtn: document.getElementById('exportInferenceCsvBtn'),
+      programEvalView: document.getElementById('programEvalView'),
+      programEvalStageBaseline: document.getElementById('programEvalStageBaseline'),
+      programEvalStageFinal: document.getElementById('programEvalStageFinal'),
+      programEvalStageFollowup: document.getElementById('programEvalStageFollowup'),
+      programEvalParticipants: document.getElementById('programEvalParticipants'),
+      programEvalCohorts: document.getElementById('programEvalCohorts'),
+      programEvalCompletionRate: document.getElementById('programEvalCompletionRate'),
+      programEvalAggregateDelta: document.getElementById('programEvalAggregateDelta'),
+      programEvalPairedDelta: document.getElementById('programEvalPairedDelta'),
+      programEvalLiteracyDelta: document.getElementById('programEvalLiteracyDelta'),
+      programEvalParticipantsLabel: document.getElementById('programEvalParticipantsLabel'),
+      programEvalCohortsLabel: document.getElementById('programEvalCohortsLabel'),
+      programEvalCompletionLabel: document.getElementById('programEvalCompletionLabel'),
+      programEvalImprovementLabel: document.getElementById('programEvalImprovementLabel'),
+      programTargetParticipants: document.getElementById('programTargetParticipants'),
+      programTargetCohorts: document.getElementById('programTargetCohorts'),
+      programTargetCompletion: document.getElementById('programTargetCompletion'),
+      programTargetImprovement: document.getElementById('programTargetImprovement'),
+      resetProgramTargetsBtn: document.getElementById('resetProgramTargetsBtn'),
+      cohortLinkProgramSelect: document.getElementById('cohortLinkProgramSelect'),
+      cohortLinkCodeInput: document.getElementById('cohortLinkCodeInput'),
+      cohortLinkBaselineInput: document.getElementById('cohortLinkBaselineInput'),
+      cohortLinkFinalInput: document.getElementById('cohortLinkFinalInput'),
+      cohortLinkFollowupInput: document.getElementById('cohortLinkFollowupInput'),
+      copyBaselineLinkBtn: document.getElementById('copyBaselineLinkBtn'),
+      copyFinalLinkBtn: document.getElementById('copyFinalLinkBtn'),
+      copyFollowupLinkBtn: document.getElementById('copyFollowupLinkBtn'),
+      cohortLinkStatus: document.getElementById('cohortLinkStatus'),
+      programEvalSummaryText: document.getElementById('programEvalSummaryText'),
+      programEvalEmpty: document.getElementById('programEvalEmpty'),
+      programEvalTableWrap: document.getElementById('programEvalTableWrap'),
+      programEvalCohortBody: document.getElementById('programEvalCohortBody'),
+      exportProgramEvalReportBtn: document.getElementById('exportProgramEvalReportBtn'),
+      exportProgramEvalCsvBtn: document.getElementById('exportProgramEvalCsvBtn'),
     };
 
     function headers() {
       return { 'X-Admin-Key': state.key };
     }
-
     async function api(path) {
       const response = await fetch(`${API_BASE}${path}`, {
         headers: headers(),
@@ -149,6 +232,8 @@
       const familiarity = els.familiarityFilter.value;
       const resources = els.resourcesFilter.value;
       const country = els.countryFilter.value;
+      const program = els.programFilter.value;
+      const phase = els.phaseFilter.value;
       const level = els.levelFilter.value;
       const haystack = normalizeText(Object.values(row).join(' '));
 
@@ -158,6 +243,8 @@
       if (familiarity && row.familiaridadInicial !== familiarity) return false;
       if (resources && row.recursosSimilares !== resources) return false;
       if (country && row.country !== country) return false;
+      if (program && row.programCode !== program) return false;
+      if (phase && row.measurementPhase !== phase) return false;
       if (level && row.likertLevel !== level) return false;
       if (!dateInRange(row.timestamp)) return false;
       return true;
@@ -208,13 +295,21 @@
       const currentFamiliarity = els.familiarityFilter.value;
       const currentResources = els.resourcesFilter.value;
       const currentCountry = els.countryFilter.value;
+      const currentProgram = els.programFilter.value;
+      const currentPhase = els.phaseFilter.value;
       const currentLevel = els.levelFilter.value;
       const profiles = new Set();
       const educationLevels = new Set();
       const familiarityLevels = new Set();
       const resourcesValues = new Set();
-      const countries = new Set();
+      const countries = new Set(
+        (window.CountryContext?.countries || [])
+          .map(option => option.name)
+          .filter(name => name && name !== 'Otro')
+      );
       const levels = new Set();
+      const programs = new Set();
+      const phases = new Set();
 
       state.completions.forEach(row => {
         if (row.profileKey || row.profile) profiles.add(row.profileKey || row.profile);
@@ -222,12 +317,16 @@
         if (row.familiaridadInicial) familiarityLevels.add(row.familiaridadInicial);
         if (row.recursosSimilares) resourcesValues.add(row.recursosSimilares);
         if (row.country) countries.add(row.country);
+        if (row.programCode) programs.add(row.programCode);
+        if (row.measurementPhase) phases.add(row.measurementPhase);
         if (row.likertLevel) levels.add(row.likertLevel);
       });
       state.feedback.forEach(row => {
         if (row.profileKey || row.profile) profiles.add(row.profileKey || row.profile);
         if (row.nivelEducativo) educationLevels.add(row.nivelEducativo);
         if (row.country) countries.add(row.country);
+        if (row.programCode) programs.add(row.programCode);
+        if (row.measurementPhase) phases.add(row.measurementPhase);
       });
 
       els.profileFilter.innerHTML = '<option value="">Todos los perfiles</option>' +
@@ -243,7 +342,16 @@
         Array.from(resourcesValues).sort().map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join('');
 
       els.countryFilter.innerHTML = '<option value="">Todos los países</option>' +
-        Array.from(countries).sort().map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join('');
+        Array.from(countries)
+          .sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }))
+          .map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join('');
+
+      els.programFilter.innerHTML = '<option value="">Todos los programas</option>' +
+        Array.from(programs).sort().map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join('');
+
+      const phaseLabels = { baseline: 'Diagnóstico inicial', final: 'Evaluación final', followup: 'Seguimiento' };
+      els.phaseFilter.innerHTML = '<option value="">Todos los momentos</option>' +
+        Array.from(phases).sort().map(value => `<option value="${escapeHtml(value)}">${escapeHtml(phaseLabels[value] || value)}</option>`).join('');
 
       els.levelFilter.innerHTML = '<option value="">Todos los resultados</option>' +
         Array.from(levels).sort().map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join('');
@@ -253,6 +361,8 @@
       els.familiarityFilter.value = currentFamiliarity;
       els.resourcesFilter.value = currentResources;
       els.countryFilter.value = currentCountry;
+      els.programFilter.value = currentProgram;
+      els.phaseFilter.value = currentPhase;
       els.levelFilter.value = currentLevel;
     }
 
@@ -266,6 +376,8 @@
         const profile = els.profileFilter.value;
         const education = els.educationFilter.value;
         const country = els.countryFilter.value;
+        const program = els.programFilter.value;
+        const phase = els.phaseFilter.value;
         // Omitir sugerencias de casos
         if (row.suggestion && (row.suggestion.startsWith('[Caso:') || row.suggestion.startsWith('=CHOICE='))) return false;
         const haystack = normalizeText(Object.values(row).join(' '));
@@ -273,6 +385,8 @@
         if (profile && row.profileKey !== profile && row.profile !== profile) return false;
         if (education && row.nivelEducativo !== education) return false;
         if (country && row.country !== country) return false;
+        if (program && row.programCode !== program) return false;
+        if (phase && row.measurementPhase !== phase) return false;
         if (!dateInRange(row.timestamp)) return false;
         return true;
       });
@@ -298,11 +412,15 @@
         const profile = els.profileFilter.value;
         const education = els.educationFilter.value;
         const country = els.countryFilter.value;
+        const program = els.programFilter.value;
+        const phase = els.phaseFilter.value;
         const haystack = normalizeText(Object.values(row).join(' '));
         if (query && !haystack.includes(query)) return false;
         if (profile && row.profileKey !== profile && row.profile !== profile) return false;
         if (education && row.nivelEducativo !== education) return false;
         if (country && row.country !== country) return false;
+        if (program && row.programCode !== program) return false;
+        if (phase && row.measurementPhase !== phase) return false;
         if (!dateInRange(row.timestamp)) return false;
         return true;
       });
@@ -417,24 +535,620 @@
       syncSelectionControls();
     }
 
+    function setSelectOptions(select, options, preferredValue, emptyOption = null) {
+      const rows = emptyOption ? [emptyOption, ...options] : options;
+      select.innerHTML = rows
+        .map(option => `<option value="${escapeHtml(option.key)}">${escapeHtml(option.label)}</option>`)
+        .join('');
+      const hasPreferred = rows.some(option => option.key === preferredValue);
+      select.value = hasPreferred ? preferredValue : (rows[0]?.key || '');
+    }
+
+    function syncAnalysisChartOptions() {
+      const metric = window.AdminAnalysis
+        ?.listMetrics(els.analysisSource.value)
+        .find(option => option.key === els.analysisMetric.value);
+      const stackedOption = Array.from(els.analysisChartType.options).find(option => option.value === 'stacked');
+      if (stackedOption) stackedOption.disabled = metric?.kind === 'average';
+      if (metric?.kind === 'average' && els.analysisChartType.value === 'stacked') {
+        els.analysisChartType.value = 'bars';
+      }
+      const isScatter = els.analysisChartType.value === 'scatter';
+      els.analysisXAxisControl.classList.toggle('hidden', !isScatter);
+      els.analysisYAxisControl.classList.toggle('hidden', !isScatter);
+    }
+
+    function configureAnalysisControls({ reset = false } = {}) {
+      if (!window.AdminAnalysis) return;
+      const source = els.analysisSource.value;
+      const dimensions = window.AdminAnalysis.listDimensions(source);
+      const metrics = window.AdminAnalysis.listMetrics(source);
+      const numericFields = window.AdminAnalysis.listNumericFields(source);
+      const priorDimension = reset ? '' : els.analysisDimension.value;
+      const priorCompare = reset ? '' : els.analysisCompare.value;
+      const priorMetric = reset ? '' : els.analysisMetric.value;
+      const priorXAxis = reset ? '' : els.analysisXAxis.value;
+      const priorYAxis = reset ? '' : els.analysisYAxis.value;
+
+      setSelectOptions(els.analysisDimension, dimensions, priorDimension || dimensions[0]?.key);
+      const comparisonOptions = dimensions.filter(option => option.key !== els.analysisDimension.value);
+      const defaultComparison = state.analysisConfigured || source !== 'completions' ? '' : 'profile';
+      setSelectOptions(
+        els.analysisCompare,
+        comparisonOptions,
+        priorCompare || defaultComparison,
+        { key: '', label: 'Sin segunda variable' }
+      );
+      setSelectOptions(els.analysisMetric, metrics, priorMetric || metrics[0]?.key);
+      setSelectOptions(els.analysisXAxis, numericFields, priorXAxis || numericFields[0]?.key);
+      setSelectOptions(els.analysisYAxis, numericFields, priorYAxis || numericFields[1]?.key || numericFields[0]?.key);
+      ensureDistinctAnalysisAxes('x');
+      state.analysisConfigured = true;
+      syncAnalysisChartOptions();
+      renderAnalysis();
+    }
+
+    function ensureDistinctAnalysisAxes(changedAxis) {
+      if (els.analysisXAxis.value !== els.analysisYAxis.value) return;
+      const target = changedAxis === 'x' ? els.analysisYAxis : els.analysisXAxis;
+      const occupied = changedAxis === 'x' ? els.analysisXAxis.value : els.analysisYAxis.value;
+      const alternative = Array.from(target.options).find(option => option.value !== occupied);
+      if (alternative) target.value = alternative.value;
+    }
+
+    function renderAnalysis() {
+      if (!window.AdminAnalysis || !els.analysisView) return;
+      const source = els.analysisSource.value;
+      const rows = source === 'feedback' ? filteredFeedback() : filteredCompletions();
+      const model = window.AdminAnalysis.aggregate(rows, {
+        source,
+        dimension: els.analysisDimension.value,
+        compare: els.analysisCompare.value,
+        metric: els.analysisMetric.value,
+        order: els.analysisOrder.value,
+        xAxis: els.analysisXAxis.value,
+        yAxis: els.analysisYAxis.value,
+      });
+      state.analysisModel = model;
+      syncAnalysisChartOptions();
+
+      const isScatter = els.analysisChartType.value === 'scatter';
+      els.analysisSampleSize.textContent = fmtNumber(model.totalRows);
+      els.analysisCategoryCount.textContent = fmtNumber(model.rows.length);
+      els.analysisSeriesCount.textContent = fmtNumber(isScatter ? model.pointSeries.length : model.series.length);
+      els.analysisSummaryText.textContent = model.empty
+        ? 'No hay registros que coincidan con la combinación actual de filtros.'
+        : `${isScatter ? model.scatterTitle : model.title}. Fuente: ${model.sourceLabel}.`;
+      els.analysisDimensionHeading.textContent = isScatter ? 'Grupo' : model.dimensionLabel;
+      els.analysisCompareHeading.textContent = isScatter ? 'Detalle' : (model.compareLabel || 'Serie');
+      els.analysisMetricHeading.textContent = isScatter ? model.xAxis.label : model.metric.label;
+      els.analysisFourthHeading.textContent = isScatter ? model.yAxis.label : 'N';
+      els.analysisEmpty.classList.toggle('hidden', !model.empty);
+      els.analysisChart.classList.toggle('hidden', model.empty);
+      els.analysisDataDetails.classList.toggle('hidden', model.empty);
+
+      const exportButtons = [els.exportAnalysisPngBtn, els.exportAnalysisSvgBtn, els.exportAnalysisCsvBtn];
+      exportButtons.forEach(button => { button.disabled = model.empty; });
+      if (model.empty) {
+        els.analysisChart.innerHTML = '';
+        els.analysisDataBody.innerHTML = '';
+        return;
+      }
+
+      els.analysisChart.innerHTML = window.AdminAnalysis.renderSvg(model, els.analysisChartType.value);
+      els.analysisDataBody.innerHTML = isScatter
+        ? model.scatterPoints.map(point => `
+          <tr>
+            <td>${escapeHtml(point.group)}</td>
+            <td>${escapeHtml(point.detail)}</td>
+            <td>${escapeHtml(window.AdminAnalysis.formatNumericValue(point.x, model.xAxis))}</td>
+            <td>${escapeHtml(window.AdminAnalysis.formatNumericValue(point.y, model.yAxis))}</td>
+          </tr>
+        `).join('')
+        : model.exportRows.map(row => `
+          <tr>
+            <td>${escapeHtml(row.variable)}</td>
+            <td>${escapeHtml(row.comparacion || 'Total')}</td>
+            <td>${escapeHtml(window.AdminAnalysis.formatValue(row.valor, model.metric))}</td>
+            <td>${escapeHtml(row.n)}</td>
+          </tr>
+        `).join('');
+    }
+
+    function analysisFilename(extension) {
+      const model = state.analysisModel;
+      const parts = ['analisis', els.analysisChartType.value, model?.sourceKey, model?.dimensionKey, model?.metricKey].filter(Boolean);
+      return `${parts.join('-')}.${extension}`;
+    }
+
+    function downloadBlob(filename, blob) {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function downloadAnalysisCsv() {
+      const model = state.analysisModel;
+      if (!model || model.empty) return;
+      if (els.analysisChartType.value === 'scatter') {
+        downloadRowsCsv(analysisFilename('csv'), model.scatterExportRows, ['grupo', 'detalle', 'eje_x', 'eje_y']);
+        return;
+      }
+      downloadRowsCsv(analysisFilename('csv'), model.exportRows, ['variable', 'comparacion', 'valor', 'n']);
+    }
+
+    function downloadAnalysisSvg() {
+      const model = state.analysisModel;
+      if (!model || model.empty) return;
+      const svg = window.AdminAnalysis.renderSvg(model, els.analysisChartType.value);
+      downloadBlob(analysisFilename('svg'), new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }));
+    }
+
+    async function downloadSvgPng(svg, filename) {
+      const width = Number(svg.match(/<svg[^>]+width="(\d+)"/)?.[1] || 1120);
+      const height = Number(svg.match(/<svg[^>]+height="(\d+)"/)?.[1] || 630);
+      const scale = Math.min(2, 10000 / Math.max(width, height));
+
+      try {
+        const image = new Image();
+        image.decoding = 'async';
+        await new Promise((resolve, reject) => {
+          image.onload = resolve;
+          image.onerror = () => reject(new Error('No se pudo preparar la imagen del gráfico.'));
+          image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+        });
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(width * scale);
+        canvas.height = Math.round(height * scale);
+        const context = canvas.getContext('2d');
+        context.fillStyle = '#ffffff';
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        if (!blob) throw new Error('El navegador no pudo generar el archivo PNG.');
+        downloadBlob(filename, blob);
+      } catch (error) {
+        setStatus(`No se pudo exportar el gráfico: ${error.message}`, true, 'error');
+      }
+    }
+
+    async function downloadAnalysisPng() {
+      const model = state.analysisModel;
+      if (!model || model.empty) return;
+      const svg = window.AdminAnalysis.renderSvg(model, els.analysisChartType.value);
+      await downloadSvgPng(svg, analysisFilename('png'));
+    }
+
+    function ensureDistinctInferenceVariables(changedVariable = 'a') {
+      if (els.inferenceVariableA.value !== els.inferenceVariableB.value) return;
+      const target = changedVariable === 'a' ? els.inferenceVariableB : els.inferenceVariableA;
+      const occupied = changedVariable === 'a' ? els.inferenceVariableA.value : els.inferenceVariableB.value;
+      const alternative = Array.from(target.options).find(option => option.value !== occupied);
+      if (alternative) target.value = alternative.value;
+    }
+
+    function configureInferenceControls({ reset = false } = {}) {
+      if (!window.AdminInference || !els.inferenceView) return;
+      const source = els.inferenceSource.value;
+      const mode = els.inferenceMode.value;
+      const dimensions = window.AdminInference.listDimensions(source, mode === 'groups' ? 'groups' : 'association');
+      const outcomes = window.AdminInference.listOutcomes(source);
+      const priorA = reset ? '' : els.inferenceVariableA.value;
+      const priorB = reset ? '' : els.inferenceVariableB.value;
+      const priorGroup = reset ? '' : els.inferenceGroup.value;
+      const priorOutcome = reset ? '' : els.inferenceOutcome.value;
+
+      setSelectOptions(els.inferenceVariableA, dimensions, priorA || dimensions[0]?.key);
+      setSelectOptions(els.inferenceVariableB, dimensions, priorB || dimensions[1]?.key || dimensions[0]?.key);
+      ensureDistinctInferenceVariables('a');
+      setSelectOptions(els.inferenceGroup, dimensions, priorGroup || dimensions[0]?.key);
+      setSelectOptions(els.inferenceOutcome, outcomes, priorOutcome || outcomes[0]?.key);
+
+      const comparesCategories = mode === 'association';
+      els.inferenceVariableAControl.classList.toggle('hidden', !comparesCategories);
+      els.inferenceVariableBControl.classList.toggle('hidden', !comparesCategories);
+      els.inferenceGroupControl.classList.toggle('hidden', comparesCategories);
+      els.inferenceOutcomeControl.classList.toggle('hidden', comparesCategories);
+      state.inferenceConfigured = true;
+      renderInference();
+    }
+
+    function renderInference() {
+      if (!window.AdminInference || !els.inferenceView) return;
+      const source = els.inferenceSource.value;
+      const rows = source === 'feedback' ? filteredFeedback() : filteredCompletions();
+      const mode = els.inferenceMode.value;
+      const model = mode === 'groups'
+        ? window.AdminInference.compareGroups(rows, {
+          source,
+          group: els.inferenceGroup.value,
+          outcome: els.inferenceOutcome.value,
+        })
+        : window.AdminInference.association(rows, {
+          source,
+          variableA: els.inferenceVariableA.value,
+          variableB: els.inferenceVariableB.value,
+          iterations: 1500,
+        });
+      state.inferenceModel = model;
+
+      els.inferenceSampleSize.textContent = fmtNumber(model.total);
+      els.inferenceMethod.textContent = model.methodLabel;
+      els.inferencePValue.textContent = model.valid
+        ? window.AdminInference.formatPValue(model.pValue, model.approximate)
+        : '—';
+      els.inferenceEffect.textContent = model.valid
+        ? `${model.effectLabel} (${model.effect.toLocaleString('es-UY', { minimumFractionDigits: 3, maximumFractionDigits: 3 })})`
+        : '—';
+      els.inferenceSummaryText.textContent = model.interpretation;
+      const warnings = model.warnings || [];
+      els.inferenceWarning.classList.toggle('hidden', warnings.length === 0);
+      els.inferenceWarning.innerHTML = warnings.length
+        ? `<ul>${warnings.map(warning => `<li>${escapeHtml(warning)}</li>`).join('')}</ul>`
+        : '';
+      els.inferenceEmpty.classList.toggle('hidden', model.valid);
+      els.inferenceChart.classList.toggle('hidden', !model.valid);
+      els.inferenceDataDetails.classList.toggle('hidden', !model.valid);
+
+      const exportButtons = [els.exportInferencePngBtn, els.exportInferenceSvgBtn, els.exportInferenceCsvBtn];
+      exportButtons.forEach(button => { button.disabled = !model.valid; });
+      if (!model.valid) {
+        els.inferenceChart.innerHTML = '';
+        els.inferenceDataBody.innerHTML = '';
+        return;
+      }
+
+      els.inferenceChart.innerHTML = window.AdminInference.renderSvg(model);
+      const isGroups = model.mode === 'groups';
+      els.inferenceHeadingA.textContent = isGroups ? model.groupLabel : model.variableALabel;
+      els.inferenceHeadingB.textContent = isGroups ? 'N' : model.variableBLabel;
+      els.inferenceHeadingC.textContent = isGroups ? 'Media' : 'Observado';
+      els.inferenceHeadingD.textContent = isGroups ? 'Q1' : 'Esperado';
+      els.inferenceHeadingE.textContent = isGroups ? 'Mediana' : 'Residuo ajustado';
+      els.inferenceHeadingF.textContent = 'Q3';
+      els.inferenceHeadingF.classList.toggle('hidden', !isGroups);
+      els.inferenceDataBody.innerHTML = isGroups
+        ? model.exportRows.map(row => `
+          <tr>
+            <td>${escapeHtml(row.grupo)}</td>
+            <td>${escapeHtml(row.n)}</td>
+            <td>${escapeHtml(row.media)}</td>
+            <td>${escapeHtml(row.q1)}</td>
+            <td>${escapeHtml(row.mediana)}</td>
+            <td>${escapeHtml(row.q3)}</td>
+          </tr>
+        `).join('')
+        : model.exportRows.map(row => `
+          <tr>
+            <td>${escapeHtml(row.variable_a)}</td>
+            <td>${escapeHtml(row.variable_b)}</td>
+            <td>${escapeHtml(row.observado)}</td>
+            <td>${escapeHtml(row.esperado)}</td>
+            <td>${escapeHtml(row.residuo_ajustado)}</td>
+          </tr>
+        `).join('');
+    }
+
+    function inferenceFilename(extension) {
+      const model = state.inferenceModel;
+      const parts = ['analisis-inferencial', model?.mode, model?.sourceKey, model?.variableAKey || model?.groupKey, model?.variableBKey || model?.outcomeKey].filter(Boolean);
+      return `${parts.join('-')}.${extension}`;
+    }
+
+    function downloadInferenceCsv() {
+      const model = state.inferenceModel;
+      if (!model?.valid) return;
+      const columns = model.mode === 'groups'
+        ? ['grupo', 'n', 'media', 'q1', 'mediana', 'q3']
+        : ['variable_a', 'variable_b', 'observado', 'esperado', 'residuo_ajustado'];
+      downloadRowsCsv(inferenceFilename('csv'), model.exportRows, columns);
+    }
+
+    function downloadInferenceSvg() {
+      const model = state.inferenceModel;
+      if (!model?.valid) return;
+      const svg = window.AdminInference.renderSvg(model);
+      downloadBlob(inferenceFilename('svg'), new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }));
+    }
+
+    async function downloadInferencePng() {
+      const model = state.inferenceModel;
+      if (!model?.valid) return;
+      await downloadSvgPng(window.AdminInference.renderSvg(model), inferenceFilename('png'));
+    }
+
+    function filteredCompletionsForProgramEval() {
+      const query = normalizeText(els.searchInput.value);
+      const profile = els.profileFilter.value;
+      const education = els.educationFilter.value;
+      const familiarity = els.familiarityFilter.value;
+      const resources = els.resourcesFilter.value;
+      const country = els.countryFilter.value;
+      const program = els.programFilter.value;
+
+      return state.completions.filter(row => {
+        const haystack = normalizeText(Object.values(row).join(' '));
+        if (query && !haystack.includes(query)) return false;
+        if (profile && row.profileKey !== profile && row.profile !== profile) return false;
+        if (education && row.nivelEducativo !== education) return false;
+        if (familiarity && row.familiaridadInicial !== familiarity) return false;
+        if (resources && row.recursosSimilares !== resources) return false;
+        if (country && row.country !== country) return false;
+        if (program && row.programCode !== program) return false;
+        if (!dateInRange(row.timestamp)) return false;
+        return true;
+      });
+    }
+
+    function fmtSignedDelta(pts, relPct) {
+      if (pts === null || pts === undefined) return '—';
+      const num = Number(pts);
+      if (!Number.isFinite(num)) return '—';
+      const sign = num > 0 ? '+' : '';
+      const ptsStr = `${sign}${num.toFixed(1)} pts`;
+      if (relPct === null || relPct === undefined || !Number.isFinite(Number(relPct))) {
+        return ptsStr;
+      }
+      const relNum = Number(relPct);
+      const relSign = relNum > 0 ? '+' : '';
+      return `${ptsStr} (${relSign}${relNum.toFixed(1)}%)`;
+    }
+
+    function renderStageCardText(stage) {
+      if (!stage || !stage.count) return '0 recorridos · Prom. —';
+      const avg = stage.averageEvidence !== null ? stage.averageEvidence.toFixed(1) : '—';
+      const lit = stage.averageLiteracyScore !== null ? ` · Lit: ${stage.averageLiteracyScore.toFixed(1)}` : '';
+      return `${fmtNumber(stage.count)} recorrido(s) · ${fmtNumber(stage.uniqueParticipants)} ID · Ética: ${avg}${lit}`;
+    }
+
+    const PROGRAM_TARGETS_STORAGE_KEY = 'iag_program_eval_targets_v1';
+    const DEFAULT_PROGRAM_TARGETS = {
+      participants: 300,
+      cohorts: 10,
+      completionRatePct: 80,
+      relativeImprovementPct: 20,
+    };
+
+    function sanitizeTargetNumber(value, fallback, min = 1, max = 100000) {
+      const n = Number(value);
+      if (!Number.isFinite(n)) return fallback;
+      return Math.max(min, Math.min(max, Math.round(n)));
+    }
+
+    function loadProgramEvalTargetsIntoInputs() {
+      let saved = null;
+      try {
+        const raw = localStorage.getItem(PROGRAM_TARGETS_STORAGE_KEY);
+        if (raw) saved = JSON.parse(raw);
+      } catch (_) {
+        saved = null;
+      }
+      const targets = {
+        participants: sanitizeTargetNumber(saved?.participants, DEFAULT_PROGRAM_TARGETS.participants, 1, 100000),
+        cohorts: sanitizeTargetNumber(saved?.cohorts, DEFAULT_PROGRAM_TARGETS.cohorts, 1, 1000),
+        completionRatePct: sanitizeTargetNumber(saved?.completionRatePct, DEFAULT_PROGRAM_TARGETS.completionRatePct, 1, 100),
+        relativeImprovementPct: sanitizeTargetNumber(saved?.relativeImprovementPct, DEFAULT_PROGRAM_TARGETS.relativeImprovementPct, 1, 500),
+      };
+      if (els.programTargetParticipants) els.programTargetParticipants.value = String(targets.participants);
+      if (els.programTargetCohorts) els.programTargetCohorts.value = String(targets.cohorts);
+      if (els.programTargetCompletion) els.programTargetCompletion.value = String(targets.completionRatePct);
+      if (els.programTargetImprovement) els.programTargetImprovement.value = String(targets.relativeImprovementPct);
+      return targets;
+    }
+
+    function getProgramEvalTargets() {
+      const targets = {
+        participants: sanitizeTargetNumber(els.programTargetParticipants?.value, DEFAULT_PROGRAM_TARGETS.participants, 1, 100000),
+        cohorts: sanitizeTargetNumber(els.programTargetCohorts?.value, DEFAULT_PROGRAM_TARGETS.cohorts, 1, 1000),
+        completionRatePct: sanitizeTargetNumber(els.programTargetCompletion?.value, DEFAULT_PROGRAM_TARGETS.completionRatePct, 1, 100),
+        relativeImprovementPct: sanitizeTargetNumber(els.programTargetImprovement?.value, DEFAULT_PROGRAM_TARGETS.relativeImprovementPct, 1, 500),
+      };
+      try {
+        localStorage.setItem(PROGRAM_TARGETS_STORAGE_KEY, JSON.stringify(targets));
+      } catch (_) {
+        // Ignorar errores de almacenamiento local restringido
+      }
+      return targets;
+    }
+
+    function resetProgramEvalTargets() {
+      try {
+        localStorage.removeItem(PROGRAM_TARGETS_STORAGE_KEY);
+      } catch (_) {}
+      loadProgramEvalTargetsIntoInputs();
+      renderProgramEval();
+    }
+
+    function sanitizeCohortToken(value) {
+      const cleaned = String(value || '')
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9_-]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 48);
+      return cleaned || 'general';
+    }
+
+    function updateCohortLinkBuilder() {
+      if (!els.cohortLinkBaselineInput) return;
+      const programCode = els.cohortLinkProgramSelect?.value || 'uy-us-ai-literacy-2027';
+      const cohortCode = sanitizeCohortToken(els.cohortLinkCodeInput?.value);
+      const baseOrigin = window.location.origin && window.location.origin !== 'null'
+        ? window.location.origin
+        : 'https://iagetica.org';
+      const buildUrl = phase => `${baseOrigin}/?program=${encodeURIComponent(programCode)}&cohort=${encodeURIComponent(cohortCode)}&phase=${encodeURIComponent(phase)}`;
+      els.cohortLinkBaselineInput.value = buildUrl('baseline');
+      if (els.cohortLinkFinalInput) els.cohortLinkFinalInput.value = buildUrl('final');
+      if (els.cohortLinkFollowupInput) els.cohortLinkFollowupInput.value = buildUrl('followup');
+    }
+
+    async function copyCohortPhaseLink(phase) {
+      updateCohortLinkBuilder();
+      const map = {
+        baseline: els.cohortLinkBaselineInput,
+        final: els.cohortLinkFinalInput,
+        followup: els.cohortLinkFollowupInput,
+      };
+      const input = map[phase];
+      if (!input || !input.value) return;
+      try {
+        await navigator.clipboard.writeText(input.value);
+        if (els.cohortLinkStatus) {
+          els.cohortLinkStatus.textContent = `Enlace (${phase}) copiado al portapapeles: ${input.value}`;
+        }
+      } catch (_) {
+        input.focus();
+        input.select();
+        if (els.cohortLinkStatus) {
+          els.cohortLinkStatus.textContent = `Seleccioné el enlace (${phase}) para copiarlo manualmente.`;
+        }
+      }
+    }
+
+    function renderProgramEval() {
+      if (!window.AdminAnalysis?.evaluateProgram || !els.programEvalView) return;
+      const rows = filteredCompletionsForProgramEval();
+      const targets = getProgramEvalTargets();
+      const evalModel = window.AdminAnalysis.evaluateProgram(rows, {
+        programCode: els.programFilter.value,
+        programOnly: true,
+        targets,
+      });
+      state.programEvalModel = evalModel;
+
+      if (els.programEvalParticipantsLabel) {
+        els.programEvalParticipantsLabel.textContent = `Participantes únicos (Meta ${fmtNumber(targets.participants)})`;
+      }
+      if (els.programEvalCohortsLabel) {
+        els.programEvalCohortsLabel.textContent = `Cohortes activas (Meta ${fmtNumber(targets.cohorts)})`;
+      }
+      if (els.programEvalCompletionLabel) {
+        els.programEvalCompletionLabel.textContent = `Finalización Pre→Post (Meta ${targets.completionRatePct}%)`;
+      }
+      if (els.programEvalImprovementLabel) {
+        els.programEvalImprovementLabel.textContent = `Cambio Pre/Post (Meta +${targets.relativeImprovementPct}%)`;
+      }
+
+      if (els.programEvalStageBaseline) {
+        els.programEvalStageBaseline.textContent = renderStageCardText(evalModel.stages.baseline);
+      }
+      if (els.programEvalStageFinal) {
+        els.programEvalStageFinal.textContent = renderStageCardText(evalModel.stages.final);
+      }
+      if (els.programEvalStageFollowup) {
+        els.programEvalStageFollowup.textContent = renderStageCardText(evalModel.stages.followup);
+      }
+
+      els.programEvalParticipants.textContent = `${fmtNumber(evalModel.uniqueParticipants)} (${evalModel.progress.participantsPct}%)`;
+      els.programEvalCohorts.textContent = `${fmtNumber(evalModel.activeCohorts)} (${evalModel.progress.cohortsPct}%)`;
+      els.programEvalCompletionRate.textContent = evalModel.progress.completionRatePct !== null
+        ? `${evalModel.progress.completionRatePct.toFixed(1)}%`
+        : '—';
+      els.programEvalAggregateDelta.textContent = fmtSignedDelta(
+        evalModel.aggregateChange.deltaPoints,
+        evalModel.aggregateChange.relativeChangePct
+      );
+      els.programEvalPairedDelta.textContent = evalModel.paired.pairedCount > 0
+        ? `${fmtSignedDelta(evalModel.paired.deltaMean, evalModel.paired.relativeChangePct)} · N=${evalModel.paired.pairedCount}`
+        : 'Sin pares aún';
+      if (els.programEvalLiteracyDelta) {
+        els.programEvalLiteracyDelta.textContent = evalModel.paired.literacyPairsCount > 0
+          ? `${fmtSignedDelta(evalModel.paired.deltaLiteracyMean, evalModel.paired.relativeLiteracyChangePct)} · N=${evalModel.paired.literacyPairsCount}`
+          : (evalModel.aggregateChange.literacyDeltaPoints !== null
+              ? fmtSignedDelta(evalModel.aggregateChange.literacyDeltaPoints, evalModel.aggregateChange.literacyRelativePct)
+              : '—');
+      }
+
+      if (evalModel.empty) {
+        els.programEvalSummaryText.textContent = 'No hay recorridos registrados con código de programa o cohorte para los filtros seleccionados.';
+      } else {
+        const pairedText = evalModel.paired.pairedCount > 0
+          ? `${evalModel.paired.pairedCount} participante(s) cuentan con trayectoria pareada Inicial→Final (${evalModel.paired.improvedPct}% mejoró su puntaje de ética${evalModel.paired.improvedLiteracyPct !== null ? `, ${evalModel.paired.improvedLiteracyPct}% mejoró en lit-v1` : ''}).`
+          : 'Aún no hay participantes con ambos momentos (Inicial y Final) bajo el mismo ID seudónimo.';
+        els.programEvalSummaryText.textContent = `${fmtNumber(evalModel.totalProgramRows)} recorrido(s) en ${fmtNumber(evalModel.activeCohorts)} cohorte(s). ${pairedText}`;
+      }
+
+      els.programEvalEmpty.classList.toggle('hidden', !evalModel.empty);
+      els.programEvalTableWrap.classList.toggle('hidden', evalModel.empty);
+      if (els.exportProgramEvalReportBtn) els.exportProgramEvalReportBtn.disabled = evalModel.empty;
+      if (els.exportProgramEvalCsvBtn) els.exportProgramEvalCsvBtn.disabled = evalModel.empty;
+
+      if (evalModel.empty) {
+        els.programEvalCohortBody.innerHTML = '';
+        return;
+      }
+
+      els.programEvalCohortBody.innerHTML = evalModel.cohorts.map(cohort => {
+        const iniText = `${fmtNumber(cohort.baselineCount)} / ${cohort.baselineMean !== null ? cohort.baselineMean.toFixed(1) : '—'}${cohort.baselineLiteracyMean !== null ? ` [${cohort.baselineLiteracyMean.toFixed(1)}]` : ''}`;
+        const finText = `${fmtNumber(cohort.finalCount)} / ${cohort.finalMean !== null ? cohort.finalMean.toFixed(1) : '—'}${cohort.finalLiteracyMean !== null ? ` [${cohort.finalLiteracyMean.toFixed(1)}]` : ''}`;
+        const segText = `${fmtNumber(cohort.followupCount)} / ${cohort.followupMean !== null ? cohort.followupMean.toFixed(1) : '—'}${cohort.followupLiteracyMean !== null ? ` [${cohort.followupLiteracyMean.toFixed(1)}]` : ''}`;
+        const aggDelta = fmtSignedDelta(cohort.aggregateDelta, cohort.aggregateRelativePct);
+        const pairDelta = cohort.pairedCount > 0
+          ? fmtSignedDelta(cohort.pairedDeltaMean, cohort.pairedRelativePct)
+          : '—';
+        const litDelta = cohort.pairedLiteracyDeltaMean !== null
+          ? fmtSignedDelta(cohort.pairedLiteracyDeltaMean, cohort.pairedLiteracyRelativePct)
+          : (cohort.aggregateLiteracyDelta !== null ? fmtSignedDelta(cohort.aggregateLiteracyDelta, cohort.aggregateLiteracyRelativePct) : '—');
+
+        return `
+          <tr>
+            <td><strong>${escapeHtml(cohort.cohortCode)}</strong></td>
+            <td>${escapeHtml(cohort.programCode)}</td>
+            <td>${escapeHtml(cohort.countries)}</td>
+            <td>${fmtNumber(cohort.uniqueParticipants)}</td>
+            <td>${escapeHtml(iniText)}</td>
+            <td>${escapeHtml(finText)}</td>
+            <td>${escapeHtml(segText)}</td>
+            <td>${fmtNumber(cohort.pairedCount)}</td>
+            <td>${escapeHtml(`${aggDelta} / ${pairDelta}`)}<br><small class="muted">Lit: ${escapeHtml(litDelta)}</small></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function downloadProgramEvalCsv() {
+      const model = state.programEvalModel;
+      if (!model || model.empty) return;
+      const progSlug = els.programFilter.value || 'programa-uy-us';
+      downloadRowsCsv(`monitoreo-cohortes-${progSlug}.csv`, model.exportRows, [
+        'programa', 'cohorte', 'paises', 'participantes_unicos', 'recorridos_totales',
+        'n_inicial', 'prom_inicial', 'n_final', 'prom_final', 'n_seguimiento', 'prom_seguimiento',
+        'n_pareados', 'cambio_agregado_pts', 'cambio_pareado_pts', 'cambio_pareado_pct', 'tasa_finalizacion_pct'
+      ]);
+    }
+
+    function downloadProgramEvalReport() {
+      const model = state.programEvalModel;
+      if (!model || model.empty || !window.AdminAnalysis?.formatProgramReportMarkdown) return;
+      const md = window.AdminAnalysis.formatProgramReportMarkdown(model);
+      const progSlug = els.programFilter.value || 'programa-uy-us';
+      downloadBlob(`informe-me-${progSlug}.md`, new Blob([md], { type: 'text/markdown;charset=utf-8' }));
+    }
+
     function renderCurrentTab() {
       const tab = state.tab;
       els.completionsView.classList.toggle('hidden', tab !== 'completions');
       els.feedbackView.classList.toggle('hidden', tab !== 'feedback');
       els.labFeedbackView.classList.toggle('hidden', tab !== 'labFeedback');
+      els.analysisView.classList.toggle('hidden', tab !== 'analysis');
+      els.inferenceView.classList.toggle('hidden', tab !== 'inference');
+      if (els.programEvalView) els.programEvalView.classList.toggle('hidden', tab !== 'programEval');
       els.levelFilter.classList.toggle('hidden', tab !== 'completions');
       els.familiarityFilter.classList.toggle('hidden', tab !== 'completions');
       els.resourcesFilter.classList.toggle('hidden', tab !== 'completions');
+      els.phaseFilter.classList.toggle('hidden', tab === 'programEval');
       els.exportCompletionsBtn.classList.toggle('hidden', tab !== 'completions');
       els.exportAnswersBtn.classList.toggle('hidden', tab !== 'completions');
       els.exportFeedbackBtn.classList.toggle('hidden', tab !== 'feedback');
       els.exportLabFeedbackBtn.classList.toggle('hidden', tab !== 'labFeedback');
-      if (els.exportComparativeCsvBtn) {
-        els.exportComparativeCsvBtn.classList.toggle('hidden', tab !== 'comparative');
-      }
-      if (els.comparativeView) {
-        els.comparativeView.classList.toggle('hidden', tab !== 'comparative');
-      }
+      const isAnalysisTab = tab === 'analysis' || tab === 'inference' || tab === 'programEval';
+      els.toggleSelectAllBtn.classList.toggle('hidden', isAnalysisTab);
+      els.deleteSelectedBtn.classList.toggle('hidden', isAnalysisTab);
       els.tabs.forEach(t => {
         const active = t.dataset.tab === tab;
         t.classList.toggle('active', active);
@@ -444,7 +1158,9 @@
       if (tab === 'completions') renderCompletions();
       else if (tab === 'feedback') renderFeedback();
       else if (tab === 'labFeedback') renderLabFeedback();
-      else if (tab === 'comparative') renderComparative();
+      else if (tab === 'analysis') renderAnalysis();
+      else if (tab === 'inference') renderInference();
+      else if (tab === 'programEval') renderProgramEval();
     }
 
         function renderLabFeedback() {
@@ -584,6 +1300,7 @@
       if (type === 'completions') {
         downloadRowsCsv('recorridos-filtrados.csv', filteredCompletions(), [
           'id', 'timestamp', 'sessionId', 'userName', 'profile', 'profileKey', 'country',
+          'programCode', 'cohortCode', 'measurementPhase', 'participantId',
           'nivelEducativo', 'familiaridadInicial', 'recursosSimilares', 'evidence',
           'likertLevel', 'answersCount'
         ]);
@@ -593,7 +1310,8 @@
       if (type === 'feedback') {
         downloadRowsCsv('valoraciones-filtradas.csv', filteredFeedback(), [
           'id', 'eventId', 'timestamp', 'sessionId', 'rating', 'suggestion',
-          'profile', 'profileKey', 'country', 'nivelEducativo'
+          'profile', 'profileKey', 'country', 'programCode', 'cohortCode',
+          'measurementPhase', 'participantId', 'nivelEducativo'
         ]);
         return;
       }
@@ -601,7 +1319,8 @@
       if (type === 'labFeedback') {
         downloadRowsCsv('laboratorio-filtrado.csv', filteredLabFeedback(), [
           'id', 'eventId', 'timestamp', 'sessionId', 'rating', 'suggestion',
-          'profile', 'profileKey', 'country', 'nivelEducativo'
+          'profile', 'profileKey', 'country', 'programCode', 'cohortCode',
+          'measurementPhase', 'participantId', 'nivelEducativo'
         ]);
         return;
       }
@@ -790,6 +1509,8 @@
     els.familiarityFilter.addEventListener('change', renderCurrentTab);
     els.resourcesFilter.addEventListener('change', renderCurrentTab);
     els.countryFilter.addEventListener('change', renderCurrentTab);
+    els.programFilter.addEventListener('change', renderCurrentTab);
+    els.phaseFilter.addEventListener('change', renderCurrentTab);
     els.levelFilter.addEventListener('change', renderCurrentTab);
     els.dateFromFilter.addEventListener('change', renderCurrentTab);
     els.dateToFilter.addEventListener('change', renderCurrentTab);
@@ -798,9 +1519,70 @@
     els.exportFeedbackBtn.addEventListener('click', () => downloadFilteredCsv('feedback'));
     els.exportLabFeedbackBtn.addEventListener('click', () => downloadFilteredCsv('labFeedback'));
     els.exportAnswersBtn.addEventListener('click', () => downloadFilteredCsv('answers'));
-      if (els.exportComparativeCsvBtn) {
-        els.exportComparativeCsvBtn.addEventListener('click', downloadComparativeCsv);
-      }
+    els.analysisSource.addEventListener('change', () => configureAnalysisControls({ reset: true }));
+    els.analysisDimension.addEventListener('change', configureAnalysisControls);
+    els.analysisCompare.addEventListener('change', renderAnalysis);
+    els.analysisMetric.addEventListener('change', renderAnalysis);
+    els.analysisChartType.addEventListener('change', renderAnalysis);
+    els.analysisXAxis.addEventListener('change', () => {
+      ensureDistinctAnalysisAxes('x');
+      renderAnalysis();
+    });
+    els.analysisYAxis.addEventListener('change', () => {
+      ensureDistinctAnalysisAxes('y');
+      renderAnalysis();
+    });
+    els.analysisOrder.addEventListener('change', renderAnalysis);
+    els.exportAnalysisPngBtn.addEventListener('click', downloadAnalysisPng);
+    els.exportAnalysisSvgBtn.addEventListener('click', downloadAnalysisSvg);
+    els.exportAnalysisCsvBtn.addEventListener('click', downloadAnalysisCsv);
+    els.inferenceMode.addEventListener('change', () => configureInferenceControls({ reset: true }));
+    els.inferenceSource.addEventListener('change', () => configureInferenceControls({ reset: true }));
+    els.inferenceVariableA.addEventListener('change', () => {
+      ensureDistinctInferenceVariables('a');
+      renderInference();
+    });
+    els.inferenceVariableB.addEventListener('change', () => {
+      ensureDistinctInferenceVariables('b');
+      renderInference();
+    });
+    els.inferenceGroup.addEventListener('change', renderInference);
+    els.inferenceOutcome.addEventListener('change', renderInference);
+    els.exportInferencePngBtn.addEventListener('click', downloadInferencePng);
+    els.exportInferenceSvgBtn.addEventListener('click', downloadInferenceSvg);
+    els.exportInferenceCsvBtn.addEventListener('click', downloadInferenceCsv);
+    if (els.exportProgramEvalCsvBtn) {
+      els.exportProgramEvalCsvBtn.addEventListener('click', downloadProgramEvalCsv);
+    }
+    if (els.exportProgramEvalReportBtn) {
+      els.exportProgramEvalReportBtn.addEventListener('click', downloadProgramEvalReport);
+    }
+    if (els.resetProgramTargetsBtn) {
+      els.resetProgramTargetsBtn.addEventListener('click', resetProgramEvalTargets);
+    }
+    [els.programTargetParticipants, els.programTargetCohorts, els.programTargetCompletion, els.programTargetImprovement]
+      .filter(Boolean)
+      .forEach(input => {
+        input.addEventListener('input', renderProgramEval);
+        input.addEventListener('change', renderProgramEval);
+      });
+    if (els.cohortLinkProgramSelect) {
+      els.cohortLinkProgramSelect.addEventListener('change', updateCohortLinkBuilder);
+    }
+    if (els.cohortLinkCodeInput) {
+      els.cohortLinkCodeInput.addEventListener('input', updateCohortLinkBuilder);
+    }
+    if (els.copyBaselineLinkBtn) {
+      els.copyBaselineLinkBtn.addEventListener('click', () => copyCohortPhaseLink('baseline'));
+    }
+    if (els.copyFinalLinkBtn) {
+      els.copyFinalLinkBtn.addEventListener('click', () => copyCohortPhaseLink('final'));
+    }
+    if (els.copyFollowupLinkBtn) {
+      els.copyFollowupLinkBtn.addEventListener('click', () => copyCohortPhaseLink('followup'));
+    }
+    loadProgramEvalTargetsIntoInputs();
+    updateCohortLinkBuilder();
     els.selectAllCompletions.addEventListener('change', () => toggleVisibleSelection('completions', els.selectAllCompletions.checked));
     els.selectAllFeedback.addEventListener('change', () => toggleVisibleSelection('feedback', els.selectAllFeedback.checked));
     if (els.selectAllLabFeedback) {
@@ -814,123 +1596,11 @@
       });
     });
 
+    configureAnalysisControls();
+    configureInferenceControls();
+
     if (state.key) {
       loadAll();
     } else {
       els.login.classList.remove('hidden');
-    }
-
-
-    function renderComparative() {
-      if (!els.comparativeTableBody) return;
-
-      const uyRows = state.completions.filter(r => r.country === 'Uruguay');
-      const caRows = state.completions.filter(r => r.country === 'Canadá');
-      const otherRows = state.completions.filter(r => r.country !== 'Uruguay' && r.country !== 'Canadá');
-
-      const calcStats = (rows) => {
-        const count = rows.length;
-        if (!count) return { count: 0, avgScore: 0, docentesPct: 0, estudiantesPct: 0, topLevel: 'Sin datos' };
-        const totalScore = rows.reduce((acc, r) => acc + Number(r.evidence || 0), 0);
-        const docentes = rows.filter(r => (r.profileKey || r.profile) === 'docente').length;
-        const estudiantes = rows.filter(r => (r.profileKey || r.profile) === 'estudiante').length;
-        
-        const levelsCount = {};
-        rows.forEach(r => {
-          const l = r.likertLevel || 'Sin dato';
-          levelsCount[l] = (levelsCount[l] || 0) + 1;
-        });
-        const topLevel = Object.keys(levelsCount).sort((a, b) => levelsCount[b] - levelsCount[a])[0] || 'Sin dato';
-
-        return {
-          count,
-          avgScore: Math.round(totalScore / count),
-          docentesPct: Math.round((docentes / count) * 100),
-          estudiantesPct: Math.round((estudiantes / count) * 100),
-          topLevel
-        };
-      };
-
-      const uyStats = calcStats(uyRows);
-      const caStats = calcStats(caRows);
-      const otherStats = calcStats(otherRows);
-
-      if (els.compUyCount) els.compUyCount.textContent = uyStats.count;
-      if (els.compUyScore) els.compUyScore.textContent = uyStats.avgScore;
-      if (els.compUyProfiles) els.compUyProfiles.textContent = `${uyStats.docentesPct}% Docentes / ${uyStats.estudiantesPct}% Estudiantes`;
-
-      if (els.compCaCount) els.compCaCount.textContent = caStats.count;
-      if (els.compCaScore) els.compCaScore.textContent = caStats.avgScore;
-      if (els.compCaProfiles) els.compCaProfiles.textContent = `${caStats.docentesPct}% Docentes / ${caStats.estudiantesPct}% Estudiantes`;
-
-      if (els.compOtherCount) els.compOtherCount.textContent = otherStats.count;
-      if (els.compOtherScore) els.compOtherScore.textContent = otherStats.avgScore;
-      
-      const otherCountriesList = Array.from(new Set(otherRows.map(r => r.country || 'Sin determinar'))).join(', ') || 'Ninguno';
-      if (els.compOtherCountries) els.compOtherCountries.textContent = otherCountriesList;
-
-      // Actualizar insight de investigación
-      if (els.comparativeInsightText) {
-        if (!uyStats.count && !caStats.count) {
-          els.comparativeInsightText.textContent = 'Aún no hay registros suficientes acumulados para generar la lectura comparativa. Los datos se actualizarán automáticamente a medida que docentes y estudiantes de Uruguay y Canadá completen la herramienta.';
-        } else {
-          els.comparativeInsightText.textContent = `Muestra procesada: Uruguay (N=${uyStats.count}, Puntaje promedio: ${uyStats.avgScore}/100) | Canadá (N=${caStats.count}, Puntaje promedio: ${caStats.avgScore}/100). Este panel permite contrastar la madurez de apropiación ética entre ambos sistemas educativos para la redacción de publicaciones científicas.`;
-        }
-      }
-
-      // Renderizar tabla comparativa
-      const labUyCount = state.feedback.filter(r => r.country === 'Uruguay' && r.suggestion && r.suggestion.startsWith('=CHOICE=')).length;
-      const labCaCount = state.feedback.filter(r => r.country === 'Canadá' && r.suggestion && r.suggestion.startsWith('=CHOICE=')).length;
-      const labOtherCount = state.feedback.filter(r => r.country !== 'Uruguay' && r.country !== 'Canadá' && r.suggestion && r.suggestion.startsWith('=CHOICE=')).length;
-
-      els.comparativeTableBody.innerHTML = `
-        <tr>
-          <td><strong>🇺🇾 Uruguay</strong></td>
-          <td>${uyStats.count}</td>
-          <td>${uyStats.docentesPct}%</td>
-          <td>${uyStats.estudiantesPct}%</td>
-          <td><span class="badge ok">${uyStats.avgScore}/100</span></td>
-          <td>${escapeHtml(uyStats.topLevel)}</td>
-          <td>${labUyCount}</td>
-        </tr>
-        <tr>
-          <td><strong>🇨🇦 Canadá</strong></td>
-          <td>${caStats.count}</td>
-          <td>${caStats.docentesPct}%</td>
-          <td>${caStats.estudiantesPct}%</td>
-          <td><span class="badge ok">${caStats.avgScore}/100</span></td>
-          <td>${escapeHtml(caStats.topLevel)}</td>
-          <td>${labCaCount}</td>
-        </tr>
-        <tr>
-          <td><strong>🌐 Otros / Sin determinar</strong></td>
-          <td>${otherStats.count}</td>
-          <td>${otherStats.docentesPct}%</td>
-          <td>${otherStats.estudiantesPct}%</td>
-          <td><span class="badge warn">${otherStats.avgScore}/100</span></td>
-          <td>${escapeHtml(otherStats.topLevel)}</td>
-          <td>${labOtherCount}</td>
-        </tr>
-      `;
-    }
-
-    function downloadComparativeCsv() {
-      const rows = state.completions.map(r => ({
-        id: r.id,
-        timestamp: r.timestamp,
-        country: r.country || 'Sin determinar',
-        countryStandardized: r.country === 'Uruguay' ? 'UY' : (r.country === 'Canadá' ? 'CA' : (r.country ? 'OTHER' : 'UNSPECIFIED')),
-        profileKey: r.profileKey || r.profile,
-        nivelEducativo: r.nivelEducativo || '',
-        familiaridadInicial: r.familiaridadInicial || '',
-        recursosSimilares: r.recursosSimilares || '',
-        evidenceScore: r.evidence ?? 0,
-        likertLevel: r.likertLevel || '',
-        answersCount: r.answersCount || 0
-      }));
-
-      downloadRowsCsv('dataset_investigacion_comparativa_uy_ca.csv', rows, [
-        'id', 'timestamp', 'country', 'countryStandardized', 'profileKey', 'nivelEducativo',
-        'familiaridadInicial', 'recursosSimilares', 'evidenceScore', 'likertLevel', 'answersCount'
-      ]);
     }

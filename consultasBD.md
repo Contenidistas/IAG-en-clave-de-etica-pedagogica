@@ -228,7 +228,14 @@ Abrir ese archivo en el navegador e ingresar la contrasena administrativa. Desde
 - listar recorridos completados
 - ver respuestas por recorrido
 - listar valoraciones y comentarios
-- filtrar por perfil, nivel o texto
+- filtrar por perfil, nivel, país, fecha o texto
+- filtrar por programa y momento de medición
+- comparar cohortes y mediciones iniciales, finales o de seguimiento
+- cruzar variables de recorridos y valoraciones con conteos, porcentajes y promedios
+- generar gráficos de barras agrupadas o apiladas, radar, dispersión, líneas y mapas de calor
+- explorar asociaciones categóricas con chi-cuadrado, Fisher o Monte Carlo y V de Cramér
+- comparar puntajes entre grupos con Kruskal-Wallis, epsilon cuadrado y diagramas de caja
+- exportar cada análisis como PNG, SVG o CSV
 - descargar CSV de recorridos, respuestas o valoraciones
 
 La interfaz usa estas rutas protegidas del Worker:

@@ -224,19 +224,33 @@ function detectCountry() {
 function applyCountryFoundation(countryName) {
   if (!window.CountryContext) return;
   const context = window.CountryContext.get(countryName);
+  const programCode = new URLSearchParams(window.location.search).get('program') || '';
+  const bilateralActive = programCode === 'uy-us-ai-literacy-2027' || countryName === 'Estados Unidos';
+  const bilateral = window.CountryContext.bilateralUyUs;
+  const partnerCountry = countryName === 'Estados Unidos' ? 'Uruguay' : 'Estados Unidos';
+  const partnerReferences = programCode === 'uy-us-ai-literacy-2027'
+    ? (window.CountryContext.get(partnerCountry)?.references || [])
+    : [];
+  const references = [...(context.references || []), ...partnerReferences].filter(
+    (ref, idx, list) => ref && list.findIndex(item => item.url === ref.url) === idx
+  );
   document.documentElement.dataset.country = countryName;
   document.title = `Fundamentación · ${context.title}`;
 
   const synthesis = document.getElementById('foundationCountrySynthesis');
-  if (synthesis) synthesis.textContent = context.synthesis;
+  if (synthesis) {
+    synthesis.textContent = bilateralActive && bilateral
+      ? `${context.synthesis} ${bilateral.summary}`
+      : context.synthesis;
+  }
 
   const cards = document.getElementById('foundationCountryCards');
   if (cards) {
     cards.replaceChildren();
-    context.references.forEach(reference => {
+    references.forEach(reference => {
       const article = document.createElement('article');
       const heading = document.createElement('h3');
-      heading.textContent = reference.label;
+      heading.textContent = reference.version ? `${reference.label} (${reference.version})` : reference.label;
       const description = document.createElement('p');
       description.textContent = reference.title;
       const link = document.createElement('a');
@@ -272,20 +286,26 @@ function applyCountryFoundation(countryName) {
       ? 'Las correspondencias que presenta la herramienta son una adaptación pedagógica para orientar la reflexión; no constituyen una evaluación oficial de cumplimiento.'
       : 'La herramienta no reutiliza instituciones de otro país. Este contexto queda identificado para incorporar fuentes nacionales verificadas en una próxima ampliación.';
     nationalPanel.append(kicker, heading, summary, scope);
+    if (bilateralActive && bilateral) {
+      const versionNote = document.createElement('p');
+      versionNote.textContent = `Referencia comparada binacional (${bilateral.version}): ${bilateral.summary}`;
+      nationalPanel.appendChild(versionNote);
+    }
   }
 
   const links = document.getElementById('foundationCountryLinks');
   if (links) {
     links.replaceChildren();
-    context.references.forEach(reference => {
+    references.forEach(reference => {
       const link = document.createElement('a');
       link.href = reference.url;
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
       link.className = 'framework-link';
+      if (reference.version) link.dataset.version = reference.version;
       const label = document.createElement('span');
       label.className = 'framework-link-label';
-      label.textContent = reference.label;
+      label.textContent = reference.version ? `${reference.label} · ${reference.version}` : reference.label;
       const title = document.createElement('span');
       title.className = 'framework-link-title';
       title.textContent = reference.title;

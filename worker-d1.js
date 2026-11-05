@@ -152,10 +152,12 @@ async function handleEvent(request, env) {
   const eventResult = await env.DB.prepare(`
     INSERT INTO events (
       timestamp, event_type, session_id, page, anonymous, profile, profile_key,
-      user_name, country, country_code, nivel_educativo, familiaridad_inicial,
-      recursos_similares, consent_tracking, evidence, likert_level, raw_path
+      user_name, country, country_code, program_code, cohort_code,
+      measurement_phase, participant_id, nivel_educativo, familiaridad_inicial,
+      recursos_similares, consent_tracking, evidence, likert_level, raw_path,
+      literacy_score, literacy_answers
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).bind(
     timestamp,
     eventType,
@@ -167,13 +169,19 @@ async function handleEvent(request, env) {
     isCompletion ? payload.userName : '',
     payload.country,
     payload.countryCode,
+    payload.programCode,
+    payload.cohortCode,
+    payload.measurementPhase,
+    payload.participantId,
     payload.nivelEducativo,
     payload.familiaridadInicial,
     payload.recursosSimilares,
     data.consentTracking ? 1 : 0,
     isCompletion ? payload.evidence : null,
     isCompletion ? payload.likertLevel : '',
-    isCompletion ? JSON.stringify(payload.path) : ''
+    isCompletion ? JSON.stringify(payload.path) : '',
+    isCompletion ? payload.literacyScore : null,
+    isCompletion ? payload.literacyAnswers : ''
   ).run();
 
   const eventId = eventResult.meta.last_row_id;
@@ -211,9 +219,10 @@ async function insertFeedback(env, eventId, data, timestamp) {
   await env.DB.prepare(`
     INSERT INTO feedback (
       event_id, timestamp, session_id, rating, suggestion, profile, profile_key,
-      country, country_code, nivel_educativo, evidence, likert_level
+      country, country_code, program_code, cohort_code, measurement_phase,
+      participant_id, nivel_educativo, evidence, likert_level
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).bind(
     eventId,
     timestamp,
@@ -224,6 +233,10 @@ async function insertFeedback(env, eventId, data, timestamp) {
     data.profileKey,
     data.country,
     data.countryCode,
+    data.programCode,
+    data.cohortCode,
+    data.measurementPhase,
+    data.participantId,
     data.nivelEducativo,
     null,
     ''
@@ -239,18 +252,36 @@ function validateEventPayload(eventType, data) {
     userName: boundedClean(data.userName, 120),
     country: boundedClean(data.country, 80),
     countryCode: normalizeCountryCode(data.countryCode, data.country),
+    programCode: normalizeProgramCode(data.programCode),
+    cohortCode: normalizeCohortCode(data.cohortCode),
+    measurementPhase: normalizeMeasurementPhase(data.measurementPhase),
+    participantId: normalizeParticipantId(data.participantId),
     nivelEducativo: boundedClean(data.nivelEducativo, 120),
     familiaridadInicial: boundedClean(data.familiaridadInicial, 80),
     recursosSimilares: boundedClean(data.recursosSimilares, 80),
     evidence: null,
     likertLevel: '',
     path: [],
+    literacyScore: null,
+    literacyAnswers: '',
     rating: null,
     suggestion: '',
   };
 
   if (COUNTRY_NAMES_BY_CODE[payload.countryCode]) {
     payload.country = COUNTRY_NAMES_BY_CODE[payload.countryCode];
+  }
+
+  if (payload.programCode) {
+    if (!payload.cohortCode || !payload.measurementPhase || !payload.participantId) {
+      const error = new Error('Contexto de programa incompleto');
+      error.status = 400;
+      throw error;
+    }
+  } else {
+    payload.cohortCode = '';
+    payload.measurementPhase = '';
+    payload.participantId = '';
   }
 
   if ((eventType === 'completion' || eventType === 'feedback') && data.consentTracking !== true) {
@@ -263,6 +294,8 @@ function validateEventPayload(eventType, data) {
     payload.evidence = normalizeScore(data.evidence);
     payload.likertLevel = normalizeLikertLevel(data.likertLevel);
     payload.path = normalizePath(data.path);
+    payload.literacyScore = normalizeScore(data.literacyScore);
+    payload.literacyAnswers = normalizeLiteracyAnswers(data.literacyAnswers);
 
     if (!payload.profile || !payload.profileKey || !payload.likertLevel || payload.evidence === null) {
       const error = new Error('Payload de resultado invalido');
@@ -288,6 +321,26 @@ function validateEventPayload(eventType, data) {
 function normalizeProfile(value) {
   const profile = clean(value);
   return VALID_PROFILES.includes(profile) ? profile : '';
+}
+
+function normalizeProgramCode(value) {
+  const code = boundedClean(value, 64).toLowerCase();
+  return /^[a-z0-9][a-z0-9_-]*$/.test(code) ? code : '';
+}
+
+function normalizeCohortCode(value) {
+  const code = boundedClean(value, 48).toLowerCase();
+  return /^[a-z0-9][a-z0-9_-]*$/.test(code) ? code : '';
+}
+
+function normalizeMeasurementPhase(value) {
+  const phase = boundedClean(value, 16).toLowerCase();
+  return ['baseline', 'final', 'followup'].includes(phase) ? phase : '';
+}
+
+function normalizeParticipantId(value) {
+  const id = boundedClean(value, 80).toLowerCase();
+  return /^[a-z0-9][a-z0-9_-]*$/.test(id) ? id : '';
 }
 
 function normalizeCountryCode(value, country) {
@@ -322,6 +375,27 @@ function normalizeScore(value) {
   const number = Number(value);
   if (!Number.isFinite(number) || number < 0 || number > 100) return null;
   return Math.round(number);
+}
+
+function normalizeLiteracyAnswers(value) {
+  if (!value) return '';
+  if (typeof value === 'object') {
+    try {
+      const json = JSON.stringify(value);
+      return json.length <= 4000 ? json : '';
+    } catch {
+      return '';
+    }
+  }
+  if (typeof value === 'string' && value.length <= 4000) {
+    try {
+      JSON.parse(value);
+      return value;
+    } catch {
+      return '';
+    }
+  }
+  return '';
 }
 
 function normalizeRating(value) {
@@ -798,11 +872,17 @@ async function listCompletions(env) {
       e.profile,
       e.profile_key AS profileKey,
       e.country,
+      e.program_code AS programCode,
+      e.cohort_code AS cohortCode,
+      e.measurement_phase AS measurementPhase,
+      e.participant_id AS participantId,
       e.nivel_educativo AS nivelEducativo,
       e.familiaridad_inicial AS familiaridadInicial,
       e.recursos_similares AS recursosSimilares,
       e.evidence,
       e.likert_level AS likertLevel,
+      e.literacy_score AS literacyScore,
+      e.literacy_answers AS literacyAnswers,
       COUNT(a.id) AS answersCount
     FROM events e
     LEFT JOIN answers a ON a.event_id = e.id
@@ -827,6 +907,10 @@ async function listFeedback(env) {
       profile,
       profile_key AS profileKey,
       country,
+      program_code AS programCode,
+      cohort_code AS cohortCode,
+      measurement_phase AS measurementPhase,
+      participant_id AS participantId,
       nivel_educativo AS nivelEducativo
     FROM feedback
     ORDER BY timestamp DESC
@@ -1077,7 +1161,7 @@ async function buildCsvExport(env, type) {
     return {
       filename: 'feedback.csv',
       rows: data.feedback,
-      columns: ['id', 'eventId', 'timestamp', 'sessionId', 'rating', 'suggestion', 'profile', 'profileKey', 'country', 'nivelEducativo'],
+      columns: ['id', 'eventId', 'timestamp', 'sessionId', 'rating', 'suggestion', 'profile', 'profileKey', 'country', 'programCode', 'cohortCode', 'measurementPhase', 'participantId', 'nivelEducativo'],
     };
   }
 
@@ -1095,8 +1179,11 @@ async function buildCsvExport(env, type) {
       SELECT
         id, timestamp, event_type AS eventType, session_id AS sessionId, page,
         profile, profile_key AS profileKey, user_name AS userName, country,
+        program_code AS programCode, cohort_code AS cohortCode,
+        measurement_phase AS measurementPhase, participant_id AS participantId,
         nivel_educativo AS nivelEducativo, familiaridad_inicial AS familiaridadInicial,
         recursos_similares AS recursosSimilares, evidence, likert_level AS likertLevel,
+        literacy_score AS literacyScore,
         created_at AS createdAt
       FROM events
       ORDER BY timestamp DESC
@@ -1106,7 +1193,7 @@ async function buildCsvExport(env, type) {
     return {
       filename: 'events.csv',
       rows: result.results || [],
-      columns: ['id', 'timestamp', 'eventType', 'sessionId', 'page', 'profile', 'profileKey', 'userName', 'country', 'nivelEducativo', 'familiaridadInicial', 'recursosSimilares', 'evidence', 'likertLevel', 'createdAt'],
+      columns: ['id', 'timestamp', 'eventType', 'sessionId', 'page', 'profile', 'profileKey', 'userName', 'country', 'programCode', 'cohortCode', 'measurementPhase', 'participantId', 'nivelEducativo', 'familiaridadInicial', 'recursosSimilares', 'evidence', 'likertLevel', 'literacyScore', 'createdAt'],
     };
   }
 
@@ -1114,7 +1201,7 @@ async function buildCsvExport(env, type) {
   return {
     filename: 'completions.csv',
     rows: data.completions,
-    columns: ['id', 'timestamp', 'sessionId', 'userName', 'profile', 'profileKey', 'country', 'nivelEducativo', 'familiaridadInicial', 'recursosSimilares', 'evidence', 'likertLevel', 'answersCount'],
+    columns: ['id', 'timestamp', 'sessionId', 'userName', 'profile', 'profileKey', 'country', 'programCode', 'cohortCode', 'measurementPhase', 'participantId', 'nivelEducativo', 'familiaridadInicial', 'recursosSimilares', 'evidence', 'likertLevel', 'literacyScore', 'answersCount'],
   };
 }
 
@@ -1152,15 +1239,15 @@ async function buildZipExport(env, searchParams) {
   const files = [
     {
       name: 'events.csv',
-      content: toCsv(events, ['id', 'timestamp', 'eventType', 'sessionId', 'page', 'profile', 'profileKey', 'userName', 'country', 'nivelEducativo', 'familiaridadInicial', 'recursosSimilares', 'evidence', 'likertLevel', 'createdAt']),
+      content: toCsv(events, ['id', 'timestamp', 'eventType', 'sessionId', 'page', 'profile', 'profileKey', 'userName', 'country', 'programCode', 'cohortCode', 'measurementPhase', 'participantId', 'nivelEducativo', 'familiaridadInicial', 'recursosSimilares', 'evidence', 'likertLevel', 'createdAt']),
     },
     {
       name: 'recorridos.csv',
-      content: toCsv(completions, ['id', 'timestamp', 'sessionId', 'userName', 'profile', 'profileKey', 'country', 'nivelEducativo', 'familiaridadInicial', 'recursosSimilares', 'evidence', 'likertLevel', 'answersCount']),
+      content: toCsv(completions, ['id', 'timestamp', 'sessionId', 'userName', 'profile', 'profileKey', 'country', 'programCode', 'cohortCode', 'measurementPhase', 'participantId', 'nivelEducativo', 'familiaridadInicial', 'recursosSimilares', 'evidence', 'likertLevel', 'answersCount']),
     },
     {
       name: 'valoraciones.csv',
-      content: toCsv(feedback, ['id', 'eventId', 'timestamp', 'sessionId', 'rating', 'suggestion', 'profile', 'profileKey', 'country', 'nivelEducativo']),
+      content: toCsv(feedback, ['id', 'eventId', 'timestamp', 'sessionId', 'rating', 'suggestion', 'profile', 'profileKey', 'country', 'programCode', 'cohortCode', 'measurementPhase', 'participantId', 'nivelEducativo']),
     },
     {
       name: 'respuestas.csv',
@@ -1220,8 +1307,11 @@ async function listEventsForRange(env, range) {
     SELECT
       id, timestamp, event_type AS eventType, session_id AS sessionId, page,
       profile, profile_key AS profileKey, user_name AS userName, country,
+      program_code AS programCode, cohort_code AS cohortCode,
+      measurement_phase AS measurementPhase, participant_id AS participantId,
       nivel_educativo AS nivelEducativo, familiaridad_inicial AS familiaridadInicial,
       recursos_similares AS recursosSimilares, evidence, likert_level AS likertLevel,
+      literacy_score AS literacyScore,
       created_at AS createdAt
     FROM events
     ${where.sql}
@@ -1247,11 +1337,17 @@ async function listCompletionsForRange(env, range) {
       e.profile,
       e.profile_key AS profileKey,
       e.country,
+      e.program_code AS programCode,
+      e.cohort_code AS cohortCode,
+      e.measurement_phase AS measurementPhase,
+      e.participant_id AS participantId,
       e.nivel_educativo AS nivelEducativo,
       e.familiaridad_inicial AS familiaridadInicial,
       e.recursos_similares AS recursosSimilares,
       e.evidence,
       e.likert_level AS likertLevel,
+      e.literacy_score AS literacyScore,
+      e.literacy_answers AS literacyAnswers,
       COUNT(a.id) AS answersCount
     FROM events e
     LEFT JOIN answers a ON a.event_id = e.id
@@ -1277,6 +1373,10 @@ async function listFeedbackForRange(env, range) {
       profile,
       profile_key AS profileKey,
       country,
+      program_code AS programCode,
+      cohort_code AS cohortCode,
+      measurement_phase AS measurementPhase,
+      participant_id AS participantId,
       nivel_educativo AS nivelEducativo
     FROM feedback
     ${where.sql}

@@ -61,14 +61,16 @@ function resolverProfileKey(profile, nivelEducativo, levelKey = '') {
       level_media_basica: 'estudiante_media', level_media_superior: 'estudiante_media',
       level_ca_sec: 'estudiante_media', level_int_secondary: 'estudiante_media',
       level_co_secondary: 'estudiante_media', level_do_secondary: 'estudiante_media',
+      level_us_middle: 'estudiante_media', level_us_high: 'estudiante_media',
       level_formacion_docente: 'estudiante_formacion', level_ca_teacher_prog: 'estudiante_formacion',
       level_int_teacher_training: 'estudiante_formacion', level_co_teacher: 'estudiante_formacion',
-      level_do_teacher: 'estudiante_formacion',
+      level_do_teacher: 'estudiante_formacion', level_us_teacher_prog: 'estudiante_formacion',
       level_universitaria: 'estudiante_universitaria', level_ca_undergrad: 'estudiante_universitaria',
       level_ca_grad: 'estudiante_universitaria', level_int_undergrad: 'estudiante_universitaria',
       level_int_postgrad: 'estudiante_universitaria', level_co_undergrad: 'estudiante_universitaria',
       level_co_postgrad: 'estudiante_universitaria', level_do_undergrad: 'estudiante_universitaria',
-      level_do_postgrad: 'estudiante_universitaria'
+      level_do_postgrad: 'estudiante_universitaria', level_us_undergrad: 'estudiante_universitaria',
+      level_us_grad: 'estudiante_universitaria'
     };
     if (levelRoutes[levelKey]) return levelRoutes[levelKey];
     if (!nivel) return 'estudiante';   // genérico si no eligió
@@ -838,7 +840,8 @@ function sendVisitToServer() {
     country: state.country || '',
     countryCode: state.countryCode || (window.CountryContext?.codeFor(state.country) ?? ''),
     consentTracking: !!state.consentTracking,
-    anonymous: true
+    anonymous: true,
+    ...(window.ProgramContext ? window.ProgramContext.payload(state) : {})
   };
 
   return fetch(CONFIG.dataEndpoint, {
@@ -892,6 +895,8 @@ function buildResultPayload() {
     familiaridadInicial: state.familiaridadInicial,
     recursosSimilares:   state.recursosSimilares,
     consentTracking:     state.consentTracking,
+    ...(window.ProgramContext ? window.ProgramContext.payload(state) : {}),
+    ...(window.LiteracyInstrument ? window.LiteracyInstrument.payload() : {}),
 
     // Resultado global
     evidence:   state.evidence,
@@ -949,7 +954,9 @@ function mostrarResultados() {
   renderizarDevolucionFinal(nivel);
   renderizarInformeCalidad(nivel);
   renderizarBrujulaEtica(nivel);
+  configurarModoProgramaEnResultados();
   renderizarAcuerdoDidactico(nivel);
+  renderizarKitTaller(nivel);
   renderizarCasosSituados();
   guardarDiagnosticoEnHistorialLocal(nivel);
   renderizarCasoRecomendado();
@@ -1310,6 +1317,76 @@ const CASOS_LABORATORIO = [
       '¿Qué acuerdos explícitos deben exigirse en la entrega de proyectos de software sobre la declaración y auditoría de código asistido por IA?'
     ],
     stats: { A: 10, B: 15, C: 45, D: 30 }
+  },
+  {
+    id: 'gobernanza_binacional_uy_us',
+    title: 'Protocolo de distrito y acuerdo de centro: auditar un tutor de IA (Caso comparado UY–EE. UU.)',
+    axis: 'privacidad',
+    axisLabel: 'Gobernanza, privacidad y derechos de decisión (UY–EE. UU.)',
+    audience: 'Comparado Uruguay–EE. UU. / Gestión y docencia',
+    story: 'En un intercambio entre un liceo público de Uruguay y un distrito escolar (K–12) de Estados Unidos, ambos equipos directivos evalúan adoptar un asistente de escritura con IA que ofrece paneles de progreso por estudiante. El proveedor ofrece acceso gratuito durante el primer semestre, pero sus términos de servicio permiten conservar interacciones "desidentificadas" para reentrenar modelos y no detallan cómo se auditan las confabulaciones ni quién puede revocar las recomendaciones automáticas de nivelación.',
+    dilemma: '¿Cómo decidir institucionalmente la adopción o rechazo de una herramienta de IA articulando protección de datos estudiantiles, gobernanza de riesgos y derechos de decisión docente en clave comparada Uruguay–Estados Unidos?',
+    options: {
+      A: {
+        text: 'Adoptar el piloto gratuito de inmediato para aprovechar la innovación y revisar los términos de privacidad recién si se contrata al año siguiente.',
+        feedback: '<strong>Análisis de la opción A (Riesgosa):</strong> Contradice tanto los principios de protección de datos desde el diseño de <em>Agesic / Ceibal</em> como las guías del <em>U.S. Department of Education</em> e <em>IES</em>, que exigen verificar el resguardo de datos estudiantiles (FERPA y normativa nacional) antes de exponer al alumnado.'
+      },
+      B: {
+        text: 'Delegar la decisión exclusivamente en cada docente de aula sin protocolo institucional ni revisión técnica del proveedor.',
+        feedback: '<strong>Análisis de la opción B (Fragmentada):</strong> Desatiende la función <em>GOVERN</em> del <em>NIST AI RMF (v1.0 / AI 600-1)</em> y los protocolos distritales del <em>IES</em>, trasladando a docentes individuales la responsabilidad legal y técnica sobre contratos y flujos de datos.'
+      },
+      C: {
+        text: 'Aplicar un protocolo previo de evaluación: exigir cláusula de no entrenamiento con datos estudiantiles, definir derechos de decisión docente («humans in the loop») y comunicar las reglas a familias y estudiantes.',
+        feedback: '<strong>Análisis de la opción C (Gobernanza responsable / Alineada UY–EE. UU.):</strong> Articula los protocolos de decisión y preparación escolar del <em>IES</em> y la centralidad docente del <em>U.S. Department of Education</em> con los criterios de privacidad y transparencia de <em>ANEP, Ceibal y Agesic</em>.'
+      },
+      D: {
+        text: 'Establecer una matriz de riesgos (mapeo de sesgos, tasa de confabulación y privacidad) con revisión trimestral conjunta de docentes, estudiantes y equipo directivo.',
+        feedback: '<strong>Análisis de la opción D (Integral y medible):</strong> Operacionaliza el ciclo <em>GOVERN–MAP–MEASURE–MANAGE</em> del <em>NIST AI RMF</em> junto con los principios de gobernanza participativa de <em>Udelar / FING</em> y <em>UNESCO</em>.'
+      }
+    },
+    giro: 'Al solicitar la documentación técnica del proveedor, el equipo binacional descubre que el clasificador automático de "nivel de escritura" fue entrenado casi exclusivamente con ensayos universitarios en inglés estándar y etiqueta como "bajo desempeño" giros sintácticos habituales de estudiantes secundarios uruguayos y de estudiantes bilingües en Estados Unidos.',
+    analysis: 'Este caso comparado muestra por qué los marcos de <em>Uruguay (ANEP, Ceibal, Agesic, FING/Udelar)</em> y de <em>Estados Unidos (U.S. Department of Education, NIST AI RMF 1.0 / AI 600-1 e IES)</em> convergen en un punto crítico: ninguna herramienta de IA debe ingresar al aula sin gobernanza previa de datos, evaluación contextual de sesgos y preservación explícita del derecho de decisión profesional docente.',
+    debateQuestions: [
+      '¿Qué puntos en común y qué matices institucionales existen entre los protocolos distritales del IES / U.S. Department of Education y los lineamientos de ANEP, Ceibal y Agesic en Uruguay?',
+      '¿Cómo aplicar las funciones GOVERN, MAP, MEASURE y MANAGE del NIST AI RMF antes de autorizar una plataforma educativa en un centro?',
+      '¿Qué acuerdos mínimos de privacidad y supervisión humana («humans in the loop») deberían exigirse a cualquier proveedor de EdTech con IA?'
+    ],
+    stats: { A: 9, B: 17, C: 44, D: 30 }
+  },
+  {
+    id: 'evaluacion_bilingue_uy_us',
+    title: 'Retroalimentación automatizada y voz estudiantil en aulas bilingües (Caso comparado UY–EE. UU.)',
+    axis: 'equidad',
+    axisLabel: 'Equidad lingüística, verificación y supervisión docente (UY–EE. UU.)',
+    audience: 'Comparado Uruguay–EE. UU. / Aula e intercambio',
+    story: 'En un proyecto de intercambio virtual entre estudiantes de Educación Media Superior de Uruguay y una High School de Estados Unidos, se utiliza un asistente de IA generativa para apoyar la revisión cruzada de ensayos sobre ciudadanía digital en español e inglés. Los docentes observan que el asistente reescribe sistemáticamente las expresiones rioplatenses y las estructuras de estudiantes bilingües (English Learners) imponiendo un registro corporativo uniforme, e introduce dos citas académicas inexistentes para "reforzar" los argumentos.',
+    dilemma: '¿Cómo utilizar la IA generativa en proyectos de intercambio bilingüe preservando la identidad cultural y la voz autoral estudiantil, mientras se controla el riesgo de confabulación bibliográfica?',
+    options: {
+      A: {
+        text: 'Pedir a los estudiantes que acepten todas las correcciones estilísticas y bibliográficas de la IA para lograr un estándar uniforme entre ambos países.',
+        feedback: '<strong>Análisis de la opción A (Inadecuada):</strong> Borra la voz autoral y reproduce sesgos lingüísticos y confabulaciones. Contradice las advertencias del <em>NIST Generative AI Profile (AI 600-1)</em> sobre homogeneización y alucinaciones, así como las pautas de <em>ANEP y Ceibal</em>.'
+      },
+      B: {
+        text: 'Prohibir el uso de IA en las actividades de intercambio y limitar la revisión únicamente al diccionario tradicional.',
+        feedback: '<strong>Análisis de la opción B (Restrictiva):</strong> Evita el problema inmediato pero desaprovecha una oportunidad clave del laboratorio binacional: formar criterio crítico para auditar cómo los modelos tratan distintas lenguas y variedades.'
+      },
+      C: {
+        text: 'Acordar que la IA solo sugiera preguntas de claridad sin reescribir párrafos, exigiendo verificar cada fuente en catálogos reales y conservar las marcas de identidad lingüística.',
+        feedback: '<strong>Análisis de la opción C (Equitativa y rigurosa):</strong> Sostiene la agencia estudiantil y la equidad lingüística promovidas por el <em>U.S. Department of Education</em>, <em>ANEP</em> y <em>FING/Udelar</em>, incorporando verificación activa frente a confabulaciones.'
+      },
+      D: {
+        text: 'Convertir las sugerencias y citas inventadas de la IA en un ejercicio comparado donde los grupos de Uruguay y EE. UU. auditen sesgos culturales y documenten qué aceptan, qué rechazan y por qué.',
+        feedback: '<strong>Análisis de la opción D (Pedagógicamente transformadora):</strong> Articula la medición crítica de riesgos del <em>NIST AI RMF</em> con la pedagogía crítica de <em>Ceibal, ANEP y UNESCO</em>, transformando el sesgo y la alucinación en evidencia analítica para el intercambio.'
+      }
+    },
+    giro: 'Al comparar los registros del taller, los estudiantes descubren que cuando el mismo prompt se formula en español rioplatense el modelo inventa más referencias no verificables que cuando se formula en inglés académico, evidenciando una asimetría de desempeño entre lenguas.',
+    analysis: 'El <em>Perfil de IA Generativa de NIST (AI 600-1)</em> y la guía del <em>Departamento de Educación de EE. UU.</em> advierten sobre las disparidades de rendimiento entre lenguas y variedades y el riesgo de confabulación (generación de citas o datos falsos con apariencia plausible). En diálogo con <em>ANEP, Ceibal y FING/Udelar</em>, el trabajo bilingüe demuestra que la alfabetización crítica en IA exige defender la pluralidad lingüística y auditar empíricamente las respuestas del modelo.',
+    debateQuestions: [
+      '¿Cómo afectan los sesgos lingüísticos de los modelos de lenguaje a la equidad educativa en contextos bilingües o de intercambio internacional?',
+      '¿Qué estrategias prácticas permiten distinguir entre apoyo en la revisión de estilo y sustitución de la voz autoral del estudiante?',
+      '¿Cómo articular las recomendaciones de NIST AI 600-1 (confabulación) y FING/ANEP (verificación de fuentes) en una rúbrica compartida Uruguay–EE. UU.?'
+    ],
+    stats: { A: 7, B: 15, C: 41, D: 37 }
   }
 ];
 
@@ -1482,6 +1559,26 @@ const CASOS_CONTENT_TRANSLATIONS = {
         C: { text: "Mandate prompt documentation and an oral Code Review where students defend code logic line by line.", feedback: "<strong>Analysis of option C (Formative & Professional):</strong> Maintains student technical sovereignty, requiring them to understand and modify AI solutions." },
         D: { text: "Require unit tests and architecture diagrams before requesting AI code suggestions.", feedback: "<strong>Analysis of option D (Methodologically sound):</strong> Reverses development cycle: human defines architecture and tests, AI writes repetitive code." }
       }
+    },
+    gobernanza_binacional_uy_us: {
+      story: "In an exchange between a public high school in Uruguay and a K–12 school district in the United States, both leadership teams evaluate adopting an AI writing assistant with student progress dashboards. The vendor offers free first-semester access, but its terms allow retaining 'de-identified' interactions to retrain models and do not document how confabulations or placement recommendations are audited.",
+      dilemma: "How should institutions decide on adopting or rejecting an AI tool while articulating student data protection, risk governance, and teacher decision rights in a comparative Uruguay–U.S. perspective?",
+      options: {
+        A: { text: "Adopt the free pilot immediately to leverage innovation and review privacy terms only if contracted next year.", feedback: "<strong>Analysis of option A (Risky):</strong> Contradicts privacy-by-design principles from Agesic/Ceibal as well as U.S. Department of Education and IES guidance on student data protection (FERPA)." },
+        B: { text: "Delegate the decision exclusively to individual classroom teachers without an institutional protocol or vendor review.", feedback: "<strong>Analysis of option B (Fragmented):</strong> Neglects the GOVERN function of the NIST AI RMF and IES district protocols, shifting legal and technical burdens onto individual teachers." },
+        C: { text: "Apply a prior evaluation protocol: require a no-training clause on student data, define educator decision rights ('humans in the loop'), and communicate rules to families and students.", feedback: "<strong>Analysis of option C (Responsible governance / UY–U.S. aligned):</strong> Connects IES decision protocols and U.S. Department of Education principles with ANEP, Ceibal, and Agesic privacy and transparency criteria." },
+        D: { text: "Establish a risk matrix (bias mapping, confabulation rate, and privacy) with quarterly joint reviews by teachers, students, and leadership.", feedback: "<strong>Analysis of option D (Comprehensive & measurable):</strong> Operationalizes the NIST AI RMF GOVERN–MAP–MEASURE–MANAGE cycle alongside Udelar/FING and UNESCO participatory governance." }
+      }
+    },
+    evaluacion_bilingue_uy_us: {
+      story: "In a virtual exchange between upper secondary students in Uruguay and a U.S. High School, a generative AI assistant is used to support cross-review of bilingual essays on digital citizenship. Teachers notice the assistant systematically rewrites Rioplatense Spanish phrasing and bilingual English Learners' structures into uniform corporate prose, while inserting two non-existent academic citations.",
+      dilemma: "How can generative AI be used in bilingual exchange projects while preserving cultural identity and student authorial voice, and controlling bibliographic confabulation?",
+      options: {
+        A: { text: "Ask students to accept all AI stylistic and bibliographic corrections to achieve a uniform standard across both countries.", feedback: "<strong>Analysis of option A (Inadequate):</strong> Erases authorial voice and reproduces linguistic bias and confabulations warned against in the NIST Generative AI Profile (AI 600-1) and ANEP/Ceibal guidelines." },
+        B: { text: "Ban AI use in exchange activities and restrict review strictly to traditional dictionaries.", feedback: "<strong>Analysis of option B (Restrictive):</strong> Avoids the immediate issue but misses a key bilateral learning opportunity: building critical criteria to audit how models treat different languages." },
+        C: { text: "Agree that AI may only suggest clarity questions without rewriting paragraphs, requiring source verification in real catalogs and preserving linguistic identity.", feedback: "<strong>Analysis of option C (Equitable & rigorous):</strong> Upholds student agency and linguistic equity promoted by the U.S. Department of Education, ANEP, and FING/Udelar." },
+        D: { text: "Turn the AI's suggestions and invented citations into a comparative audit where Uruguayan and U.S. students document what they accept, reject, and why.", feedback: "<strong>Analysis of option D (Pedagogically transformative):</strong> Connects NIST AI RMF risk measurement with Ceibal, ANEP, and UNESCO critical pedagogy." }
+      }
     }
   },
   pt: {
@@ -1563,6 +1660,26 @@ const CASOS_CONTENT_TRANSLATIONS = {
         B: { text: "Aprovar o projeto se cumprir os testes de integração, sem avaliar a leitura e compreensão do código.", feedback: "<strong>Análise da opção B (Inadequada):</strong> Promove o desenvolvimento caixa-preta. Profissionais devem saber justificar e auditar todo código." },
         C: { text: "Tornar obrigatória a documentação dos prompts e uma sessão de Code Review onde defendam a lógica linha por linha.", feedback: "<strong>Análise da opção C (Formativa & Profissional):</strong> Mantém a soberania técnica do aluno, exigindo que ele compreenda e modifique a IA." },
         D: { text: "Exigir testes unitários e diagramas de arquitetura antes de pedir sugestões de código à IA.", feedback: "<strong>Análise da opção D (Metodologicamente sólida):</strong> Inverte o ciclo: o humano define arquitetura e testes, a IA escreve código repetitivo." }
+      }
+    },
+    gobernanza_binacional_uy_us: {
+      story: "Em um intercâmbio entre um liceu público do Uruguai e um distrito escolar (K–12) dos Estados Unidos, as equipes diretivas avaliam adotar um assistente de escrita com IA que oferece painéis de progresso por estudante. O fornecedor oferece acesso gratuito no primeiro semestre, mas seus termos permitem reter interações 'desidentificadas' para retreinar modelos.",
+      dilemma: "Como decidir institucionalmente a adoção ou rejeição de uma ferramenta de IA articulando proteção de dados estudantis, governança de riscos e direitos de decisão docente em perspectiva comparada Uruguai–EUA?",
+      options: {
+        A: { text: "Adotar o piloto gratuito imediatamente e revisar os termos de privacidade apenas se for contratado no ano seguinte.", feedback: "<strong>Análise da opção A (Arriscada):</strong> Contraria os princípios de proteção de dados da Agesic/Ceibal e as diretrizes do U.S. Department of Education e IES." },
+        B: { text: "Delegar a decisão exclusivamente a cada docente sem protocolo institucional nem revisão técnica do fornecedor.", feedback: "<strong>Análise da opção B (Fragmentada):</strong> Desconsidera a função GOVERN do NIST AI RMF e os protocolos distritais do IES." },
+        C: { text: "Aplicar um protocolo prévio de avaliação: exigir cláusula de não treinamento com dados estudantis, definir direitos de decisão docente e comunicar regras a famílias e estudantes.", feedback: "<strong>Análise da opção C (Governança responsável / Alinhada UY–EUA):</strong> Articula os protocolos do IES e do U.S. Department of Education com os critérios de ANEP, Ceibal e Agesic." },
+        D: { text: "Estabelecer uma matriz de riscos (vieses, taxa de confabulação e privacidade) com revisão trimestral conjunta.", feedback: "<strong>Análise da opção D (Integral e mensurável):</strong> Operacionaliza o ciclo GOVERN–MAP–MEASURE–MANAGE do NIST AI RMF junto com Udelar/FING e UNESCO." }
+      }
+    },
+    evaluacion_bilingue_uy_us: {
+      story: "Em um projeto de intercâmbio virtual entre estudantes do ensino médio do Uruguai e de uma High School dos Estados Unidos, utiliza-se um assistente de IA para apoiar a revisão de ensaios bilíngues. Os docentes notam que o assistente reescreve expressões rio-pratenses e estruturas de estudantes bilíngues em um tom corporativo uniforme e insere duas citações acadêmicas inexistentes.",
+      dilemma: "Como utilizar a IA generativa em projetos de intercâmbio bilíngue preservando a identidade cultural e a voz autoral estudantil, controlando o risco de confabulação bibliográfica?",
+      options: {
+        A: { text: "Pedir aos estudantes que aceitem todas as correções estilísticas e bibliográficas da IA para obter um padrão uniforme.", feedback: "<strong>Análise da opção A (Inadequada):</strong> Apaga a voz autoral e reproduz vieses linguísticos e confabulações advertidos pelo NIST AI 600-1 e ANEP/Ceibal." },
+        B: { text: "Proibir o uso de IA nas atividades de intercâmbio e limitar a revisão ao dicionário tradicional.", feedback: "<strong>Análise da opção B (Restritiva):</strong> Evita o problema imediato, mas perde a oportunidade pedagógica de auditar criticamente como os modelos tratam diferentes línguas." },
+        C: { text: "Acordar que a IA apenas sugira perguntas de clareza sem reescrever parágrafos, exigindo verificação de fontes em catálogos reais.", feedback: "<strong>Análise da opção C (Equitativa e rigorosa):</strong> Sustenta a agência estudantil e a equidade linguística promovidas pelo U.S. Department of Education, ANEP e FING/Udelar." },
+        D: { text: "Transformar as sugestões e citações inventadas em um exercício comparado onde os grupos do Uruguai e dos EUA auditem vieses e documentem suas decisões.", feedback: "<strong>Análise da opção D (Pedagogicamente transformadora):</strong> Articula a medição de riscos do NIST AI RMF com a pedagogia crítica de Ceibal, ANEP e UNESCO." }
       }
     }
   },
@@ -1646,6 +1763,26 @@ const CASOS_CONTENT_TRANSLATIONS = {
         C: { text: "Rendre obligatoire la documentation des prompts et une séance de Code Review orale où les étudiants défendent la logique ligne par ligne.", feedback: "<strong>Analyse de l'option C (Formative & Professionnelle) :</strong> Maintient la souveraineté technique de l'étudiant, en lui exigeant de comprendre l'IA." },
         D: { text: "Exiger des tests unitaires et des schémas d'architecture avant de solliciter des suggestions de code à l'IA.", feedback: "<strong>Analyse de l'option D (Méthodologiquement solide) :</strong> Inverse le cycle : l'humain définit l'architecture et les tests, l'IA écrit le code répétitif." }
       }
+    },
+    gobernanza_binacional_uy_us: {
+      story: "Lors d'un échange entre un lycée public d'Uruguay et un district scolaire (K–12) des États-Unis, les équipes de direction évaluent l'adoption d'un assistant d'écriture IA. Le fournisseur offre un accès gratuit au premier semestre, mais ses conditions permettent de conserver des interactions « désidentifiées » pour réentraîner ses modèles.",
+      dilemma: "Comment décider institutionnellement de l'adoption ou du rejet d'un outil d'IA en articulant protection des données des élèves, gouvernance des risques et droits de décision enseignants dans une perspective comparée Uruguay–États-Unis ?",
+      options: {
+        A: { text: "Adopter immédiatement le pilote gratuit et n'examiner les conditions de confidentialité que l'année suivante.", feedback: "<strong>Analyse de l'option A (Risquée) :</strong> Contredit les principes d'Agesic/Ceibal ainsi que les directives du U.S. Department of Education et de l'IES." },
+        B: { text: "Déléguer la décision exclusivement à chaque enseignant sans protocole institutionnel ni examen du fournisseur.", feedback: "<strong>Analyse de l'option B (Fragmentée) :</strong> Néglige la fonction GOVERN du NIST AI RMF et les protocoles de district de l'IES." },
+        C: { text: "Appliquer un protocole d'évaluation préalable : exiger une clause de non-entraînement sur les données des élèves, définir les droits de décision enseignants et communiquer les règles.", feedback: "<strong>Analyse de l'option C (Gouvernance responsable / Alignée UY–É.-U.) :</strong> Articule les protocoles de l'IES et du U.S. Department of Education avec les critères d'ANEP, Ceibal et Agesic." },
+        D: { text: "Établir une matrice de risques (biais, taux de confabulation et confidentialité) avec révision trimestrielle conjointe.", feedback: "<strong>Analyse de l'option D (Intégrale et mesurable) :</strong> Opérationnalise le cycle GOVERN–MAP–MEASURE–MANAGE du NIST AI RMF avec l'Udelar/FING et l'UNESCO." }
+      }
+    },
+    evaluacion_bilingue_uy_us: {
+      story: "Dans un projet d'échange virtuel entre des lycéens d'Uruguay et d'une High School américaine, un assistant d'IA générative est utilisé pour la révision croisée d'essais bilingues. Les enseignants remarquent que l'IA réécrit systématiquement les expressions rioplatenses et les tournures des élèves bilingues dans un style uniforme et insère deux citations académiques fictives.",
+      dilemma: "Comment utiliser l'IA générative dans des projets d'échange bilingues tout en préservant l'identité culturelle et la voix d'auteur des élèves, et en contrôlant le risque de confabulation bibliographique ?",
+      options: {
+        A: { text: "Demander aux élèves d'accepter toutes les corrections stylistiques et bibliographiques de l'IA pour obtenir un standard uniforme.", feedback: "<strong>Analyse de l'option A (Inadéquate) :</strong> Efface la voix de l'élève et reproduit les biais linguistiques et confabulations signalés par le NIST AI 600-1 et l'ANEP/Ceibal." },
+        B: { text: "Interdire l'IA dans les activités d'échange et limiter la révision au dictionnaire traditionnel.", feedback: "<strong>Analyse de l'option B (Restrictive) :</strong> Évite le problème immédiat mais manque l'occasion pédagogique d'auditer de manière critique le traitement des langues par les modèles." },
+        C: { text: "Convenir que l'IA ne suggère que des questions de clarté sans réécrire les paragraphes, en exigeant la vérification des sources dans des catalogues réels.", feedback: "<strong>Analyse de l'option C (Équitable et rigoureuse) :</strong> Soutient l'agentivité étudiante et l'équité linguistique promues par le U.S. Department of Education, l'ANEP et la FING/Udelar." },
+        D: { text: "Transformer les suggestions et citations inventées en un exercice comparé où les groupes d'Uruguay et des États-Unis auditent les biais et documentent leurs choix.", feedback: "<strong>Analyse de l'option D (Pédagogiquement transformatrice) :</strong> Articule la mesure des risques du NIST AI RMF avec la pédagogie critique de Ceibal, ANEP et UNESCO." }
+      }
     }
   }
 };
@@ -1703,7 +1840,9 @@ function getCaseMetaTranslation(caso, lang) {
     'Aula / gestión': { es: 'Aula / gestión', en: 'Classroom / Management', pt: 'Sala de aula / Gestão', fr: 'Classe / Gestion' },
     'Aula / formación docente': { es: 'Aula / formación docente', en: 'Classroom / Teacher training', pt: 'Sala de aula / Formação docente', fr: 'Classe / Formation enseignante' },
     'Formación docente / nivel superior': { es: 'Formación docente / Nivel superior', en: 'Teacher training / Higher ed', pt: 'Formação docente / Nível superior', fr: 'Formation enseignante / Supérieur' },
-    'Educación técnica / terciaria / universidad (informática)': { es: 'Educación técnica / Universidad', en: 'Technical / Higher ed (CS)', pt: 'Ensino Técnico / Superior', fr: 'Enseignement technique / Supérieur' }
+    'Educación técnica / terciaria / universidad (informática)': { es: 'Educación técnica / Universidad', en: 'Technical / Higher ed (CS)', pt: 'Ensino Técnico / Superior', fr: 'Enseignement technique / Supérieur' },
+    'Comparado Uruguay–EE. UU. / Gestión y docencia': { es: 'Comparado Uruguay–EE. UU. / Gestión y docencia', en: 'Uruguay–U.S. Comparative / Leadership & Teaching', pt: 'Comparado Uruguai–EUA / Gestão e docência', fr: 'Comparé Uruguay–États-Unis / Gestion et enseignement' },
+    'Comparado Uruguay–EE. UU. / Aula e intercambio': { es: 'Comparado Uruguay–EE. UU. / Aula e intercambio', en: 'Uruguay–U.S. Comparative / Classroom & Exchange', pt: 'Comparado Uruguai–EUA / Sala de aula e intercâmbio', fr: 'Comparé Uruguay–États-Unis / Classe et échange' }
   };
 
   const titlesMap = {
@@ -1714,7 +1853,9 @@ function getCaseMetaTranslation(caso, lang) {
     equidad: { es: 'La brecha de las licencias', en: 'The license gap', pt: 'A lacuna das licenças', fr: 'L\'écart des licences' },
     delegacion: { es: 'La paradoja del borrador: agencia humana y delegación cognitiva', en: 'The draft paradox: human agency and cognitive offloading', pt: 'O paradoxo do rascunho: agência humana e delegação cognitiva', fr: 'Le paradoxe du brouillon : agentivité humaine et délégation cognitive' },
     tfg_docente: { es: 'El marco teórico automatizado: ética en la investigación de grado', en: 'The automated theoretical framework: ethics in undergraduate research', pt: 'O marco teórico automatizado: ética na pesquisa de graduação', fr: 'Le cadre théorique automatisé : éthique dans la recherche de diplôme' },
-    coconstruccion_codex: { es: 'El artefacto generado: co-construcción de software y comprensión algorítmica', en: 'The generated artifact: software co-construction and algorithmic understanding', pt: 'O artefato gerado: co-construção de software e compreensão algorítmica', fr: 'L\'artéfact généré : co-construction de logiciel et compréhension algorithmique' }
+    coconstruccion_codex: { es: 'El artefacto generado: co-construcción de software y comprensión algorítmica', en: 'The generated artifact: software co-construction and algorithmic understanding', pt: 'O artefato gerado: co-construção de software e compreensão algorítmica', fr: 'L\'artéfact généré : co-construction de logiciel et compréhension algorithmique' },
+    gobernanza_binacional_uy_us: { es: 'Protocolo de distrito y acuerdo de centro: auditar un tutor de IA (Caso comparado UY–EE. UU.)', en: 'District protocol and school agreement: auditing an AI tutor (UY–U.S. comparative case)', pt: 'Protocolo distrital e acordo escolar: auditar um tutor de IA (Caso comparado UY–EUA)', fr: 'Protocole de district et accord d\'établissement : auditer un tuteur d\'IA (Cas comparé UY–É.-U.)' },
+    evaluacion_bilingue_uy_us: { es: 'Retroalimentación automatizada y voz estudiantil en aulas bilingües (Caso comparado UY–EE. UU.)', en: 'Automated feedback and student voice in bilingual classrooms (UY–U.S. comparative case)', pt: 'Feedback automatizado e voz estudantil em salas bilíngues (Caso comparado UY–EUA)', fr: 'Rétroaction automatisée et voix étudiante en classes bilingues (Cas comparé UY–É.-U.)' }
   };
 
   return {
@@ -2037,7 +2178,9 @@ function cargarCasoInteractivo(caseId, target = elements.situatedCases, onReturn
         profileKey: state.profileKey || 'docente',
         sessionId: typeof getAnalyticsSessionId === 'function' ? getAnalyticsSessionId() : 'anonimo',
         country: state.country || 'No indicado',
-        nivelEducativo: state.nivelEducativo || 'Secundaria'
+        countryCode: state.countryCode || (window.CountryContext?.codeFor(state.country) ?? ''),
+        nivelEducativo: state.nivelEducativo || 'Secundaria',
+        ...(window.ProgramContext ? window.ProgramContext.payload(state) : {})
       };
       
       fetch(CONFIG.dataEndpoint, {
@@ -2081,7 +2224,9 @@ function cargarCasoInteractivo(caseId, target = elements.situatedCases, onReturn
           profileKey: state.profileKey || 'docente',
           sessionId: typeof getAnalyticsSessionId === 'function' ? getAnalyticsSessionId() : 'anonimo',
           country: state.country || 'No indicado',
-          nivelEducativo: state.nivelEducativo || 'Secundaria'
+          countryCode: state.countryCode || (window.CountryContext?.codeFor(state.country) ?? ''),
+          nivelEducativo: state.nivelEducativo || 'Secundaria',
+          ...(window.ProgramContext ? window.ProgramContext.payload(state) : {})
         };
         
         fetch(CONFIG.dataEndpoint, {
@@ -2137,9 +2282,17 @@ function cargarCasoInteractivo(caseId, target = elements.situatedCases, onReturn
 // Explicit links to existing stories, using the same evidence as the network.
 // Verification is addressed by the invented bibliography in the "sesgos" case.
 function recomendarCasoDelRecorrido() {
+  const bilateralActive = Boolean(
+    window.ProgramContext?.current?.active
+    || state.programCode === 'uy-us-ai-literacy-2027'
+    || state.country === 'Estados Unidos'
+  );
   const casesByAxis = {
-    transparencia: 'transparencia', verificacion: 'sesgos',
-    privacidad: 'privacidad', equidad: 'equidad', agencia: 'delegacion'
+    transparencia: 'transparencia',
+    verificacion: 'sesgos',
+    privacidad: bilateralActive ? 'gobernanza_binacional_uy_us' : 'privacidad',
+    equidad: bilateralActive ? 'evaluacion_bilingue_uy_us' : 'equidad',
+    agencia: 'delegacion'
   };
   const candidates = Object.entries(casesByAxis).map(([axis, caseId]) => {
     const steps = pasosDeCriterio(axis).filter(step => {
@@ -2462,6 +2615,32 @@ function renderizarBrujulaEtica(nivel) {
   updateDecisionMap();
 }
 
+function configurarModoProgramaEnResultados() {
+  const isProgram = Boolean(
+    window.ProgramContext?.current?.active
+    || state.programCode === 'uy-us-ai-literacy-2027'
+  );
+  const instInput = document.getElementById('agreementInstitutionInput');
+  const configDetails = document.getElementById('agreementCustomConfigDetails');
+  const kitDetails = document.getElementById('workshopKitDetails');
+
+  if (isProgram) {
+    if (!state.userPickedAgreementFormat) {
+      state.agreementFormat = 'binacional';
+      if (elements.agreementFormatBtns && elements.agreementFormatBtns.length) {
+        elements.agreementFormatBtns.forEach(item => {
+          item.classList.toggle('active', item.dataset.agreementFormat === 'binacional');
+        });
+      }
+    }
+    if (instInput && !instInput.value.trim() && state.cohortCode) {
+      instInput.value = state.cohortCode;
+    }
+    if (configDetails) configDetails.open = true;
+    if (kitDetails) kitDetails.open = true;
+  }
+}
+
 function construirAcuerdoDidactico(nivel) {
   const perfilBase = state.profileBase || state.profile || 'participante';
   const formato = state.agreementFormat || 'aula';
@@ -2485,6 +2664,11 @@ function construirAcuerdoDidactico(nivel) {
       titulo: 'Texto breve para aula virtual o plataforma educativa',
       destino: 'Crea, Moodle, Classroom u otra plataforma',
       cierre: 'Pegá este acuerdo junto a la consigna y ajustá ejemplos, herramientas permitidas y forma de declaración según la actividad.'
+    },
+    binacional: {
+      titulo: 'Protocolo Binacional Uruguay–Estados Unidos para Uso Responsable de IA en Educación',
+      destino: 'cohorte de programa, acuerdo de centro o taller comparado (ANEP/Ceibal · NIST/Ed.gov/IES)',
+      cierre: 'Este protocolo vincula el diagnóstico inicial (baseline), el taller de casos comparados y la medición post-intervención / seguimiento a 60–90 días.'
     }
   };
   const formatoActual = formatos[formato] || formatos.aula;
@@ -2494,8 +2678,14 @@ function construirAcuerdoDidactico(nivel) {
       ? 'docente'
       : 'estudiante';
   const nivelEducativo = state.nivelEducativo || 'nivel educativo no especificado';
+  const institucionRaw = document.getElementById('agreementInstitutionInput')?.value.trim()
+    || state.cohortCode
+    || '';
+  const horizonteRevision = document.getElementById('agreementHorizonSelect')?.value
+    || '30 días (al cierre de la unidad o actividad)';
+  const compromisoClave = document.getElementById('agreementCommitmentSelect')?.value
+    || 'Declaración explícita de uso de IA y registro breve de consultas (prompts)';
   const respuestasAFortalecer = state.path.filter(p => p.answerKey === 'no' || p.answerKey === 'sometimes');
-  const respuestasAlineadas = state.path.filter(p => p.answerKey === 'yes');
   const prioridades = respuestasAFortalecer.slice(0, 3);
   const fecha = new Date().toLocaleDateString('es-UY');
 
@@ -2515,12 +2705,19 @@ function construirAcuerdoDidactico(nivel) {
       ? 'La interpretación de marcos, la orientación a otros actores y la construcción de criterios compartidos quedan bajo responsabilidad profesional y académica.'
     : 'La comprensión, la explicación del proceso y la producción final quedan bajo responsabilidad de quien entrega la tarea.';
 
+  const lineaInstitucion = institucionRaw ? `\nInstitución / cohorte: ${institucionRaw}` : '';
+  const bloqueBinacional = (formato === 'binacional' || window.ProgramContext?.current?.active)
+    ? `\nArticulación bilateral Uruguay–Estados Unidos\n- Gobernanza y derechos de decisión (IES / ANEP): definir qué actores autorizan herramientas, comunican criterios a estudiantes y familias, y auditan su pertinencia.\n- Gestión de riesgos generativos (NIST AI RMF / UNESCO): documentar riesgos de confabulación, sesgos y dependencia cognitiva antes de escalar el uso en evaluación.\n- Supervisión docente y privacidad (U.S. Dept. of Ed / Agesic-Ceibal): sostener el principio human-in-the-loop y prohibir el ingreso de datos estudiantiles identificables.\n`
+    : '';
+
   return `${formatoActual.titulo}
-Fecha: ${fecha}
+Fecha: ${fecha}${lineaInstitucion}
 Perfil: ${perfilHumano}
 Nivel/contexto: ${nivelEducativo}
 Resultado del recorrido: ${nivel.id}
 Formato: ${formatoActual.destino}
+Compromiso verificable acordado: ${compromisoClave}
+Horizonte de revisión: ${horizonteRevision}
 
 Propósito
 Usaremos IA generativa como apoyo para aprender, enseñar, revisar y pensar mejor. No sustituirá el juicio humano, la responsabilidad pedagógica ni la autoría de las producciones.
@@ -2544,16 +2741,91 @@ Autoría y valor agregado humano
 La producción final deberá mostrar comprensión, criterio propio, contextualización y aportes personales. La IA podrá asistir el proceso, pero no reemplazar el pensamiento ni la explicación de las decisiones tomadas.
 
 Responsabilidad
-${responsabilidad}
-
+${responsabilidad}${bloqueBinacional}
 Prioridades detectadas en este recorrido
 ${focoPrincipal}
 
-Seguimiento
+Seguimiento (${horizonteRevision})
 ${formatoActual.cierre} El objetivo es fortalecer un uso ético, crítico, reflexivo, seguro y responsable de la IA.
 
 Referencias orientadoras
 ${getJourneyFrameworkNames()}.`;
+}
+
+function construirKitTaller(nivel) {
+  const audienceKey = document.getElementById('workshopAudienceSelect')?.value || 'docentes';
+  const durationMin = Number(document.getElementById('workshopDurationSelect')?.value || 90);
+  const focusKey = document.getElementById('workshopFocusSelect')?.value || 'binacional';
+  const cohortSlug = (
+    document.getElementById('agreementInstitutionInput')?.value.trim()
+    || state.cohortCode
+    || 'cohorte-01'
+  ).toLowerCase().replace(/[^a-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '') || 'cohorte-01';
+
+  const audienceLabels = {
+    docentes: 'Docentes y formadores',
+    estudiantes: 'Estudiantes de educación media y superior',
+    directivos: 'Equipos directivos y referentes institucionales',
+  };
+  const focusLabels = {
+    binacional: 'Comparado Uruguay–EE. UU. (ANEP/Ceibal/Agesic + NIST AI RMF/U.S. Dept. of Ed/IES)',
+    aula: 'Práctica de aula, diseño de consignas y trazabilidad de autoría',
+    gobernanza: 'Gobernanza institucional, protección de datos estudiantiles y equidad',
+  };
+
+  const t1 = Math.round(durationMin * 0.2);
+  const t2 = Math.round(durationMin * 0.3);
+  const t3 = Math.round(durationMin * 0.3);
+  const t4 = durationMin - (t1 + t2 + t3);
+
+  const originUrl = (typeof window !== 'undefined' && window.location?.origin && window.location.origin !== 'null')
+    ? window.location.origin
+    : 'https://iagetica.org';
+  const linkBaseline = `${originUrl}/?program=uy-us-ai-literacy-2027&cohort=${cohortSlug}&phase=baseline`;
+  const linkFinal = `${originUrl}/?program=uy-us-ai-literacy-2027&cohort=${cohortSlug}&phase=final`;
+  const linkFollowup = `${originUrl}/?program=uy-us-ai-literacy-2027&cohort=${cohortSlug}&phase=followup`;
+
+  return [
+    '# Kit de Taller y Facilitación — IA con criterio (Recorrido en 4 momentos)',
+    '',
+    `- **Destinatarios:** ${audienceLabels[audienceKey] || audienceLabels.docentes}`,
+    `- **Duración total:** ${durationMin} minutos`,
+    `- **Enfoque:** ${focusLabels[focusKey] || focusLabels.binacional}`,
+    `- **Cohorte / institución sugerida:** \`${cohortSlug}\``,
+    `- **Nivel base de referencia:** ${nivel ? nivel.id : 'Diagnóstico inicial'}`,
+    '',
+    '## Momento 1 · Diagnóstico inicial en plataforma (`baseline` · ' + t1 + ' min)',
+    '1. Compartir el enlace de inicio con el grupo (conserva ID seudónimo en el navegador sin pedir datos personales):',
+    `   ${linkBaseline}`,
+    '2. Cada participante completa las 8 preguntas adaptativas y observa su Brújula Ética y el grafo de principios.',
+    '',
+    '## Momento 2 · Taller facilitado: pensamiento crítico, autoría y datos (' + t2 + ' min)',
+    '- **Apertura conceptual:** Contrastar los principios nacionales (ANEP, Ceibal, Agesic, Udelar) con los marcos estadounidenses (NIST AI RMF 1.0 / AI 600-1, U.S. Department of Education e IES) y UNESCO.',
+    '- **Preguntas guía para el plenario:**',
+    '  1. ¿Qué decisiones pedagógicas o evaluativas nunca deberían delegarse a un sistema automatizado (*human-in-the-loop*)?',
+    '  2. ¿Qué datos estudiantiles o institucionales requieren resguardo estricto antes de usar un asistente generativo?',
+    '  3. ¿Cómo pasamos de prohibir o ignorar la IA a exigir evidencia del proceso humano (borradores, bitácora de prompts, defensa oral)?',
+    '',
+    '## Momento 3 · Laboratorio de casos comparados Uruguay–EE. UU. (' + t3 + ' min)',
+    '- En subgrupos, abrir el **Laboratorio de casos** y trabajar los dos dilemas binacionales:',
+    '  - **Caso 1 (Privacidad y Gobernanza):** *Protocolo de distrito y acuerdo de centro: auditar un tutor de IA (UY–EE. UU.)*',
+    '  - **Caso 2 (Equidad y Evaluación):** *Retroalimentación automatizada y voz estudiantil en aulas bilingües (UY–EE. UU.)*',
+    '- Cada subgrupo fundamenta qué opción descartaría y cuál adoptaría según los criterios de transparencia, verificación, privacidad, equidad y agencia.',
+    '',
+    '## Momento 4 · Producto aplicado y evaluación post-taller (`final` · ' + t4 + ' min + seguimiento)',
+    '1. En la pestaña **Propuestas de acción**, configurar y descargar el **Acuerdo didáctico / Protocolo Binacional** con un compromiso verificable y horizonte de revisión.',
+    '2. Completar el recorrido de cierre (`final`) desde el mismo navegador para medir el cambio Pre/Post:',
+    `   ${linkFinal}`,
+    '3. Agendar el enlace de seguimiento a 60–90 días (`followup`) para verificar cambios efectivos de práctica:',
+    `   ${linkFollowup}`,
+  ].join('\n');
+}
+
+function renderizarKitTaller(nivel) {
+  const textarea = document.getElementById('workshopKitText');
+  if (!textarea) return;
+  const nivelActual = nivel || CONFIG.likert.find(l => state.evidence >= l.min && l.max >= state.evidence) || CONFIG.likert[0];
+  textarea.value = construirKitTaller(nivelActual);
 }
 
 function renderizarAcuerdoDidactico(nivel) {
@@ -2681,6 +2953,7 @@ if (elements.regenerateAgreementBtn) {
 if (elements.agreementFormatBtns && elements.agreementFormatBtns.length) {
   elements.agreementFormatBtns.forEach(btn => {
     btn.addEventListener('click', () => {
+      state.userPickedAgreementFormat = true;
       state.agreementFormat = btn.dataset.agreementFormat || 'aula';
       elements.agreementFormatBtns.forEach(item => {
         item.classList.toggle('active', item === btn);
@@ -2695,6 +2968,67 @@ if (elements.agreementFormatBtns && elements.agreementFormatBtns.length) {
         }
       }
     });
+  });
+}
+
+['agreementInstitutionInput', 'agreementHorizonSelect', 'agreementCommitmentSelect'].forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const updateAll = () => {
+    const nivel = CONFIG.likert.find(l => state.evidence >= l.min && l.max >= state.evidence) || CONFIG.likert[0];
+    if (nivel) {
+      renderizarAcuerdoDidactico(nivel);
+      renderizarKitTaller(nivel);
+    }
+  };
+  el.addEventListener('input', updateAll);
+  el.addEventListener('change', updateAll);
+});
+
+['workshopAudienceSelect', 'workshopDurationSelect', 'workshopFocusSelect'].forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('change', () => {
+    const nivel = CONFIG.likert.find(l => state.evidence >= l.min && l.max >= state.evidence) || CONFIG.likert[0];
+    renderizarKitTaller(nivel);
+  });
+});
+
+const copyWorkshopKitBtn = document.getElementById('copyWorkshopKitBtn');
+if (copyWorkshopKitBtn) {
+  copyWorkshopKitBtn.addEventListener('click', async () => {
+    const textarea = document.getElementById('workshopKitText');
+    const statusEl = document.getElementById('workshopKitStatus');
+    if (!textarea || !textarea.value) return;
+    try {
+      await navigator.clipboard.writeText(textarea.value);
+      if (statusEl) statusEl.textContent = 'Guía de taller copiada al portapapeles.';
+    } catch (_) {
+      textarea.focus();
+      textarea.select();
+      if (statusEl) statusEl.textContent = 'Seleccioné la guía para que puedas copiarla.';
+    }
+  });
+}
+
+const downloadWorkshopKitBtn = document.getElementById('downloadWorkshopKitBtn');
+if (downloadWorkshopKitBtn) {
+  downloadWorkshopKitBtn.addEventListener('click', () => {
+    const textarea = document.getElementById('workshopKitText');
+    const statusEl = document.getElementById('workshopKitStatus');
+    if (!textarea || !textarea.value) return;
+    const audience = document.getElementById('workshopAudienceSelect')?.value || 'docentes';
+    const duration = document.getElementById('workshopDurationSelect')?.value || '90';
+    const blob = new Blob([textarea.value], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `kit-taller-iag-${audience}-${duration}min.md`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    if (statusEl) statusEl.textContent = 'Kit de taller descargado (.md).';
   });
 }
 

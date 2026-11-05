@@ -125,25 +125,44 @@ function getEthicalFrameworkGuidance(axis) {
   const selectedCountry = window.state?.country || '';
   const country = window.CountryContext?.get(selectedCountry);
   const original = ETHICAL_FRAMEWORK_GUIDANCE[axis];
+  const programActive = Boolean(
+    window.ProgramContext?.current?.active
+    || window.state?.programCode === 'uy-us-ai-literacy-2027'
+  );
+  const bilateral = window.CountryContext?.getBilateralGuidance?.(axis) || null;
+  const dedupeSources = list => list.filter(
+    (source, index, arr) => source && arr.findIndex(item => item.url === source.url && item.label === source.label) === index
+  );
+
   if (!country || country.country === 'Uruguay') {
+    const sources = programActive && bilateral
+      ? dedupeSources([...original.sources, ...bilateral.sources])
+      : original.sources;
     return {
       ...original,
+      sources,
       countryNote: original.agesic || '',
+      bilateralNote: programActive && bilateral ? bilateral.synthesis : '',
       interpretation: 'Orientación pedagógica basada en tus respuestas y en los marcos citados; no es una calificación oficial. La vinculación con Agesic es una adaptación educativa de la Estrategia Nacional de IA 2024–2030.'
     };
   }
 
   const local = country.axisGuidance?.[axis] || {};
   const international = window.CountryContext.internationalReference;
-  const sources = [...(local.sources || []), international]
-    .filter((source, index, list) => list.findIndex(item => item.url === source.url) === index);
+  const baseSources = [...(local.sources || []), international];
+  if (programActive && bilateral) baseSources.push(...bilateral.sources);
+  const sources = dedupeSources(baseSources);
+  const isUS = country.country === 'Estados Unidos';
   return {
     basis: local.basis || INTERNATIONAL_ETHICAL_BASE[axis],
     action: original.action,
     sources,
     countryNote: local.note || country.summary,
-    interpretation: country.hasNationalFramework
-      ? `Orientación pedagógica basada en tus respuestas y en los marcos citados para ${country.country}; no es una evaluación oficial de cumplimiento.`
-      : `Orientación pedagógica basada en UNESCO. Aún no se incorporó un marco nacional curado para ${country.country}.`
+    bilateralNote: (programActive || isUS) && bilateral ? bilateral.synthesis : '',
+    interpretation: isUS
+      ? 'Orientación pedagógica basada en tus respuestas y en los marcos citados para Estados Unidos (referencias versionadas NIST AI RMF 1.0 / AI 600-1 en revisión, U.S. Department of Education e IES); no es una evaluación oficial de cumplimiento.'
+      : country.hasNationalFramework
+        ? `Orientación pedagógica basada en tus respuestas y en los marcos citados para ${country.country}; no es una evaluación oficial de cumplimiento.`
+        : `Orientación pedagógica basada en UNESCO. Aún no se incorporó un marco nacional curado para ${country.country}.`
   };
 }

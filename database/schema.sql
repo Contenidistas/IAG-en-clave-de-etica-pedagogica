@@ -13,6 +13,10 @@ CREATE TABLE IF NOT EXISTS events (
   user_name TEXT,
   country TEXT,
   country_code TEXT,
+  program_code TEXT,
+  cohort_code TEXT,
+  measurement_phase TEXT,
+  participant_id TEXT,
   nivel_educativo TEXT,
   familiaridad_inicial TEXT,
   recursos_similares TEXT,
@@ -20,6 +24,8 @@ CREATE TABLE IF NOT EXISTS events (
   evidence INTEGER,
   likert_level TEXT,
   raw_path TEXT,
+  literacy_score INTEGER,
+  literacy_answers TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
@@ -44,6 +50,10 @@ CREATE TABLE IF NOT EXISTS feedback (
   profile_key TEXT,
   country TEXT,
   country_code TEXT,
+  program_code TEXT,
+  cohort_code TEXT,
+  measurement_phase TEXT,
+  participant_id TEXT,
   nivel_educativo TEXT,
   evidence INTEGER,
   likert_level TEXT,
@@ -55,7 +65,10 @@ CREATE INDEX IF NOT EXISTS idx_events_type ON events(event_type);
 CREATE INDEX IF NOT EXISTS idx_events_session ON events(session_id);
 CREATE INDEX IF NOT EXISTS idx_events_timestamp ON events(timestamp);
 CREATE INDEX IF NOT EXISTS idx_events_country_type ON events(country_code, event_type);
+CREATE INDEX IF NOT EXISTS idx_events_program_cohort_phase ON events(program_code, cohort_code, measurement_phase, event_type);
+CREATE INDEX IF NOT EXISTS idx_events_program_participant ON events(program_code, participant_id, event_type);
 CREATE INDEX IF NOT EXISTS idx_answers_event ON answers(event_id);
 CREATE INDEX IF NOT EXISTS idx_feedback_rating ON feedback(rating);
 CREATE INDEX IF NOT EXISTS idx_feedback_timestamp ON feedback(timestamp);
 CREATE INDEX IF NOT EXISTS idx_feedback_country ON feedback(country_code);
+CREATE INDEX IF NOT EXISTS idx_feedback_program_cohort_phase ON feedback(program_code, cohort_code, measurement_phase);

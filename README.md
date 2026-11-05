@@ -4,6 +4,8 @@ Aplicacion web estatica para promover la reflexion pedagogica, etica y critica s
 
 La herramienta combina seleccion de perfil, arboles de decision, grafo vivo de principios, devoluciones formativas, brujula etica, constructor de acuerdos didacticos, casos situados, reporte PDF, estadisticas anonimas de uso, opiniones publicas filtradas y asistencia conversacional. Su fundamentacion articula marcos de ANEP, UNESCO, FING, Udelar y Ceibal, junto con evidencia empirica y experiencia de aula de los autores.
 
+También dispone de un modo programa por enlace para implementar cohortes, distinguir diagnóstico inicial, evaluación final y seguimiento, y vincular esos momentos mediante un identificador seudónimo local. Este contexto solo se envía cuando la persona acepta el registro anónimo. La configuración inicial del programa Uruguay–Estados Unidos 2027 se documenta en `PROGRAMA_UY_US_2027.md`.
+
 ## Recorridos ratificados
 
 La experiencia se adapta desde el inicio segun el lugar desde el que se usa la herramienta:
@@ -46,6 +48,7 @@ Los recorridos estan definidos en `configuracion-ia.js`. La resolucion de perfil
 - `styles.css`: estilos visuales, responsive, brujula, mapa de decision y constructor de acuerdos.
 - `experience.css`: capa visual del inicio, selección de perfil, controles y transiciones accesibles.
 - `storage.js`: acceso a almacenamiento con respaldo temporal en memoria si el navegador lo bloquea.
+- `program-context.js`: activación validada de programas, cohortes, momentos e identificadores seudónimos.
 - `principle-network.js`: red de principios con posiciones estables, adaptación móvil y detalle accesible por teclado.
 - `ethical-evidence.js`: asociaciones explícitas entre preguntas y ejes, con orientaciones y enlaces a los marcos. Las preguntas de contexto y «No aplica» no valoran un eje; un eje sin respuestas permanece sin evidencia. Estas asociaciones son una interpretación pedagógica de la aplicación, no una rúbrica oficial de las instituciones citadas.
 - `configuracion-ia.js`: configuracion general, endpoints, niveles, perfiles y arboles de decision.

@@ -16,6 +16,8 @@ const publicFiles = [
   'admin.css',
   'storage.js',
   'country-context.js',
+  'program-context.js',
+  'literacy-instrument.js',
   'configuracion-ia.js',
   'canonical-redirect.js',
   'ethical-evidence.js',
@@ -26,6 +28,8 @@ const publicFiles = [
   'certificado-ia.js',
   'pwa.js',
   'fundamentacion.js',
+  'admin-analysis.js',
+  'admin-inference.js',
   'admin.js',
 ];
 

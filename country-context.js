@@ -28,7 +28,7 @@
     { name: 'Venezuela', flag: '🇻🇪', code: 've' },
     { name: 'Canadá', flag: '🇨🇦', code: 'ca' },
     { name: 'España', flag: '🇪🇸', code: 'es' },
-    { name: 'Estados Unidos', flag: '🇺🇸', code: 'us' },
+    { name: 'Estados Unidos', flag: '🇺🇸', code: 'us', featured: true },
     { name: 'Portugal', flag: '🇵🇹', code: 'pt' },
     { name: 'Otro', flag: '🌐' }
   ];
@@ -167,8 +167,117 @@
           sources: [{ label: 'MINERD · Uso responsable y agentivo', url: 'https://educando.edu.do/portal/wp-content/uploads/2026/06/Estrategia-Nacional-de-Educacion-Digital.-Mayo-2026.pdf' }]
         }
       }
+    },
+    'Estados Unidos': {
+      flag: '🇺🇸',
+      code: 'us',
+      hasNationalFramework: true,
+      frameworkVersion: '2024–2026 (NIST AI RMF 1.0 / AI 600-1 en revisión · U.S. ED · IES)',
+      title: 'Marcos de Estados Unidos + UNESCO',
+      names: ['U.S. Department of Education', 'NIST AI RMF', 'IES', 'UNESCO'],
+      summary: 'El recorrido integra los principios del Departamento de Educación de EE. UU., el NIST AI Risk Management Framework (y su perfil para IA generativa, con referencias versionadas) y los protocolos de planificación institucional del IES junto con la guía de UNESCO.',
+      synthesis: 'En Estados Unidos, el Departamento de Educación (U.S. ED) promueve una tecnología educativa orientada por educadores («humans in the loop»), ética, accesible, transparente y protectora de los datos estudiantiles. El NIST AI Risk Management Framework (AI RMF 1.0 y su perfil para IA generativa NIST AI 600-1, referenciados de forma versionada por encontrarse en revisión continua) estructura la gobernanza, la evaluación, la documentación y la gestión de riesgos como confabulaciones, sesgos y trazabilidad. El Institute of Education Sciences (IES) aporta protocolos de decisión institucional, privacidad, preparación escolar y comunicación de políticas de IA. UNESCO funciona como base internacional común.',
+      references: [
+        { label: 'NIST AI RMF', version: 'AI RMF 1.0 / AI 600-1 (en revisión)', title: 'AI Risk Management Framework & Generative AI Profile (v1.0 / AI 600-1)', url: 'https://www.nist.gov/itl/ai-risk-management-framework' },
+        { label: 'U.S. Department of Education', version: 'EdTech & AI Guidance', title: 'Guidance on Responsible Use of Education Technology and AI in the Classroom', url: 'https://www.ed.gov/about/news/press-release/us-department-of-education-releases-guidance-responsible-use-of-education-technology-classroom' },
+        { label: 'IES', version: 'District Leadership Protocol', title: 'Helping District Leaders Make Informed Decisions About AI', url: 'https://ies.ed.gov/use-work/resource-library/resource/other-resource/helping-district-leaders-make-informed-decisions-about-ai' },
+        UNESCO_REFERENCE
+      ],
+      axisGuidance: {
+        transparencia: {
+          basis: 'El Departamento de Educación de EE. UU. e IES destacan la comunicación transparente de políticas de IA, mientras que NIST AI RMF (GOVERN / MAP) exige documentar procedencia, límites y condiciones de uso.',
+          note: 'En el aula y la institución, esto implica explicitar cuándo interviene la IA, documentar su alcance y establecer acuerdos comprensibles con estudiantes y familias.',
+          sources: [
+            { label: 'U.S. Department of Education · Uso responsable en el aula', url: 'https://www.ed.gov/about/news/press-release/us-department-of-education-releases-guidance-responsible-use-of-education-technology-classroom' },
+            { label: 'IES · Derechos de decisión y comunicación de políticas', url: 'https://ies.ed.gov/use-work/resource-library/resource/other-resource/helping-district-leaders-make-informed-decisions-about-ai' },
+            { label: 'NIST AI RMF · Gobernanza y trazabilidad (v1.0 / AI 600-1)', url: 'https://www.nist.gov/itl/ai-risk-management-framework' }
+          ]
+        },
+        verificacion: {
+          basis: 'El perfil para IA generativa de NIST (AI 600-1 · MEASURE / MANAGE) advierte sobre confabulaciones (alucinaciones) y exige verificación humana y evaluación de fiabilidad.',
+          note: 'El Departamento de Educación subraya que los resultados generados deben ser evaluados por docentes y estudiantes antes de sustentar decisiones académicas.',
+          sources: [
+            { label: 'NIST AI RMF · Fiabilidad y confabulación (v1.0 / AI 600-1)', url: 'https://www.nist.gov/itl/ai-risk-management-framework' },
+            { label: 'U.S. Department of Education · Evaluación crítica de EdTech', url: 'https://www.ed.gov/about/news/press-release/us-department-of-education-releases-guidance-responsible-use-of-education-technology-classroom' }
+          ]
+        },
+        privacidad: {
+          basis: 'El Departamento de Educación de EE. UU. e IES priorizan el resguardo estricto de los datos estudiantiles (FERPA/COPPA) y la revisión de términos de proveedores antes de adoptar herramientas.',
+          note: 'NIST AI RMF sitúa la privacidad mejorada y la gobernanza de datos como controles esenciales frente a la exposición o reutilización de información sensible.',
+          sources: [
+            { label: 'U.S. Department of Education · Protección de datos estudiantiles', url: 'https://www.ed.gov/about/news/press-release/us-department-of-education-releases-guidance-responsible-use-of-education-technology-classroom' },
+            { label: 'IES · Protocolos de privacidad y preparación escolar', url: 'https://ies.ed.gov/use-work/resource-library/resource/other-resource/helping-district-leaders-make-informed-decisions-about-ai' },
+            { label: 'NIST AI RMF · Privacidad de datos (v1.0 / AI 600-1)', url: 'https://www.nist.gov/itl/ai-risk-management-framework' }
+          ]
+        },
+        equidad: {
+          basis: 'El Departamento de Educación exige tecnología accesible y equitativa; NIST AI RMF aborda la identificación y mitigación de sesgos dañinos y brechas de desempeño entre grupos y lenguas.',
+          note: 'IES recomienda evaluar el impacto diferencial de las herramientas en estudiantes con discapacidad, hablantes multilingües y contextos con distinto acceso.',
+          sources: [
+            { label: 'U.S. Department of Education · Accesibilidad y equidad', url: 'https://www.ed.gov/about/news/press-release/us-department-of-education-releases-guidance-responsible-use-of-education-technology-classroom' },
+            { label: 'NIST AI RMF · Gestión de sesgos dañinos (v1.0 / AI 600-1)', url: 'https://www.nist.gov/itl/ai-risk-management-framework' },
+            { label: 'IES · Planificación institucional equitativa', url: 'https://ies.ed.gov/use-work/resource-library/resource/other-resource/helping-district-leaders-make-informed-decisions-about-ai' }
+          ]
+        },
+        agencia: {
+          basis: 'El Departamento de Educación sitúa a educadores y estudiantes en el centro («humans in the loop»), asegurando que la IA complemente y nunca reemplace el juicio pedagógico.',
+          note: 'IES y NIST AI RMF refuerzan la definición clara de derechos de decisión humana y la supervisión activa frente a la automatización acrítica.',
+          sources: [
+            { label: 'U.S. Department of Education · Tecnología orientada por educadores', url: 'https://www.ed.gov/about/news/press-release/us-department-of-education-releases-guidance-responsible-use-of-education-technology-classroom' },
+            { label: 'IES · Derechos de decisión humana en educación', url: 'https://ies.ed.gov/use-work/resource-library/resource/other-resource/helping-district-leaders-make-informed-decisions-about-ai' }
+          ]
+        }
+      }
     }
   };
+
+  const BILATERAL_UY_US = Object.freeze({
+    code: 'uy-us',
+    version: '2026.11 · Referencias versionadas (NIST AI RMF 1.0 / AI 600-1 en revisión · U.S. ED · IES · ANEP · Ceibal · FING/Udelar · Agesic)',
+    title: 'Capa comparativa Uruguay–Estados Unidos',
+    summary: 'Cruza los marcos uruguayos (ANEP, Ceibal, FING, Udelar y Agesic) con las referencias estadounidenses (NIST AI RMF, U.S. Department of Education e IES) para fundamentar decisiones pedagógicas e institucionales.',
+    axes: Object.freeze({
+      transparencia: Object.freeze({
+        synthesis: 'Comparación UY–EE. UU.: FING y Agesic enfatizan declarar la asistencia de IA y explicitar reglas de uso; en paralelo, NIST AI RMF (GOVERN/MAP) e IES estructuran la documentación de procedencia y los protocolos de comunicación institucional con la comunidad educativa.',
+        sources: Object.freeze([
+          { label: 'NIST AI RMF · Gobernanza y documentación (v1.0 / AI 600-1)', url: 'https://www.nist.gov/itl/ai-risk-management-framework' },
+          { label: 'IES · Comunicación de políticas de IA', url: 'https://ies.ed.gov/use-work/resource-library/resource/other-resource/helping-district-leaders-make-informed-decisions-about-ai' }
+        ])
+      }),
+      verificacion: Object.freeze({
+        synthesis: 'Comparación UY–EE. UU.: ANEP, Ceibal y FING promueven contrastar fuentes frente a alucinaciones; el perfil generativo de NIST (AI 600-1 · MEASURE) y el U.S. Department of Education aportan criterios sistemáticos de medición de fiabilidad y control de confabulaciones.',
+        sources: Object.freeze([
+          { label: 'NIST AI RMF · Confabulación y fiabilidad (v1.0 / AI 600-1)', url: 'https://www.nist.gov/itl/ai-risk-management-framework' },
+          { label: 'U.S. Department of Education · Uso responsable de EdTech', url: 'https://www.ed.gov/about/news/press-release/us-department-of-education-releases-guidance-responsible-use-of-education-technology-classroom' }
+        ])
+      }),
+      privacidad: Object.freeze({
+        synthesis: 'Comparación UY–EE. UU.: Ceibal y Agesic resguardan datos personales desde el diseño; U.S. Department of Education e IES operacionalizan protocolos distritales de protección de datos estudiantiles y evaluación de proveedores antes de su adopción en aula.',
+        sources: Object.freeze([
+          { label: 'U.S. Department of Education · Privacidad estudiantil', url: 'https://www.ed.gov/about/news/press-release/us-department-of-education-releases-guidance-responsible-use-of-education-technology-classroom' },
+          { label: 'IES · Protocolos de privacidad y decisiones distritales', url: 'https://ies.ed.gov/use-work/resource-library/resource/other-resource/helping-district-leaders-make-informed-decisions-about-ai' }
+        ])
+      }),
+      equidad: Object.freeze({
+        synthesis: 'Comparación UY–EE. UU.: ANEP, Ceibal y FING atienden brechas de acceso y sesgos culturales; U.S. Department of Education y NIST AI RMF suman estándares de accesibilidad, equidad para estudiantes multilingües y auditoría de sesgos algorítmicos.',
+        sources: Object.freeze([
+          { label: 'U.S. Department of Education · Equidad y accesibilidad', url: 'https://www.ed.gov/about/news/press-release/us-department-of-education-releases-guidance-responsible-use-of-education-technology-classroom' },
+          { label: 'NIST AI RMF · Mitigación de sesgos (v1.0 / AI 600-1)', url: 'https://www.nist.gov/itl/ai-risk-management-framework' }
+        ])
+      }),
+      agencia: Object.freeze({
+        synthesis: 'Comparación UY–EE. UU.: ANEP, Udelar y Agesic defienden la autonomía intelectual y la supervisión humana; U.S. Department of Education («humans in the loop») e IES definen derechos de decisión para que la tecnología esté siempre conducida por educadores.',
+        sources: Object.freeze([
+          { label: 'U.S. Department of Education · Educadores en el centro', url: 'https://www.ed.gov/about/news/press-release/us-department-of-education-releases-guidance-responsible-use-of-education-technology-classroom' },
+          { label: 'IES · Derechos de decisión humana', url: 'https://ies.ed.gov/use-work/resource-library/resource/other-resource/helping-district-leaders-make-informed-decisions-about-ai' }
+        ])
+      })
+    })
+  });
+
+  function getBilateralGuidance(axis) {
+    return BILATERAL_UY_US.axes[axis] || null;
+  }
 
   function getCountryContext(country) {
     const name = country && country !== 'Otro' ? country : '';
@@ -219,6 +328,8 @@
     getByCode: getCountryByCode,
     codeFor: getCountryCode,
     getFrameworkNames,
+    bilateralUyUs: BILATERAL_UY_US,
+    getBilateralGuidance,
     internationalReference: UNESCO_REFERENCE
   };
 })();

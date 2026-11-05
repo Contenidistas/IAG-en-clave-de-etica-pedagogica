@@ -52,12 +52,12 @@ test('a recommended case opens and returns inline without changing the student j
   assert.equal($('#recommendedCase').hidden, true);
 });
 
-async function app(t, { blockedStorage = false, fetchImpl = null } = {}) {
+async function app(t, { blockedStorage = false, fetchImpl = null, url = 'http://localhost/' } = {}) {
   const errors = [];
   const console = new VirtualConsole();
   console.on('jsdomError', error => errors.push(error.message));
   const dom = new JSDOM(fs.readFileSync(path.join(root, 'index.html'), 'utf8'), {
-    url: 'http://localhost/', runScripts: 'outside-only', pretendToBeVisual: true, virtualConsole: console
+    url, runScripts: 'outside-only', pretendToBeVisual: true, virtualConsole: console
   });
   t.after(() => dom.window.close());
   const w = dom.window;
@@ -70,7 +70,7 @@ async function app(t, { blockedStorage = false, fetchImpl = null } = {}) {
   w.scrollTo = () => {};
   w.HTMLElement.prototype.scrollIntoView = () => {};
   w.fetch = fetchImpl || (async () => ({ ok: true, json: async () => ({ summary: {}, opinions: [], profiles: [], countries: [], levels: [] }) }));
-  for (const file of ['storage.js', 'country-context.js', 'configuracion-ia.js', 'ethical-evidence.js', 'ui-ia.js', 'principle-network.js', 'juego-ia.js', 'chatbot-component.js']) {
+  for (const file of ['storage.js', 'country-context.js', 'program-context.js', 'literacy-instrument.js', 'configuracion-ia.js', 'ethical-evidence.js', 'ui-ia.js', 'principle-network.js', 'juego-ia.js', 'chatbot-component.js']) {
     vm.runInContext(fs.readFileSync(path.join(root, file), 'utf8'), dom.getInternalVMContext(), { filename: file });
   }
   await new Promise(resolve => setTimeout(resolve, 150));
@@ -84,6 +84,31 @@ async function app(t, { blockedStorage = false, fetchImpl = null } = {}) {
   click('#landingGoToDiagnostic');
   return { w, $, click, change };
 }
+
+test('a program link activates cohort and measurement context without exposing identity', async t => {
+  const { w, $, change } = await app(t, {
+    url: 'http://localhost/?program=uy-us-ai-literacy-2027&cohort=liceo-01&phase=final'
+  });
+
+  assert.equal(w.state.programCode, 'uy-us-ai-literacy-2027');
+  assert.equal(w.state.cohortCode, 'liceo-01');
+  assert.equal(w.state.measurementPhase, 'final');
+  assert.match(w.state.participantId, /^p-[a-z0-9-]+$/);
+  assert.equal($('#programContextCard').hidden, false);
+  assert.match($('#programContextTitle').textContent, /Uruguay–Estados Unidos/);
+  assert.equal($('#programContextPhase').textContent, 'Evaluación final');
+  assert.match($('#programContextPrivacy').textContent, /sin guardar correo/i);
+
+  const payload = w.buildResultPayload();
+  assert.equal(payload.programCode, 'uy-us-ai-literacy-2027');
+  assert.equal(payload.cohortCode, 'liceo-01');
+  assert.equal(payload.measurementPhase, 'final');
+  assert.equal(payload.participantId, w.state.participantId);
+
+  change('#languageSelect', 'en');
+  assert.match($('#programContextTitle').textContent, /Uruguay–United States/);
+  assert.equal($('#programContextPhase').textContent, 'Final assessment');
+});
 
 test('profile selection is accessible and preserves a valid level on reselection', async t => {
   const { w, $, click, change } = await app(t);
@@ -369,6 +394,14 @@ test('combined styles keep the setup stepper in a padded four-column grid', asyn
     assert.equal(card.closest('.chips-container'), null);
   }
   assert.equal($('#onboardingProgress').closest('.intro-slide'), null);
+  const srOnly = w.getComputedStyle($('label[for="languageSelect"]'));
+  assert.equal(srOnly.position, 'absolute');
+  assert.equal(srOnly.width, '1px');
+  assert.equal(srOnly.overflow, 'hidden');
+  const headerBtn = w.getComputedStyle($('#btnVerAutores'));
+  assert.equal(headerBtn.flexGrow, '0');
+  assert.equal(headerBtn.flexShrink, '0');
+  assert.equal(headerBtn.whiteSpace, 'nowrap');
 });
 
 test('both graphs have visible-paint nodes, independent IDs and keyboard details', async t => {
@@ -489,4 +522,182 @@ test('hover and focus show actual answers, rationale and primary-source links wi
     assert.match(graph.querySelector('.en-interpretation').textContent, /adaptación educativa/);
   }
   assert.equal(w.obtenerEstadoCriterio('privacidad').className, 'pending');
+});
+
+test('United States frameworks, levels and bilateral Uruguay–U.S. comparative cases work end-to-end', async t => {
+  const { w, $, click, change } = await app(t, {
+    url: 'http://localhost/?program=uy-us-ai-literacy-2027&cohort=exchange-01&phase=baseline'
+  });
+  click('[data-country="Estados Unidos"]');
+  assert.match($('#countryContextPreview').textContent, /Marcos de Estados Unidos/);
+  assert.ok($('#frameworkLinks a[href*="nist.gov"][data-version]'));
+  assert.ok($('#frameworkLinks a[href*="ed.gov"]'));
+  assert.ok($('#frameworkLinks a[href*="ies.ed.gov"]'));
+  assert.ok($('#frameworkLinks a[href*="anep.edu.uy"]'), 'bilateral program mode also links Uruguayan partner references');
+
+  click('#onboardingNextBtn');
+  click('[data-profile="estudiante"]');
+  click('#onboardingNextBtn');
+  assert.match($('#nivelEducativo').textContent, /High School/);
+  const highSchoolOption = [...$('#nivelEducativo').options].find(opt => opt.dataset.levelKey === 'level_us_high');
+  change('#nivelEducativo', highSchoolOption.value);
+  click('#onboardingNextBtn');
+
+  assert.equal(w.state.onboardingStep, 3);
+  w.LiteracyInstrument.knowledgeItems.forEach(item => w.LiteracyInstrument.setAnswer('k', item.id, item.correct));
+  w.LiteracyInstrument.practiceItems.forEach(item => w.LiteracyInstrument.setAnswer('p', item.id, 4));
+  click('#onboardingNextBtn');
+
+  change('#familiaridadInicial', $('#familiaridadInicial').options[1].value);
+  click('input[name="recursosSimilares"][value="No"]');
+  click('#onboardingNextBtn');
+  assert.equal(w.state.profileKey, 'estudiante_media');
+
+  const graph = $('#principleGraph');
+  w.renderPrincipleGraph(graph, null);
+  graph.querySelector('[role="button"][data-criterion="verificacion"]').dispatchEvent(new w.FocusEvent('focus'));
+  assert.ok(graph.querySelector('.en-bilateral'));
+  assert.match(graph.querySelector('.en-bilateral').textContent, /Comparación UY–EE\. UU\./);
+  assert.ok(graph.querySelector('.en-source-links a[href*="nist.gov"]'));
+
+  w.state.path = [{ id: 'g2', answerKey: 'no', answer: 'No' }];
+  const recommended = w.recomendarCasoDelRecorrido();
+  assert.equal(recommended.caso.id, 'evaluacion_bilingue_uy_us');
+
+  w.renderizarCasosSituados();
+  assert.ok($('#situatedCases [data-case-id="gobernanza_binacional_uy_us"]'));
+  assert.ok($('#situatedCases [data-case-id="evaluacion_bilingue_uy_us"]'));
+
+  // Mostrar resultados en modo programa despliega acuerdo binacional y kit de taller configurable
+  w.mostrarResultados();
+  assert.equal(w.state.agreementFormat, 'binacional');
+  assert.equal($('#agreementCustomConfigDetails').open, true);
+  assert.equal($('#workshopKitDetails').open, true);
+  assert.equal($('#agreementInstitutionInput').value, 'exchange-01');
+  assert.match($('#agreementBuilderText').value, /Protocolo Binacional Uruguay–Estados Unidos/);
+  assert.match($('#agreementBuilderText').value, /Articulación bilateral Uruguay–Estados Unidos/);
+  assert.match($('#workshopKitText').value, /phase=baseline/);
+  assert.match($('#workshopKitText').value, /phase=final/);
+  assert.match($('#workshopKitText').value, /phase=followup/);
+});
+
+test('open-web mode keeps agreement customizer and workshop kit collapsed by default', async t => {
+  const { w, $, change } = await app(t);
+  w.state.country = 'Uruguay';
+  w.state.profile = 'docente';
+  w.state.profileBase = 'docente';
+  w.state.profileKey = 'docente';
+  w.state.evidence = 75;
+  w.mostrarResultados();
+
+  assert.equal($('#agreementCustomConfigDetails').open, false);
+  assert.equal($('#workshopKitDetails').open, false);
+  assert.equal(w.state.agreementFormat || 'aula', 'aula');
+
+  change('#agreementHorizonSelect', '90 días (evaluación trimestral / post-intervención)');
+  assert.match($('#agreementBuilderText').value, /90 días/);
+  change('#workshopDurationSelect', '120');
+  assert.match($('#workshopKitText').value, /120 minutos/);
+});
+
+test('program mode includes the 8-item AI literacy instrument (lit-v1), blocks progression until answered, and records scores in payload', async t => {
+  const { w, $, click, change } = await app(t, {
+    url: 'http://localhost/?program=uy-us-ai-literacy-2027&cohort=pilot-a&phase=baseline'
+  });
+
+  const keys = w.getOnboardingStepKeys();
+  assert.equal(keys.join(','), 'pais,profile,contexto,programa,cierre');
+
+  // Paso 0: País
+  click('[data-country="Uruguay"]');
+  click('#onboardingNextBtn');
+  assert.equal(w.state.onboardingStep, 1);
+
+  // Paso 1: Perfil
+  click('[data-profile="docente"]');
+  click('#onboardingNextBtn');
+  assert.equal(w.state.onboardingStep, 2);
+
+  // Paso 2: Contexto (Nivel educativo)
+  change('#nivelEducativo', $('#nivelEducativo').options[1].value);
+  click('#onboardingNextBtn');
+  assert.equal(w.state.onboardingStep, 3);
+  assert.match($('#onboardingStepTitle').textContent, /Alfabetización IA/);
+  assert.equal($('.onboarding-flow').classList.contains('has-program-step'), true);
+
+  // El contenedor del instrumento contiene las 8 preguntas (5 situaciones + 3 prácticas)
+  assert.equal($('#literacyInstrumentWrapper').hidden, false);
+  const kFieldsets = $('#literacyInstrumentItems').querySelectorAll('[data-literacy-item^="k:"]');
+  const pFieldsets = $('#literacyInstrumentItems').querySelectorAll('[data-literacy-item^="p:"]');
+  assert.equal(kFieldsets.length, 5);
+  assert.equal(pFieldsets.length, 3);
+
+  // Intentar avanzar sin responder: se bloquea en el paso 3
+  click('#onboardingNextBtn');
+  assert.equal(w.state.onboardingStep, 3, 'debe permanecer en el paso 3 si no está completo');
+  assert.equal(w.LiteracyInstrument.isComplete(), false);
+
+  // Responder solo las de situación (5/8)
+  w.LiteracyInstrument.knowledgeItems.forEach(item => {
+    w.LiteracyInstrument.setAnswer('k', item.id, item.correct);
+  });
+  assert.equal(w.LiteracyInstrument.isComplete(), false);
+  click('#onboardingNextBtn');
+  assert.equal(w.state.onboardingStep, 3);
+
+  // Responder las de práctica (3/3)
+  w.LiteracyInstrument.practiceItems.forEach(item => {
+    w.LiteracyInstrument.setAnswer('p', item.id, 4);
+  });
+  assert.equal(w.LiteracyInstrument.isComplete(), true);
+  const scoreResult = w.LiteracyInstrument.score();
+  assert.equal(typeof scoreResult.literacyScore, 'number');
+  assert.equal(scoreResult.version, 'lit-v1');
+  assert.equal(scoreResult.correct, 5);
+
+  // Ahora sí avanza al paso 4 (cierre)
+  click('#onboardingNextBtn');
+  assert.equal(w.state.onboardingStep, 4);
+
+  // Completar cierre e iniciar
+  change('#familiaridadInicial', $('#familiaridadInicial').options[1].value);
+  click('input[name="recursosSimilares"][value="No"]');
+  click('#onboardingNextBtn');
+
+  // Payload final contiene literacyScore y literacyAnswers
+  const payload = w.buildResultPayload();
+  assert.equal(payload.programCode, 'uy-us-ai-literacy-2027');
+  assert.equal(payload.literacyScore, scoreResult.literacyScore);
+  assert.ok(payload.literacyAnswers);
+  assert.equal(payload.literacyAnswers.version, 'lit-v1');
+  assert.equal(payload.literacyAnswers.knowledgeScore, 100);
+  assert.equal(payload.literacyAnswers.practiceScore, 75);
+
+  // Reset limpia las respuestas
+  w.LiteracyInstrument.reset();
+  assert.equal(w.LiteracyInstrument.isComplete(), false);
+  assert.equal(Object.keys(w.LiteracyInstrument.payload()).length, 0);
+});
+
+test('open-web mode keeps 4-step onboarding without requiring literacy instrument', async t => {
+  const { w, $, click, change } = await app(t);
+
+  const keys = w.getOnboardingStepKeys();
+  assert.equal(keys.join(','), 'pais,profile,contexto,cierre');
+  assert.equal($('.onboarding-flow').classList.contains('has-program-step'), false);
+
+  click('[data-country="Uruguay"]');
+  click('#onboardingNextBtn');
+  click('[data-profile="docente"]');
+  click('#onboardingNextBtn');
+  change('#nivelEducativo', $('#nivelEducativo').options[1].value);
+  click('#onboardingNextBtn');
+  assert.equal(w.state.onboardingStep, 3);
+  change('#familiaridadInicial', $('#familiaridadInicial').options[1].value);
+  click('input[name="recursosSimilares"][value="No"]');
+  click('#onboardingNextBtn');
+
+  const payload = w.buildResultPayload();
+  assert.equal(payload.literacyScore, undefined);
+  assert.equal(payload.literacyAnswers, undefined);
 });

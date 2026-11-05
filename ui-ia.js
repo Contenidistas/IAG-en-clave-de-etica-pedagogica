@@ -1488,6 +1488,9 @@ function updateAppLanguage(lang = 'es') {
   if (typeof updateStatsScopeUI === 'function') {
     updateStatsScopeUI();
   }
+  if (window.ProgramContext) {
+    window.ProgramContext.render(document, lang);
+  }
 }
 
 
@@ -1551,6 +1554,8 @@ const elements = {
   familiaridadInicialWrapper: document.getElementById('familiaridadInicialWrapper'),
   recursosSimilaresRadios: document.querySelectorAll('input[name="recursosSimilares"]'),
   recursosSimilaresWrapper: document.getElementById('recursosSimilaresWrapper'),
+  literacyInstrumentWrapper: document.getElementById('literacyInstrumentWrapper'),
+  literacyInstrumentItems: document.getElementById('literacyInstrumentItems'),
   startGuidance: document.getElementById('startGuidance'),
   startGuidanceBadge: document.getElementById('startGuidanceBadge'),
   startGuidanceTitle: document.getElementById('startGuidanceTitle'),
@@ -1738,6 +1743,25 @@ const NIVELES_POR_PAIS = {
       { key: 'level_do_teacher', default: 'Formación docente' },
       { key: 'level_do_undergrad', default: 'Grado universitario' },
       { key: 'level_do_postgrad', default: 'Posgrado' }
+    ]
+  },
+  'Estados Unidos': {
+    framework: 'U.S. Department of Education / NIST AI RMF / IES / UNESCO',
+    docente: [
+      { key: 'level_us_elem', default: 'Educación Primaria (Elementary School, K–5)' },
+      { key: 'level_us_middle', default: 'Educación Media Básica (Middle School, 6–8)' },
+      { key: 'level_us_high', default: 'Educación Media Superior (High School, 9–12)' },
+      { key: 'level_us_college', default: 'Community College / Educación Técnica (CTE)' },
+      { key: 'level_us_teacher_ed', default: 'Formación Docente (Teacher Preparation)' },
+      { key: 'level_us_higher', default: 'Educación Superior / Universidad (Higher Education)' }
+    ],
+    estudiante: [
+      { key: 'level_us_middle', default: 'Educación Media Básica (Middle School, 6–8)' },
+      { key: 'level_us_high', default: 'Educación Media Superior (High School, 9–12)' },
+      { key: 'level_us_college', default: 'Community College / Educación Técnica (CTE)' },
+      { key: 'level_us_teacher_prog', default: 'Formación Docente (Teacher Preparation / B.Ed.)' },
+      { key: 'level_us_undergrad', default: 'Grado Universitario (Undergraduate)' },
+      { key: 'level_us_grad', default: 'Posgrado (Graduate / Master’s / Ph.D.)' }
     ]
   }
 };
@@ -2648,13 +2672,28 @@ function updateFrameworkAudience(perfil) {
   const t = TRANSLATIONS[lang] || TRANSLATIONS['es'];
   const context = getActiveCountryContext();
   const selectedCountry = window.state?.country || '';
+  const programActive = Boolean(
+    window.ProgramContext?.current?.active
+    || window.state?.programCode === 'uy-us-ai-literacy-2027'
+  );
+  const bilateral = window.CountryContext?.bilateralUyUs || null;
+  const partnerCountry = selectedCountry === 'Estados Unidos' ? 'Uruguay' : 'Estados Unidos';
+  const partnerReferences = programActive && window.CountryContext
+    ? (window.CountryContext.get(partnerCountry)?.references || [])
+    : [];
+  const activeReferences = [...(context.references || []), ...partnerReferences].filter(
+    (ref, idx, list) => ref && list.findIndex(item => item.url === ref.url) === idx
+  );
 
   const audienceTitle = t[`fw_${audience}_title`];
   let title = audienceTitle && selectedCountry ? `${audienceTitle} · ${context.country}` : context.title;
+  if (programActive && bilateral) {
+    title = `${title} · ${bilateral.title}`;
+  }
   let intro = t[`fw_${audience}_intro`] || (t.fw_base_intro || 'Una propuesta construida desde investigación, formación docente...');
   let contextText = selectedCountry
-    ? context.summary
-    : 'Seleccioná tu país al iniciar el recorrido para cargar los marcos de referencia correspondientes.';
+    ? (programActive && bilateral ? `${context.summary} ${bilateral.summary}` : context.summary)
+    : (programActive && bilateral ? bilateral.summary : 'Seleccioná tu país al iniciar el recorrido para cargar los marcos de referencia correspondientes.');
   let buttonText = audience === 'especializado' ? (t.fw_btn_hide || 'Ocultar marcos') : (t.fw_btn_view || 'Ver marcos');
 
   elements.frameworkCard.dataset.audience = audience;
@@ -2668,15 +2707,16 @@ function updateFrameworkAudience(perfil) {
 
   if (elements.frameworkLinks) {
     elements.frameworkLinks.replaceChildren();
-    context.references.forEach(reference => {
+    activeReferences.forEach(reference => {
       const link = document.createElement('a');
       link.href = reference.url;
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
       link.className = 'framework-link';
+      if (reference.version) link.dataset.version = reference.version;
       const label = document.createElement('span');
       label.className = 'framework-link-label';
-      label.textContent = reference.label;
+      label.textContent = reference.version ? `${reference.label} · ${reference.version}` : reference.label;
       const linkTitle = document.createElement('span');
       linkTitle.className = 'framework-link-title';
       linkTitle.textContent = reference.title;
@@ -2689,13 +2729,14 @@ function updateFrameworkAudience(perfil) {
     const parameters = new URLSearchParams();
     if (selectedCountry) parameters.set('country', selectedCountry);
     if (lang) parameters.set('lang', lang);
+    if (programActive && window.state?.programCode) parameters.set('program', window.state.programCode);
     elements.frameworkFoundationLink.href = `fundamentacion.html${parameters.size ? `?${parameters.toString()}` : ''}`;
   }
 
   if (elements.footerFrameworks) {
     elements.footerFrameworks.replaceChildren();
-    context.references.forEach((reference, index) => {
-      if (index) elements.footerFrameworks.append(document.createTextNode(index === context.references.length - 1 ? ' y ' : ', '));
+    activeReferences.forEach((reference, index) => {
+      if (index) elements.footerFrameworks.append(document.createTextNode(index === activeReferences.length - 1 ? ' y ' : ', '));
       const link = document.createElement('a');
       link.href = reference.url;
       link.target = '_blank';
@@ -2756,6 +2797,7 @@ function focusInitialField(targetKey) {
     nivel: elements.nivelEducativoWrapper,
     contexto: elements.playerName || elements.countrySelect,
     country: isCountryOtherVisible() ? elements.countryOtherInput : (elements.countryCards || elements.countrySelect),
+    programa: elements.literacyInstrumentWrapper,
     familiaridad: elements.familiaridadInicialWrapper,
     recursos: elements.recursosSimilaresWrapper,
     start: elements.startBtn
@@ -2766,6 +2808,7 @@ function focusInitialField(targetKey) {
     country: isCountryOtherVisible() ? elements.countryOtherInput : (elements.countrySearch || elements.countryCards?.querySelector('.country-card') || elements.countrySelect),
     nivel: elements.nivelEducativo,
     contexto: elements.playerName || elements.countrySelect,
+    programa: elements.literacyInstrumentWrapper?.querySelector('input'),
     familiaridad: elements.familiaridadInicial,
     recursos: elements.recursosSimilaresRadios && elements.recursosSimilaresRadios[0],
     start: elements.startBtn
@@ -2788,7 +2831,10 @@ function renderStartGuidance(missingItems, ready) {
   if (!elements.startGuidance || !elements.startGuidanceList) return;
 
   // Validation stays next to the active step, without duplicating navigation.
-  const stepTargets = [['country'], ['profile'], ['nivel', 'contexto'], ['familiaridad', 'recursos']];
+  const isProgram = Boolean(window.ProgramContext?.current?.active || state.programCode);
+  const stepTargets = isProgram
+    ? [['country'], ['profile'], ['nivel', 'contexto'], ['programa'], ['familiaridad', 'recursos']]
+    : [['country'], ['profile'], ['nivel', 'contexto'], ['familiaridad', 'recursos']];
   const targets = stepTargets[state.onboardingStep || 0] || [];
   const currentMissing = missingItems.filter(item => targets.includes(item.target));
   elements.startGuidance.hidden = !state.onboardingAttempted || currentMissing.length === 0;
@@ -2804,10 +2850,10 @@ function renderStartGuidance(missingItems, ready) {
 
 function setupText(key) {
   const texts = {
-    es: { pais: 'Tu país', profile: 'Tu perfil', contexto: 'Tu contexto', cierre: 'Antes de empezar', back: 'Volver al inicio', next: 'Continuar', missing: 'Revisá estos datos para continuar', setup_title: 'Un recorrido a tu medida', setup_intro: 'Contanos desde dónde participás. Vamos a adaptar las preguntas y la devolución a tu contexto.', setup_profile_hint: 'Elegí el rol que mejor represente tu práctica hoy. Podés cambiarlo antes de comenzar.', setup_consent: 'Quiero aportar mi recorrido al registro anónimo (opcional)', estudiante: 'Vas a explorar cómo estudiar, crear y reconocer el aporte de la IA en tus trabajos.', docente: 'Vas a revisar consignas, evaluación y acuerdos para el uso de IA en el aula.', especializado: 'Vas a profundizar en investigación, marcos éticos y criterios institucionales.' },
-    en: { pais: 'Your country', profile: 'Your role', contexto: 'Your context', cierre: 'Before you start', back: 'Back to home', next: 'Continue', missing: 'Check these details to continue', setup_title: 'A journey shaped around you', setup_intro: 'Tell us where you are participating from. We will adapt the questions and feedback to your context.', setup_profile_hint: 'Choose the role that best reflects your practice today. You can change it before starting.', setup_consent: 'Contribute my journey to anonymous records (optional)', estudiante: 'Explore studying, creating and acknowledging AI contributions in your work.', docente: 'Review assignments, assessment and agreements for using AI in the classroom.', especializado: 'Explore research, ethical frameworks and institutional criteria.' },
-    pt: { pais: 'Seu país', profile: 'Seu perfil', contexto: 'Seu contexto', cierre: 'Antes de começar', back: 'Voltar ao início', next: 'Continuar', missing: 'Confira estes dados para continuar', setup_title: 'Um percurso para você', setup_intro: 'Conte de onde você participa. Vamos adaptar as perguntas e a devolutiva ao seu contexto.', setup_profile_hint: 'Escolha o papel que melhor representa sua prática hoje. Você pode mudar antes de começar.', setup_consent: 'Quero contribuir com meu percurso para o registro anônimo (opcional)', estudiante: 'Explore como estudar, criar e reconhecer a contribuição da IA nos seus trabalhos.', docente: 'Revise atividades, avaliação e acordos para o uso de IA em sala de aula.', especializado: 'Aprofunde pesquisa, referenciais éticos e critérios institucionais.' },
-    fr: { pais: 'Votre pays', profile: 'Votre profil', contexto: 'Votre contexte', cierre: 'Avant de commencer', back: 'Retour à l’accueil', next: 'Continuer', missing: 'Vérifiez ces informations pour continuer', setup_title: 'Un parcours à votre mesure', setup_intro: 'Indiquez d’où vous participez. Nous adapterons les questions et le bilan à votre contexte.', setup_profile_hint: 'Choisissez le rôle qui correspond à votre pratique. Vous pourrez le modifier avant de commencer.', setup_consent: 'Contribuer au registre anonyme avec mon parcours (facultatif)', estudiante: 'Explorez comment étudier, créer et reconnaître les apports de l’IA.', docente: 'Examinez les consignes, l’évaluation et les accords sur l’IA en classe.', especializado: 'Approfondissez la recherche, les cadres éthiques et les critères institutionnels.' }
+    es: { pais: 'Tu país', profile: 'Tu perfil', contexto: 'Tu contexto', programa: 'Alfabetización IA', cierre: 'Antes de empezar', back: 'Volver al inicio', next: 'Continuar', missing: 'Revisá estos datos para continuar', setup_title: 'Un recorrido a tu medida', setup_intro: 'Contanos desde dónde participás. Vamos a adaptar las preguntas y la devolución a tu contexto.', setup_profile_hint: 'Elegí el rol que mejor represente tu práctica hoy. Podés cambiarlo antes de comenzar.', setup_consent: 'Quiero aportar mi recorrido al registro anónimo (opcional)', estudiante: 'Vas a explorar cómo estudiar, crear y reconocer el aporte de la IA en tus trabajos.', docente: 'Vas a revisar consignas, evaluación y acuerdos para el uso de IA en el aula.', especializado: 'Vas a profundizar en investigación, marcos éticos y criterios institucionales.' },
+    en: { pais: 'Your country', profile: 'Your role', contexto: 'Your context', programa: 'AI Literacy', cierre: 'Before you start', back: 'Back to home', next: 'Continue', missing: 'Check these details to continue', setup_title: 'A journey shaped around you', setup_intro: 'Tell us where you are participating from. We will adapt the questions and feedback to your context.', setup_profile_hint: 'Choose the role that best reflects your practice today. You can change it before starting.', setup_consent: 'Contribute my journey to anonymous records (optional)', estudiante: 'Explore studying, creating and acknowledging AI contributions in your work.', docente: 'Review assignments, assessment and agreements for using AI in the classroom.', especializado: 'Explore research, ethical frameworks and institutional criteria.' },
+    pt: { pais: 'Seu país', profile: 'Seu perfil', contexto: 'Seu contexto', programa: 'Letramento IA', cierre: 'Antes de começar', back: 'Voltar ao início', next: 'Continuar', missing: 'Confira estes dados para continuar', setup_title: 'Um percurso para você', setup_intro: 'Conte de onde você participa. Vamos adaptar as perguntas e a devolutiva ao seu contexto.', setup_profile_hint: 'Escolha o papel que melhor representa sua prática hoje. Você pode mudar antes de começar.', setup_consent: 'Quero contribuir com meu percurso para o registro anônimo (opcional)', estudiante: 'Explore como estudar, criar e reconhecer a contribuição da IA nos seus trabalhos.', docente: 'Revise atividades, avaliação e acordos para o uso de IA em sala de aula.', especializado: 'Aprofunde pesquisa, referenciais éticos e critérios institucionais.' },
+    fr: { pais: 'Votre pays', profile: 'Votre profil', contexto: 'Votre contexte', programa: 'Littératie IA', cierre: 'Avant de commencer', back: 'Retour à l’accueil', next: 'Continuer', missing: 'Vérifiez ces informations pour continuer', setup_title: 'Un parcours à votre mesure', setup_intro: 'Indiquez d’où vous participez. Nous adapterons les questions et le bilan à votre contexte.', setup_profile_hint: 'Choisissez le rôle qui correspond à votre pratique. Vous pourrez le modifier avant de commencer.', setup_consent: 'Contribuer au registre anonyme avec mon parcours (facultatif)', estudiante: 'Explorez comment étudier, créer et reconnaître les apports de l’IA.', docente: 'Examinez les consignes, l’évaluation et les accords sur l’IA en classe.', especializado: 'Approfondissez la recherche, les cadres éthiques et les critères institutionnels.' }
   };
   const language = state.lang || 'es';
   return (texts[language] || texts.es)[key] || texts.es[key] || key;
@@ -2834,6 +2880,15 @@ const ONBOARDING_STEP_META = {
       return levelOk;
     }
   },
+  programa: {
+    title: 'Alfabetización IA',
+    target: 'programa',
+    isValid: () => {
+      const isProgram = Boolean(window.ProgramContext?.current?.active || state.programCode);
+      if (!isProgram) return true;
+      return typeof window.LiteracyInstrument?.isComplete === 'function' && window.LiteracyInstrument.isComplete();
+    }
+  },
   cierre: {
     title: 'Uso y Privacidad',
     target: 'start',
@@ -2847,7 +2902,10 @@ const ONBOARDING_STEP_META = {
 };
 
 function getOnboardingStepKeys() {
-  return ['pais', 'profile', 'contexto', 'cierre'];
+  const isProgram = Boolean(window.ProgramContext?.current?.active || state.programCode);
+  return isProgram
+    ? ['pais', 'profile', 'contexto', 'programa', 'cierre']
+    : ['pais', 'profile', 'contexto', 'cierre'];
 }
 
 function syncOnboardingStepBounds() {
@@ -2866,6 +2924,22 @@ function updateOnboardingUI() {
   const keys = syncOnboardingStepBounds();
   const activeKey = keys[state.onboardingStep] || keys[0];
 
+  const flowContainer = document.querySelector('.onboarding-flow');
+  if (flowContainer) {
+    flowContainer.classList.toggle('has-program-step', keys.includes('programa'));
+  }
+
+  const lang = (window.state && window.state.lang) || 'es';
+
+  if (window.LiteracyInstrument && elements.literacyInstrumentItems) {
+    if (!elements.literacyInstrumentItems.hasChildNodes() || elements.literacyInstrumentItems.dataset.renderedLang !== lang) {
+      elements.literacyInstrumentItems.dataset.renderedLang = lang;
+      window.LiteracyInstrument.render(elements.literacyInstrumentItems, lang, () => {
+        if (typeof updateStartButtonState === 'function') updateStartButtonState();
+      });
+    }
+  }
+
   elements.onboardingSteps.forEach(step => {
     const key = step.dataset.onboardingStep;
     const isActive = key === activeKey;
@@ -2876,7 +2950,6 @@ function updateOnboardingUI() {
     step.inert = !visible;
   });
 
-  const lang = (window.state && window.state.lang) || 'es';
   const t = TRANSLATIONS[lang] || TRANSLATIONS['es'];
 
   if (elements.onboardingStepCounter) {
@@ -2937,6 +3010,11 @@ function focusCurrentOnboardingStep() {
     target = 'country';
   } else if (activeKey === 'contexto') {
     target = 'nivel';
+  } else if (activeKey === 'programa') {
+    if (typeof window.LiteracyInstrument?.focusFirstUnanswered === 'function') {
+      window.LiteracyInstrument.focusFirstUnanswered();
+      return;
+    }
   } else if (activeKey === 'cierre') {
     target = !elements.familiaridadInicial?.value ? 'familiaridad' : 'recursos';
   }
@@ -3070,7 +3148,11 @@ if (elements.startGuidance) {
     if (target === 'country' || target === 'pais') targetStepIndex = 0;
     else if (target === 'profile') targetStepIndex = 1;
     else if (target === 'nivel' || target === 'contexto') targetStepIndex = 2;
-    else if (target === 'familiaridad' || target === 'recursos' || target === 'cierre' || target === 'start') targetStepIndex = 3;
+    else if (target === 'programa') targetStepIndex = 3;
+    else if (target === 'familiaridad' || target === 'recursos' || target === 'cierre' || target === 'start') {
+      const isProg = Boolean(window.ProgramContext?.current?.active || state.programCode);
+      targetStepIndex = isProg ? 4 : 3;
+    }
     
     if (targetStepIndex >= 0) {
       state.onboardingStep = targetStepIndex;
@@ -3215,7 +3297,22 @@ function updateStartButtonState() {
     debugLog('Recursos OK:', recursosOk);
   }
 
-  // 5) Consentimiento opcional: habilita registro anónimo, no bloquea el uso.
+  // 5) Instrumento de alfabetización IA (en modo programa)
+  const isProgram = Boolean(window.ProgramContext?.current?.active || state.programCode);
+  let literacyOk = true;
+  if (isProgram) {
+    literacyOk = typeof window.LiteracyInstrument?.isComplete === 'function' && window.LiteracyInstrument.isComplete();
+    if (!literacyOk) {
+      missingItems.push({
+        target: 'programa',
+        title: window.LiteracyInstrument?.missingLabel ? window.LiteracyInstrument.missingLabel(state.lang) : 'Respondé las preguntas del programa',
+        help: 'Completá las 8 preguntas breves para continuar.'
+      });
+    }
+    debugLog('Literacy OK:', literacyOk);
+  }
+
+  // 6) Consentimiento opcional: habilita registro anónimo, no bloquea el uso.
   if (elements.consentTracking) {
     if (window.state) {
       window.state.consentTracking = elements.consentTracking.checked;
@@ -3226,7 +3323,7 @@ function updateStartButtonState() {
   // 🔑 Lógica de Habilitación y Visibilidad
   const countryOk = !!elements.countrySelect?.value && (!isCountryOtherVisible() || !!elements.countryOtherInput?.value.trim());
   if (!countryOk) missingItems.push({ target: 'country', title: TRANSLATIONS[state.lang || 'es']?.label_country_other || 'Especificá tu país' });
-  const todasOk = perfilOk && nivelOk && famOk && recursosOk && countryOk;
+  const todasOk = perfilOk && nivelOk && famOk && recursosOk && countryOk && literacyOk;
   const nextSlideBtn = document.getElementById('nextSlide');
   const hasOnboardingFlow = elements.onboardingNextBtn && elements.onboardingSteps && elements.onboardingSteps.length;
 
@@ -4129,7 +4226,8 @@ function buildToolFeedbackPayload() {
     country: state.country || '',
     countryCode: state.countryCode || countryCodeFor(state.country),
     nivelEducativo: state.nivelEducativo || '',
-    consentTracking: !!state.consentTracking
+    consentTracking: !!state.consentTracking,
+    ...(window.ProgramContext ? window.ProgramContext.payload(state) : {})
   };
 }
 

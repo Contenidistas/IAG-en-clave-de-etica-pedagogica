@@ -367,6 +367,10 @@ if (elements.restartBtn) {
       elements.sendToolFeedbackBtn.textContent = 'Enviar valoración';
     }
 
+    if (typeof window.LiteracyInstrument?.reset === 'function') {
+      window.LiteracyInstrument.reset();
+    }
+
     updateStartButtonState();
     showScreen('intro');
     updateCarousel();
