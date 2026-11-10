@@ -35,7 +35,14 @@
 
     <div class="header-actions">
       <button type="button" class="btn-academic btn-authors" id="btnVerAutores">
-        <span class="btn-academic-icon">👥</span>
+        <span class="btn-academic-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9" cy="7" r="3.5"></circle>
+            <path d="M2.5 19.5c0-3.1 2.9-5.5 6.5-5.5s6.5 2.4 6.5 5.5"></path>
+            <circle cx="17" cy="8.5" r="2.5"></circle>
+            <path d="M16.5 14.2c2.8.3 5 2.2 5 4.8"></path>
+          </svg>
+        </span>
         <span class="btn-academic-text">
           <span class="btn-academic-label" data-i18n="btn_authors_label">Autores</span>
           <span class="btn-academic-title" data-i18n="btn_authors_title">¿Quiénes somos?</span>
@@ -67,10 +74,10 @@
       <div class="lang-select-wrapper">
         <label for="languageSelect" class="sr-only">Idioma / Language</label>
         <select id="languageSelect" class="lang-select" aria-label="Seleccionar idioma">
-          <option value="es" selected>🌐 ES</option>
-          <option value="en">🌐 EN</option>
-          <option value="pt">🌐 PT</option>
-          <option value="fr">🌐 FR</option>
+          <option value="es" selected>ES</option>
+          <option value="en">EN</option>
+          <option value="pt">PT</option>
+          <option value="fr">FR</option>
         </select>
       </div>
       <button class="theme-toggle" id="themeToggle" aria-label="Cambiar tema">
@@ -128,7 +135,13 @@
                 <section id="landingCountryCard" class="landing-country-card" aria-labelledby="landingCountryName">
                   <div class="landing-country-flag-wrap" aria-hidden="true">
                     <img id="landingCountryFlag" class="landing-country-flag" src="icons/flags/uy.svg" alt="" hidden>
-                    <span id="landingCountryGlobe" class="landing-country-globe">🌐</span>
+                    <span id="landingCountryGlobe" class="landing-country-globe">
+                      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="9"></circle>
+                        <path d="M3.6 9h16.8M3.6 15h16.8"></path>
+                        <path d="M12 3a13.5 13.5 0 0 1 0 18M12 3a13.5 13.5 0 0 0 0 18"></path>
+                      </svg>
+                    </span>
                   </div>
                   <div class="landing-country-copy">
                     <span class="landing-country-eyebrow" data-i18n="landing_country_context">Tu contexto</span>
@@ -623,7 +636,12 @@
 
         <div class="stats-scope-controls" role="group" aria-label="Alcance de las estadísticas">
           <button type="button" id="statsCountryScopeBtn" class="stats-scope-btn active" data-stats-scope="country" aria-pressed="true">
-            <span id="statsCountryScopeFlag" aria-hidden="true">🌐</span>
+            <span id="statsCountryScopeFlag" class="stats-scope-flag-wrap" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="8.5"></circle>
+                <path d="M3.8 12h16.4M12 3.5a12 12 0 0 1 0 17M12 3.5a12 12 0 0 0 0 17"></path>
+              </svg>
+            </span>
             <span id="statsCountryScopeLabel" data-i18n="stats_scope_country">Tu país</span>
           </button>
           <button type="button" id="statsGlobalScopeBtn" class="stats-scope-btn" data-stats-scope="global" aria-pressed="false" data-i18n="stats_scope_global">Global</button>
@@ -636,7 +654,13 @@
           <div class="stats-kpis stats-kpis--five">
             <div class="stats-kpi stats-kpi--global-visits">
               <div class="stats-kpi-head">
-                <span class="stats-kpi-badge" aria-hidden="true">🌐</span>
+                <span class="stats-kpi-badge stats-kpi-badge--indigo" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="8.5"></circle>
+                    <ellipse cx="12" cy="12" rx="4" ry="8.5"></ellipse>
+                    <path d="M4 9.5h16M4 14.5h16"></path>
+                  </svg>
+                </span>
                 <span class="stats-kpi-label" data-i18n="stat_global_visits_label">Visitas generales</span>
               </div>
               <strong id="statGlobalVisits">0</strong>
@@ -644,7 +668,12 @@
             </div>
             <div class="stats-kpi stats-kpi--country-visits">
               <div class="stats-kpi-head">
-                <span id="statCountryVisitsFlag" class="stats-kpi-badge" aria-hidden="true">📍</span>
+                <span id="statCountryVisitsFlag" class="stats-kpi-badge stats-kpi-badge--sky" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 15 9 22 12 15 15 12 22 9 15 2 12 9 9 12 2"></polygon>
+                    <circle cx="12" cy="12" r="2"></circle>
+                  </svg>
+                </span>
                 <span id="statCountryVisitsLabel" class="stats-kpi-label" data-i18n="stat_visits_label">Sesiones del país</span>
               </div>
               <strong id="statVisits">0</strong>
@@ -652,7 +681,13 @@
             </div>
             <div class="stats-kpi stats-kpi--completed">
               <div class="stats-kpi-head">
-                <span class="stats-kpi-badge" aria-hidden="true">✅</span>
+                <span class="stats-kpi-badge stats-kpi-badge--emerald" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="4" y="3" width="16" height="18" rx="2.5"></rect>
+                    <path d="M8.5 12.5l2.3 2.3 4.7-4.8"></path>
+                    <path d="M8.5 7.5h7"></path>
+                  </svg>
+                </span>
                 <span class="stats-kpi-label" data-i18n="stat_completed_label">Cuestionarios completados</span>
               </div>
               <strong id="statCompleted">0</strong>
@@ -660,7 +695,13 @@
             </div>
             <div class="stats-kpi stats-kpi--average">
               <div class="stats-kpi-head">
-                <span class="stats-kpi-badge" aria-hidden="true">🎯</span>
+                <span class="stats-kpi-badge stats-kpi-badge--violet" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 17a8 8 0 0 1 16 0"></path>
+                    <path d="M12 17l3.5-5.5"></path>
+                    <circle cx="12" cy="17" r="1.5"></circle>
+                  </svg>
+                </span>
                 <span class="stats-kpi-label" data-i18n="stat_average_label">Puntaje promedio</span>
               </div>
               <div class="stats-kpi-gauge-row">
@@ -670,7 +711,12 @@
             </div>
             <div class="stats-kpi stats-kpi--top-level">
               <div class="stats-kpi-head">
-                <span class="stats-kpi-badge" aria-hidden="true">🏅</span>
+                <span class="stats-kpi-badge stats-kpi-badge--amber" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 19h16"></path>
+                    <path d="M6 19v-4h3v4M11 19v-8h3v8M16 19V7h3v12"></path>
+                  </svg>
+                </span>
                 <span class="stats-kpi-label" data-i18n="stat_top_level_label">Nivel más frecuente</span>
               </div>
               <strong id="statTopLevel">—</strong>
@@ -1249,8 +1295,14 @@
       <a href="https://ceibal.edu.uy/politicas/buenas-practicas-uso-ia-educacion/" target="_blank" rel="noopener noreferrer">Ceibal</a>
       </span>
     </p>
-    <p style="margin-top: 0.75rem; font-size: 0.85rem; opacity: 0.8;">
-      🔄 <span data-i18n="footer_updated_text">Sitio en constante actualización con nuevas funcionalidades y mejoras</span>
+    <p style="margin-top: 0.75rem; font-size: 0.85rem; opacity: 0.8; display: inline-flex; align-items: center; gap: 0.4rem;">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 12a9 9 0 0 0-15.4-6.4L3 8"></path>
+        <path d="M3 3v5h5"></path>
+        <path d="M3 12a9 9 0 0 0 15.4 6.4L21 16"></path>
+        <path d="M16 16h5v5"></path>
+      </svg>
+      <span data-i18n="footer_updated_text">Sitio en constante actualización con nuevas funcionalidades y mejoras</span>
     </p>
     <button type="button" class="ai-use-disclosure-btn" id="aiUseDisclosureBtn" data-i18n="footer_ia_declaration">
       Declaración de uso de IA

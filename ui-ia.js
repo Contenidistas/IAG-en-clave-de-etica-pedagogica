@@ -131,8 +131,8 @@ const TRANSLATIONS = {
     history_title: "Tus recorridos previos",
     modal_mode_title: "¿Qué recorrido deseás realizar?",
     modal_mode_desc: "Como docente, tenés la opción de realizar el cuestionario reflexivo para evaluar tu práctica, o ingresar directamente al Laboratorio de Casos.",
-    modal_mode_quiz: "📝 Iniciar cuestionario reflexivo",
-    modal_mode_lab: "🧪 Entrar al Laboratorio de Casos",
+    modal_mode_quiz: "Iniciar cuestionario reflexivo",
+    modal_mode_lab: "Entrar al Laboratorio de Casos",
     consent_help: "Podés iniciar el recorrido aunque no aceptes. Si marcás esta opción, se guarda únicamente: perfil, país, seudónimo opcional, nivel de familiaridad, uso de recursos similares y registro del cuestionario.",
     consent_unchecked: "Acepto registro anónimo",
     consent_checked: "Registro anónimo aceptado",
@@ -314,21 +314,21 @@ const TRANSLATIONS = {
     option_word: "Opción",
     your_final_decision: "Tu decisión final",
     colleague_word: "Colega",
-    player_community_title: "📊 Decisiones de la Comunidad de Docentes",
+    player_community_title: "Decisiones de la Comunidad de Docentes",
     player_community_sub: "Resultados acumulados de las elecciones de docentes en talleres formativos:",
-    player_comments_title: "💬 Reflexiones de otros colegas sobre este caso:",
-    player_feedback_title: "✏️ Sugerencias o mejoras para este caso:",
+    player_comments_title: "Reflexiones de otros colegas sobre este caso:",
+    player_feedback_title: "Sugerencias o mejoras para este caso:",
     player_feedback_desc: "Este laboratorio es un recurso evolutivo. Compartí tus reflexiones o propuestas de mejora para esta situación.",
     player_textarea_placeholder: "Escribí aquí tus sugerencias o ideas de mejora para este caso...",
     player_btn_send_feedback: "Enviar sugerencia",
-    player_community_title: "📊 Decisiones de la Comunidad de Docentes",
+    player_community_title: "Decisiones de la Comunidad de Docentes",
     player_community_sub: "Resultados acumulados de las elecciones de docentes en talleres formativos (se resalta tu decisión final en color):",
-    player_comments_title: "💬 Reflexiones de otros colegas sobre este caso:",
-    player_feedback_title: "✏️ Sugerencias o mejoras para este caso:",
+    player_comments_title: "Reflexiones de otros colegas sobre este caso:",
+    player_feedback_title: "Sugerencias o mejoras para este caso:",
     player_feedback_desc: "Este laboratorio es un recurso evolutivo. Compartí tus reflexiones o propuestas de mejora para esta situación.",
     player_textarea_placeholder: "Escribí aquí tus sugerencias o ideas de mejora para este caso...",
     player_btn_send_feedback: "Enviar sugerencia",
-    player_btn_pdf: "🖨️ Descargar Ficha de Taller (PDF)",
+    player_btn_pdf: "Descargar Ficha de Taller (PDF)",
     player_btn_finish: "Volver a la lista de dilemas",
 
     level_primaria: "Primaria",
@@ -345,7 +345,7 @@ const TRANSLATIONS = {
     modal_lab_access_title: "Acceso al Laboratorio de Casos",
     modal_lab_access_desc: "El **Laboratorio de Casos (Modo Taller)** es una herramienta diseñada para el perfil **Docente** para la deliberación y el trabajo ético situado.",
     modal_lab_access_confirm_q: "¿Deseás configurar tu perfil como Docente ahora para ingresar?",
-    modal_lab_access_yes: "✅ Sí, configurar e ingresar",
+    modal_lab_access_yes: "Sí, configurar e ingresar",
     modal_lab_access_cancel: "Cancelar",
 
     modal_confirm_exit_title: "Confirmar salida",
@@ -488,8 +488,8 @@ const TRANSLATIONS = {
     history_title: "Your previous journeys",
     modal_mode_title: "Which path do you want to take?",
     modal_mode_desc: "As a teacher, you can choose to complete the reflective questionnaire or go directly to the Cases Laboratory (Workshop Mode).",
-    modal_mode_quiz: "📝 Start reflective questionnaire",
-    modal_mode_lab: "🧪 Open Cases Laboratory",
+    modal_mode_quiz: "Start reflective questionnaire",
+    modal_mode_lab: "Open Cases Laboratory",
     consent_help: "You can start the journey even if you do not accept. If checked, only profile, country, optional pseudonym, familiarity level, resources usage, and survey responses are saved anonymously.",
     consent_unchecked: "I accept anonymous tracking",
     consent_checked: "Anonymous tracking accepted",
@@ -669,14 +669,14 @@ const TRANSLATIONS = {
     option_word: "Option",
     your_final_decision: "Your final decision",
     colleague_word: "Colleague",
-    player_community_title: "📊 Teaching Community Decisions",
+    player_community_title: "Teaching Community Decisions",
     player_community_sub: "Accumulated results from teacher choices in training workshops:",
-    player_comments_title: "💬 Reflections from other colleagues on this case:",
-    player_feedback_title: "✏️ Suggestions or improvements for this case:",
+    player_comments_title: "Reflections from other colleagues on this case:",
+    player_feedback_title: "Suggestions or improvements for this case:",
     player_feedback_desc: "This laboratory is an evolving resource. Share your reflections or improvement proposals for this situation.",
     player_textarea_placeholder: "Write your suggestions or improvement ideas for this case here...",
     player_btn_send_feedback: "Submit suggestion",
-    player_btn_pdf: "🖨️ Download Workshop Worksheet (PDF)",
+    player_btn_pdf: "Download Workshop Worksheet (PDF)",
     player_btn_finish: "Return to dilemmas list",
 
     level_primaria: "Primary Education",
@@ -693,7 +693,7 @@ const TRANSLATIONS = {
     modal_lab_access_title: "Access to the Cases Laboratory",
     modal_lab_access_desc: "The **Cases Laboratory (Workshop Mode)** is a tool designed for the **Teacher** profile for deliberation and situated ethical work.",
     modal_lab_access_confirm_q: "Do you want to set your profile as Teacher now to enter?",
-    modal_lab_access_yes: "✅ Yes, configure and enter",
+    modal_lab_access_yes: "Yes, configure and enter",
     modal_lab_access_cancel: "Cancel",
 
     modal_confirm_exit_title: "Confirm exit",
@@ -827,8 +827,8 @@ const TRANSLATIONS = {
     history_title: "Seus percursos anteriores",
     modal_mode_title: "Qual percurso você deseja realizar?",
     modal_mode_desc: "Como professor, você pode optar por preencher o questionário reflexivo ou acessar diretamente o Laboratório de Casos (Modo Oficina).",
-    modal_mode_quiz: "📝 Iniciar questionário reflexivo",
-    modal_mode_lab: "🧪 Entrar no Laboratório de Casos",
+    modal_mode_quiz: "Iniciar questionário reflexivo",
+    modal_mode_lab: "Entrar no Laboratório de Casos",
     consent_help: "Você pode iniciar o percurso mesmo sem aceitar. Se marcado, salva-se apenas: perfil, país, pseudônimo opcional, familiaridade, uso de recursos e respostas anônimas.",
     consent_unchecked: "Aceito registro anônimo",
     consent_checked: "Registro anônimo aceito",
@@ -1008,14 +1008,14 @@ const TRANSLATIONS = {
     option_word: "Opção",
     your_final_decision: "Sua decisão final",
     colleague_word: "Colega",
-    player_community_title: "📊 Decisões da Comunidade de Professores",
+    player_community_title: "Decisões da Comunidade de Professores",
     player_community_sub: "Resultados acumulados das escolhas dos professores em oficinas formativas:",
-    player_comments_title: "💬 Reflexões de outros colegas sobre este caso:",
-    player_feedback_title: "✏️ Sugestões ou melhorias para este caso:",
+    player_comments_title: "Reflexões de outros colegas sobre este caso:",
+    player_feedback_title: "Sugestões ou melhorias para este caso:",
     player_feedback_desc: "Este laboratório é um recurso evolutivo. Compartilhe suas reflexões ou propostas de melhoria para esta situação.",
     player_textarea_placeholder: "Escreva aqui suas sugestões ou ideias de melhoria para este caso...",
     player_btn_send_feedback: "Enviar sugestão",
-    player_btn_pdf: "🖨️ Baixar Ficha de Oficina (PDF)",
+    player_btn_pdf: "Baixar Ficha de Oficina (PDF)",
     player_btn_finish: "Voltar à lista de dilemas",
 
     level_primaria: "Ensino Fundamental I",
@@ -1032,7 +1032,7 @@ const TRANSLATIONS = {
     modal_lab_access_title: "Acesso ao Laboratório de Casos",
     modal_lab_access_desc: "O **Laboratório de Casos (Modo Oficina)** é uma ferramenta projetada para o perfil **Professor** para deliberação e trabalho ético situado.",
     modal_lab_access_confirm_q: "Deseja configurar seu perfil como Professor agora para entrar?",
-    modal_lab_access_yes: "✅ Sim, configurar e entrar",
+    modal_lab_access_yes: "Sim, configurar e entrar",
     modal_lab_access_cancel: "Cancelar",
 
     modal_confirm_exit_title: "Confirmar saída",
@@ -1175,8 +1175,8 @@ const TRANSLATIONS = {
     history_title: "Vos parcours précédents",
     modal_mode_title: "Quel parcours souhaitez-vous effectuer ?",
     modal_mode_desc: "En tant qu'enseignant, vous pouvez choisir de remplir le questionnaire réflexif ou d'accéder directement au Laboratoire de cas (Mode atelier).",
-    modal_mode_quiz: "📝 Démarrer le questionnaire réflexif",
-    modal_mode_lab: "🧪 Entrer dans le Laboratoire de cas",
+    modal_mode_quiz: "Démarrer le questionnaire réflexif",
+    modal_mode_lab: "Entrer dans le Laboratoire de cas",
     consent_help: "Vous pouvez commencer le parcours même si vous n'acceptez pas. Si vous cochez cette option, seuls le profil, le pays, le pseudonyme optionnel, la familiarité, l'usage des ressources et les réponses sont enregistrés anonymement.",
     consent_unchecked: "J'accepte l'enregistrement anonyme",
     consent_checked: "Enregistrement anonyme accepté",
@@ -1352,14 +1352,14 @@ const TRANSLATIONS = {
     player_resolution_title: "Analyse pédagogique et résolution",
     player_general_reflection: "Réflexion éthique générale :",
     player_workshop_guide: "Guide de débat pour ateliers",
-    player_community_title: "📊 Décisions de la communauté d'enseignants",
+    player_community_title: "Décisions de la communauté d'enseignants",
     player_community_sub: "Résultats cumulés des choix des enseignants dans les ateliers de formation (votre choix final est mis en valeur) :",
-    player_comments_title: "💬 Réflexions d'autres collègues sur ce cas :",
-    player_feedback_title: "✏️ Suggestions ou améliorations pour ce cas :",
+    player_comments_title: "Réflexions d'autres collègues sur ce cas :",
+    player_feedback_title: "Suggestions ou améliorations pour ce cas :",
     player_feedback_desc: "Ce laboratoire est une ressource évolutive. Partagez vos réflexions ou propositions d'amélioration pour cette situation.",
     player_textarea_placeholder: "Écrivez ici vos suggestions ou idées d'amélioration pour ce cas...",
     player_btn_send_feedback: "Envoyer la suggestion",
-    player_btn_pdf: "🖨️ Télécharger la fiche d'atelier (PDF)",
+    player_btn_pdf: "Télécharger la fiche d'atelier (PDF)",
     player_btn_finish: "Retourner à la liste des dilemmes",
 
     level_primaria: "École Élémentaire",
@@ -1376,7 +1376,7 @@ const TRANSLATIONS = {
     modal_lab_access_title: "Accès au Laboratoire de cas",
     modal_lab_access_desc: "Le **Laboratoire de cas (Mode atelier)** est un outil conçu pour le profil **Enseignant** pour la délibération et le travail éthique situé.",
     modal_lab_access_confirm_q: "Voulez-vous configurer votre profil en tant qu'Enseignant maintenant pour entrer ?",
-    modal_lab_access_yes: "✅ Oui, configurer et entrer",
+    modal_lab_access_yes: "Oui, configurer et entrer",
     modal_lab_access_cancel: "Annuler",
 
     modal_confirm_exit_title: "Confirmer la sortie",
@@ -3973,11 +3973,34 @@ const LEVEL_VISUAL_META = {
   'Amplio margen de mejora': { color: '#f97316', order: 5 },
 };
 
+function getStatsCustomIcon(name) {
+  const icons = {
+    globe: `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M3.8 12h16.4M12 3.5a12 12 0 0 1 0 17M12 3.5a12 12 0 0 0 0 17"></path></svg>`,
+    compass: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15 9 22 12 15 15 12 22 9 15 2 12 9 9 12 2"></polygon><circle cx="12" cy="12" r="2"></circle></svg>`,
+    docente: `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h7a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H2z"></path><path d="M22 4h-7a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h8z"></path></svg>`,
+    estudiante: `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 3 2 8 12 13 22 8 12 3"></polygon><path d="M6 10.5V16c0 1.8 2.7 3.2 6 3.2s6-1.4 6-3.2v-5.5"></path></svg>`,
+    investigador: `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="5.5"></circle><path d="M14.5 14.5L20 20"></path><circle cx="10.5" cy="10.5" r="2"></circle></svg>`,
+    genericRole: `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 19c0-3.2 3.1-5.5 7-5.5s7 2.3 7 5.5"></path></svg>`,
+    emptyChart: `<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"></rect><path d="M8 16v-4M12 16V8M16 16v-6"></path></svg>`,
+    offlineCloud: `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>`
+  };
+  return icons[name] || '';
+}
+
 const PROFILE_VISUAL_META = {
-  'Docente': { color: '#4f46e5', icon: '👩‍🏫' },
-  'Estudiante': { color: '#06b6d4', icon: '🎓' },
-  'Docente/investigador/a': { color: '#8b5cf6', icon: '🔬' },
+  'Docente': { color: '#4f46e5', icon: getStatsCustomIcon('docente') },
+  'Estudiante': { color: '#06b6d4', icon: getStatsCustomIcon('estudiante') },
+  'Docente/investigador/a': { color: '#8b5cf6', icon: getStatsCustomIcon('investigador') },
 };
+
+function renderCountryFlagBadge(container, option, fallbackSvg) {
+  if (!container) return;
+  if (option?.code) {
+    container.innerHTML = `<img src="icons/flags/${escapeHtml(option.code)}.svg" class="stats-inline-flag" alt="">`;
+  } else {
+    container.innerHTML = fallbackSvg;
+  }
+}
 
 function updateStatsScopeUI() {
   const hasCountry = Boolean(window.state?.country);
@@ -3985,15 +4008,11 @@ function updateStatsScopeUI() {
   const scope = window.state?.statsScope === 'global' ? 'global' : 'country';
   const option = window.CountryContext?.getOption(window.state?.country);
 
-  if (elements.statsCountryScopeFlag) {
-    elements.statsCountryScopeFlag.textContent = option?.flag || '🌐';
-  }
+  renderCountryFlagBadge(elements.statsCountryScopeFlag, option, getStatsCustomIcon('globe'));
   if (elements.statsCountryScopeLabel) {
     elements.statsCountryScopeLabel.textContent = window.state?.country || statsText('stats_scope_country', 'Tu país');
   }
-  if (elements.statCountryVisitsFlag) {
-    elements.statCountryVisitsFlag.textContent = option?.flag || '📍';
-  }
+  renderCountryFlagBadge(elements.statCountryVisitsFlag, option, getStatsCustomIcon('compass'));
   if (elements.statCountryVisitsLabel) {
     elements.statCountryVisitsLabel.textContent = hasCountry
       ? statsText('stat_country_visits_named', 'Sesiones en {country}', { country: window.state.country })
@@ -4069,7 +4088,7 @@ function renderEmptyStatsState(container) {
   if (!container) return;
   container.innerHTML = `
     <div class="stats-empty-container">
-      <span class="stats-empty-icon">📊</span>
+      <span class="stats-empty-icon" aria-hidden="true">${getStatsCustomIcon('emptyChart')}</span>
       <p class="stats-empty">Sin registros suficientes en este momento</p>
     </div>
   `;
@@ -4186,7 +4205,7 @@ function renderProfilesChart(container, rows) {
       const label = String(row.label).trim();
       const meta = PROFILE_VISUAL_META[label] || {
         color: ['#4f46e5', '#06b6d4', '#8b5cf6'][idx % 3],
-        icon: '👤'
+        icon: getStatsCustomIcon('genericRole')
       };
       return {
         label,
@@ -4539,7 +4558,7 @@ async function cargarEstadisticasAnonimas() {
     console.warn('No se pudieron cargar estadísticas anónimas:', error);
     elements.statsStatus.innerHTML = `
       <div class="stats-offline-card">
-        <div class="stats-offline-icon">🌐</div>
+        <div class="stats-offline-icon" aria-hidden="true">${getStatsCustomIcon('offlineCloud')}</div>
         <h4>Modo local / Sin conexión</h4>
         <p>Las estadísticas globales no están disponibles en este momento (se activarán automáticamente al desplegar la actualización en producción con el servidor de base de datos).</p>
         <div class="stats-offline-action-note">

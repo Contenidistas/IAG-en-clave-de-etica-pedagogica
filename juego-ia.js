@@ -2083,7 +2083,9 @@ function cargarCasoInteractivo(caseId, target = elements.situatedCases, onReturn
       
       <div class="case-debate-guide">
         <h5>
-          <span style="font-size:1.15rem;">👥</span>
+          <span style="display:inline-flex; align-items:center;" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="3.5"></circle><path d="M2.5 19.5c0-3.1 2.9-5.5 6.5-5.5s6.5 2.4 6.5 5.5"></path><circle cx="17" cy="8.5" r="2.5"></circle><path d="M16.5 14.2c2.8.3 5 2.2 5 4.8"></path></svg>
+          </span>
           ${t.player_workshop_guide || 'Guía de debate para talleres'}
         </h5>
         <ul>
@@ -2091,9 +2093,9 @@ function cargarCasoInteractivo(caseId, target = elements.situatedCases, onReturn
         </ul>
       </div>
 
-      <!-- 📊 Distribución de Decisiones de la Comunidad -->
+      <!-- Distribución de Decisiones de la Comunidad -->
       <div class="community-stats-card" style="margin-top: 2rem; background: var(--bg-hover); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
-        <h5 style="margin-bottom: 0.5rem; font-weight: 700; color: var(--primary);">${t.player_community_title || '📊 Decisiones de la Comunidad de Docentes'}</h5>
+        <h5 style="margin-bottom: 0.5rem; font-weight: 700; color: var(--primary);">${t.player_community_title || 'Decisiones de la Comunidad de Docentes'}</h5>
         <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
           ${t.player_community_sub || 'Resultados acumulados de las elecciones de docentes en talleres formativos:'}
         </p>
@@ -2101,14 +2103,14 @@ function cargarCasoInteractivo(caseId, target = elements.situatedCases, onReturn
         
         <!-- Comentarios dinámicos cargados desde la DB -->
         <div id="caseCommunityComments" style="margin-top: 1.5rem; border-top: 1px dashed var(--border); padding-top: 1.25rem; display: none;">
-          <h6 style="font-weight: 700; margin-bottom: 0.75rem; font-size: 0.9rem; color: var(--text-primary);">${t.player_comments_title || '💬 Reflexiones de otros colegas sobre este caso:'}</h6>
+          <h6 style="font-weight: 700; margin-bottom: 0.75rem; font-size: 0.9rem; color: var(--text-primary);">${t.player_comments_title || 'Reflexiones de otros colegas sobre este caso:'}</h6>
           <div id="caseCommentsList" style="font-size: 0.85rem; display: flex; flex-direction: column; gap: 0.65rem; max-height: 250px; overflow-y: auto; padding-right: 0.5rem;"></div>
         </div>
       </div>
 
       <!-- Espacio para recoger sugerencias -->
       <div class="case-feedback-form" style="margin-top: 2rem; border-top: 1px dashed var(--border); padding-top: 1.5rem; margin-bottom: 2rem;">
-        <h5 style="margin-bottom: 0.5rem; font-weight: 700; color: var(--primary);">${t.player_feedback_title || '✏️ Sugerencias o mejoras para este caso:'}</h5>
+        <h5 style="margin-bottom: 0.5rem; font-weight: 700; color: var(--primary);">${t.player_feedback_title || 'Sugerencias o mejoras para este caso:'}</h5>
         <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
           ${t.player_feedback_desc || 'Este laboratorio es un recurso evolutivo. Compartí tus reflexiones o propuestas de mejora para esta situación.'}
         </p>
@@ -2126,7 +2128,7 @@ function cargarCasoInteractivo(caseId, target = elements.situatedCases, onReturn
     const statsContainer = resArea.querySelector('#caseCommunityStatsBars');
     if (statsContainer && caso.stats) {
       const optWord = t.option_word || 'Opción';
-      const userChoiceTag = t.your_final_decision ? ` 👈 (${t.your_final_decision})` : ' 👈 (Tu decisión final)';
+      const userChoiceTag = t.your_final_decision ? ` · (${t.your_final_decision})` : ' · (Tu decisión final)';
       statsContainer.innerHTML = Object.entries(caso.options).map(([key, opt]) => {
         const percentage = caso.stats[key] || 0;
         const isUserChoice = decisionFinal === key;

@@ -4260,8 +4260,56 @@ img, video {
 }
 
 .stats-kpi-badge {
-  font-size: 0.95rem;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: rgba(79, 70, 229, 0.1);
+  color: var(--primary);
   line-height: 1;
+}
+
+.stats-kpi-badge--indigo {
+  background: rgba(79, 70, 229, 0.12);
+  color: #4f46e5;
+}
+
+.stats-kpi-badge--sky {
+  background: rgba(14, 165, 233, 0.14);
+  color: #0284c7;
+}
+
+.stats-kpi-badge--emerald {
+  background: rgba(16, 185, 129, 0.14);
+  color: #059669;
+}
+
+.stats-kpi-badge--violet {
+  background: rgba(139, 92, 246, 0.14);
+  color: #7c3aed;
+}
+
+.stats-kpi-badge--amber {
+  background: rgba(245, 158, 11, 0.16);
+  color: #d97706;
+}
+
+.stats-scope-flag-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.stats-inline-flag {
+  width: 18px;
+  height: 13px;
+  object-fit: cover;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.12);
 }
 
 .stats-kpi-label {
@@ -4498,8 +4546,15 @@ img, video {
 }
 
 .stats-role-icon {
-  font-size: 0.95rem;
-  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: rgba(79, 70, 229, 0.08);
+  color: var(--primary);
+  flex-shrink: 0;
 }
 
 .stats-rank-badge {
