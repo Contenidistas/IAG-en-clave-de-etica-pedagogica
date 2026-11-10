@@ -106,7 +106,12 @@ const TRANSLATIONS = {
     country_search_placeholder: "Buscar país…",
     country_gate_confirm: "Continuar con este país",
     country_gate_cancel: "Cancelar",
-    stat_visits_label: "Sesiones registradas",
+    stat_global_visits_label: "Visitas generales",
+    stat_global_visits_meta: "Total acumulado en la plataforma",
+    stat_visits_label: "Sesiones del país",
+    stat_country_visits_named: "Sesiones en {country}",
+    stat_country_visits_share: "{pct}% del total general",
+    stat_country_visits_pending: "Se vincula al elegir país",
     stat_completed_label: "Cuestionarios completados",
     stat_average_label: "Puntaje promedio",
     stat_top_level_label: "Nivel más frecuente",
@@ -115,6 +120,11 @@ const TRANSLATIONS = {
     stat_chart_indicators: "Indicadores a fortalecer",
     stat_chart_education: "Distribución por formación",
     stat_chart_insight: "Lectura pedagógica",
+    stat_chip_maturity: "Escala de madurez",
+    stat_chip_composition: "Composición",
+    stat_chip_radar: "Radar de foco ético",
+    stat_chip_levels: "Niveles educativos",
+    stat_chip_synthesis: "Síntesis",
     opinions_kicker: "Opiniones anónimas",
     opinions_title: "Qué dicen quienes la usaron",
     history_kicker: "Historial local",
@@ -453,7 +463,12 @@ const TRANSLATIONS = {
     country_search_placeholder: "Search country…",
     country_gate_confirm: "Continue with this country",
     country_gate_cancel: "Cancel",
-    stat_visits_label: "Registered sessions",
+    stat_global_visits_label: "Total visits",
+    stat_global_visits_meta: "Cumulative platform sessions",
+    stat_visits_label: "Country sessions",
+    stat_country_visits_named: "Sessions in {country}",
+    stat_country_visits_share: "{pct}% of total visits",
+    stat_country_visits_pending: "Linked when selecting a country",
     stat_completed_label: "Completed surveys",
     stat_average_label: "Average score",
     stat_top_level_label: "Most frequent level",
@@ -462,6 +477,11 @@ const TRANSLATIONS = {
     stat_chart_indicators: "Indicators to strengthen",
     stat_chart_education: "Education level distribution",
     stat_chart_insight: "Pedagogical insight",
+    stat_chip_maturity: "Maturity scale",
+    stat_chip_composition: "Composition",
+    stat_chip_radar: "Ethical focus radar",
+    stat_chip_levels: "Education levels",
+    stat_chip_synthesis: "Synthesis",
     opinions_kicker: "Anonymous feedback",
     opinions_title: "What users say",
     history_kicker: "Local history",
@@ -782,7 +802,12 @@ const TRANSLATIONS = {
     country_search_placeholder: "Buscar país…",
     country_gate_confirm: "Continuar com este país",
     country_gate_cancel: "Cancelar",
-    stat_visits_label: "Sessões registradas",
+    stat_global_visits_label: "Visitas gerais",
+    stat_global_visits_meta: "Total acumulado na plataforma",
+    stat_visits_label: "Sessões do país",
+    stat_country_visits_named: "Sessões em {country}",
+    stat_country_visits_share: "{pct}% do total geral",
+    stat_country_visits_pending: "Vinculado ao escolher o país",
     stat_completed_label: "Questionários concluídos",
     stat_average_label: "Pontuação média",
     stat_top_level_label: "Nível mais frequente",
@@ -791,6 +816,11 @@ const TRANSLATIONS = {
     stat_chart_indicators: "Indicadores a fortalecer",
     stat_chart_education: "Distribuição por formação",
     stat_chart_insight: "Leitura pedagógica",
+    stat_chip_maturity: "Escala de maturidade",
+    stat_chip_composition: "Composição",
+    stat_chip_radar: "Radar de foco ético",
+    stat_chip_levels: "Níveis educacionais",
+    stat_chip_synthesis: "Síntese",
     opinions_kicker: "Opiniões anônimas",
     opinions_title: "O que dizem os usuários",
     history_kicker: "Histórico local",
@@ -1120,7 +1150,12 @@ const TRANSLATIONS = {
     country_search_placeholder: "Rechercher un pays…",
     country_gate_confirm: "Continuer avec ce pays",
     country_gate_cancel: "Annuler",
-    stat_visits_label: "Sessions enregistrées",
+    stat_global_visits_label: "Visites générales",
+    stat_global_visits_meta: "Total cumulé sur la plateforme",
+    stat_visits_label: "Sessions du pays",
+    stat_country_visits_named: "Sessions en {country}",
+    stat_country_visits_share: "{pct}% du total général",
+    stat_country_visits_pending: "Lié lors du choix du pays",
     stat_completed_label: "Questionnaires terminés",
     stat_average_label: "Score moyen",
     stat_top_level_label: "Niveau le plus fréquent",
@@ -1129,6 +1164,11 @@ const TRANSLATIONS = {
     stat_chart_indicators: "Indicateurs à renforcer",
     stat_chart_education: "Distribution par niveau d'études",
     stat_chart_insight: "Analyse pédagogique",
+    stat_chip_maturity: "Échelle de maturité",
+    stat_chip_composition: "Composition",
+    stat_chip_radar: "Radar d'attention éthique",
+    stat_chip_levels: "Niveaux d'études",
+    stat_chip_synthesis: "Synthèse",
     opinions_kicker: "Avis anonymes",
     opinions_title: "Ce que disent les utilisateurs",
     history_kicker: "Historique local",
@@ -1632,10 +1672,18 @@ const elements = {
   statsCountryScopeFlag: document.getElementById('statsCountryScopeFlag'),
   statsCountryScopeLabel: document.getElementById('statsCountryScopeLabel'),
   statsScopeNote: document.getElementById('statsScopeNote'),
+  statGlobalVisits: document.getElementById('statGlobalVisits'),
+  statGlobalVisitsMeta: document.getElementById('statGlobalVisitsMeta'),
+  statCountryVisitsFlag: document.getElementById('statCountryVisitsFlag'),
+  statCountryVisitsLabel: document.getElementById('statCountryVisitsLabel'),
+  statCountryVisitsMeta: document.getElementById('statCountryVisitsMeta'),
   statVisits: document.getElementById('statVisits'),
   statCompleted: document.getElementById('statCompleted'),
+  statCompletedMeta: document.getElementById('statCompletedMeta'),
   statAverage: document.getElementById('statAverage'),
+  statAverageGauge: document.getElementById('statAverageGauge'),
   statTopLevel: document.getElementById('statTopLevel'),
+  statTopLevelMeta: document.getElementById('statTopLevelMeta'),
   statsLevels: document.getElementById('statsLevels'),
   statsProfiles: document.getElementById('statsProfiles'),
   statsIndicators: document.getElementById('statsIndicators'),
@@ -2209,6 +2257,9 @@ function confirmCountryGateSelection() {
   countryGateRequired = false;
 
   if (window.state) window.state.statsScope = 'country';
+  if (typeof sendVisitToServer === 'function') {
+    sendVisitToServer();
+  }
   cargarEstadisticasAnonimas();
   if (elements.countryContextBtn) elements.countryContextBtn.focus({ preventScroll: true });
 }
@@ -2351,6 +2402,9 @@ if (elements.countrySelect && elements.countryFinalInput) {
       window.state.country = elements.countryFinalInput.value;
       window.state.countryCode = countryCodeFor(window.state.country);
       persistCountryContext();
+      if (window.state.country && typeof sendVisitToServer === 'function') {
+        sendVisitToServer();
+      }
       if (['docente', 'estudiante'].includes(window.state.profile) && typeof updateNivelEducativo === 'function') {
         updateNivelEducativo(window.state.profile);
       }
@@ -3911,6 +3965,20 @@ function setStatsScopeNote(message, warning = false) {
   elements.statsScopeNote.classList.toggle('is-warning', warning);
 }
 
+const LEVEL_VISUAL_META = {
+  'Nivel avanzado': { color: '#4f46e5', order: 1 },
+  'Prácticas consolidadas': { color: '#0ea5e9', order: 2 },
+  'Desarrollo progresivo': { color: '#10b981', order: 3 },
+  'En proceso inicial': { color: '#f59e0b', order: 4 },
+  'Amplio margen de mejora': { color: '#f97316', order: 5 },
+};
+
+const PROFILE_VISUAL_META = {
+  'Docente': { color: '#4f46e5', icon: '👩‍🏫' },
+  'Estudiante': { color: '#06b6d4', icon: '🎓' },
+  'Docente/investigador/a': { color: '#8b5cf6', icon: '🔬' },
+};
+
 function updateStatsScopeUI() {
   const hasCountry = Boolean(window.state?.country);
   if (!hasCountry && window.state) window.state.statsScope = 'global';
@@ -3922,6 +3990,14 @@ function updateStatsScopeUI() {
   }
   if (elements.statsCountryScopeLabel) {
     elements.statsCountryScopeLabel.textContent = window.state?.country || statsText('stats_scope_country', 'Tu país');
+  }
+  if (elements.statCountryVisitsFlag) {
+    elements.statCountryVisitsFlag.textContent = option?.flag || '📍';
+  }
+  if (elements.statCountryVisitsLabel) {
+    elements.statCountryVisitsLabel.textContent = hasCountry
+      ? statsText('stat_country_visits_named', 'Sesiones en {country}', { country: window.state.country })
+      : statsText('stat_visits_label', 'Sesiones del país');
   }
   if (elements.statsCountryScopeBtn) {
     elements.statsCountryScopeBtn.disabled = !hasCountry;
@@ -3946,9 +4022,14 @@ function updateStatsScopeUI() {
 
 function buildStatsRequestUrl(scope) {
   const url = new URL(CONFIG.statsEndpoint, window.location.href);
-  if (scope === 'country' && window.state?.country) {
-    url.searchParams.set('country', window.state.countryCode || countryCodeFor(window.state.country));
-    url.searchParams.set('countryName', window.state.country);
+  const countryName = window.state?.country || '';
+  const countryCode = window.state?.countryCode || countryCodeFor(countryName);
+  if (scope === 'country' && countryName) {
+    url.searchParams.set('country', countryCode);
+    url.searchParams.set('countryName', countryName);
+  } else if (countryName) {
+    url.searchParams.set('focusCountry', countryCode);
+    url.searchParams.set('focusCountryName', countryName);
   }
   return url.toString();
 }
@@ -3974,6 +4055,7 @@ function sanitizeStatsRows(rows, kind = 'generic') {
     })
     .map(row => ({
       ...row,
+      rawKey: row.label,
       label: kind === 'profiles' ? STATS_PROFILE_LABELS[row.label] : row.label
     }));
 }
@@ -3981,6 +4063,305 @@ function sanitizeStatsRows(rows, kind = 'generic') {
 function resolveTopLevel(summary, levelRows) {
   if (VALID_STATS_LEVELS.has(summary.topLevel)) return summary.topLevel;
   return levelRows.length ? levelRows[0].label : '—';
+}
+
+function renderEmptyStatsState(container) {
+  if (!container) return;
+  container.innerHTML = `
+    <div class="stats-empty-container">
+      <span class="stats-empty-icon">📊</span>
+      <p class="stats-empty">Sin registros suficientes en este momento</p>
+    </div>
+  `;
+}
+
+function renderAverageGauge(container, scoreValue) {
+  if (!container) return;
+  const numeric = Number(scoreValue);
+  const clamped = Number.isFinite(numeric) ? Math.max(0, Math.min(100, numeric)) : 0;
+  const radius = 36;
+  const circumference = Math.PI * radius;
+  const offset = circumference * (1 - clamped / 100);
+  const strokeColor = clamped >= 75
+    ? '#4f46e5'
+    : clamped >= 60
+      ? '#0ea5e9'
+      : clamped >= 45
+        ? '#10b981'
+        : '#f59e0b';
+
+  container.innerHTML = `
+    <svg class="stats-gauge-svg" viewBox="0 0 92 52" role="img" aria-label="Puntaje promedio ${clamped.toFixed(1)} de 100">
+      <path class="stats-gauge-track" d="M 10 44 A 36 36 0 0 1 82 44" fill="none" stroke-width="8" stroke-linecap="round"></path>
+      <path class="stats-gauge-fill" d="M 10 44 A 36 36 0 0 1 82 44" fill="none" stroke="${strokeColor}" stroke-width="8" stroke-linecap="round"
+        stroke-dasharray="${circumference.toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}"></path>
+      <text x="46" y="46" text-anchor="middle" class="stats-gauge-sub">/ 100</text>
+    </svg>
+  `;
+}
+
+function renderLevelsChart(container, rows, totalCompleted) {
+  if (!container) return;
+  const normalized = normalizeStatsCollection(rows)
+    .filter(row => row && row.label)
+    .map(row => ({
+      label: String(row.label).trim(),
+      count: Number(row.count || row.value || 0),
+      color: LEVEL_VISUAL_META[String(row.label).trim()]?.color || '#4f46e5'
+    }))
+    .filter(row => Number.isFinite(row.count) && row.count > 0);
+
+  if (!normalized.length) {
+    renderEmptyStatsState(container);
+    return;
+  }
+
+  const total = normalized.reduce((sum, row) => sum + row.count, 0) || 1;
+  const centerTotal = totalCompleted || total;
+  const radius = 46;
+  const circumference = 2 * Math.PI * radius;
+  let accumulated = 0;
+
+  const segmentsSvg = normalized.map(row => {
+    const fraction = row.count / total;
+    const dash = Math.max(fraction * circumference, 1.5);
+    const gap = Math.max(circumference - dash, 0);
+    const offset = -accumulated * circumference;
+    accumulated += fraction;
+    const pct = Math.round(fraction * 100);
+    return `
+      <circle class="stats-donut-segment" cx="64" cy="64" r="${radius}" fill="none"
+        stroke="${row.color}" stroke-width="16"
+        stroke-dasharray="${dash.toFixed(2)} ${gap.toFixed(2)}"
+        stroke-dashoffset="${offset.toFixed(2)}"
+        transform="rotate(-90 64 64)">
+        <title>${escapeHtml(row.label)}: ${formatNumber(row.count)} (${pct}%)</title>
+      </circle>
+    `;
+  }).join('');
+
+  const barsHtml = normalized.map(row => {
+    const pctTotal = Math.round((row.count / total) * 100);
+    return `
+      <div class="stats-bar-row">
+        <div class="stats-bar-label">
+          <span class="stats-bar-title">
+            <span class="stats-color-dot" style="background:${row.color}"></span>
+            <span>${escapeHtml(row.label)}</span>
+          </span>
+          <span class="stats-bar-values">
+            <strong>${formatNumber(row.count)}</strong>
+            <small class="stats-pct-pill">${pctTotal}%</small>
+          </span>
+        </div>
+        <div class="stats-bar-track">
+          <div class="stats-bar-fill stats-bar-fill--semantic" style="width:${Math.max(pctTotal, 4)}%; --bar-fill:${row.color}"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="stats-donut-layout">
+      <div class="stats-donut-figure">
+        <svg class="stats-donut-svg" viewBox="0 0 128 128" role="img" aria-label="Distribución porcentual por nivel">
+          <circle cx="64" cy="64" r="${radius}" fill="none" stroke="rgba(148, 163, 184, 0.18)" stroke-width="16"></circle>
+          ${segmentsSvg}
+          <text x="64" y="60" text-anchor="middle" class="stats-donut-total">${formatNumber(centerTotal)}</text>
+          <text x="64" y="76" text-anchor="middle" class="stats-donut-caption">diagnósticos</text>
+        </svg>
+      </div>
+      <div class="stats-donut-legend">
+        ${barsHtml}
+      </div>
+    </div>
+  `;
+}
+
+function renderProfilesChart(container, rows) {
+  if (!container) return;
+  const normalized = normalizeStatsCollection(rows)
+    .filter(row => row && row.label)
+    .map((row, idx) => {
+      const label = String(row.label).trim();
+      const meta = PROFILE_VISUAL_META[label] || {
+        color: ['#4f46e5', '#06b6d4', '#8b5cf6'][idx % 3],
+        icon: '👤'
+      };
+      return {
+        label,
+        count: Number(row.count || row.value || 0),
+        color: meta.color,
+        icon: meta.icon
+      };
+    })
+    .filter(row => Number.isFinite(row.count) && row.count > 0);
+
+  if (!normalized.length) {
+    renderEmptyStatsState(container);
+    return;
+  }
+
+  const total = normalized.reduce((sum, row) => sum + row.count, 0) || 1;
+  const stackedSegments = normalized.map(row => {
+    const pct = Math.max(Math.round((row.count / total) * 100), 4);
+    return `<div class="stats-stacked-segment" style="width:${pct}%; background:${row.color}" title="${escapeHtml(row.label)}: ${formatNumber(row.count)} (${pct}%)"></div>`;
+  }).join('');
+
+  const itemsHtml = normalized.map(row => {
+    const pct = Math.round((row.count / total) * 100);
+    return `
+      <div class="stats-profile-row stats-bar-row">
+        <div class="stats-bar-label">
+          <span class="stats-bar-title">
+            <span class="stats-role-icon" aria-hidden="true">${row.icon}</span>
+            <span class="stats-color-dot" style="background:${row.color}"></span>
+            <span>${escapeHtml(row.label)}</span>
+          </span>
+          <span class="stats-bar-values">
+            <strong>${formatNumber(row.count)}</strong>
+            <small class="stats-pct-pill">${pct}%</small>
+          </span>
+        </div>
+        <div class="stats-bar-track">
+          <div class="stats-bar-fill stats-bar-fill--semantic" style="width:${Math.max(pct, 4)}%; --bar-fill:${row.color}"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="stats-stacked-bar" role="img" aria-label="Composición proporcional de perfiles participantes">
+      ${stackedSegments}
+    </div>
+    <div class="stats-profile-list">
+      ${itemsHtml}
+    </div>
+  `;
+}
+
+function shortenIndicatorAxisLabel(label) {
+  const cleanLabel = String(label || '').trim();
+  if (cleanLabel.includes('Verificación')) return 'Verificación';
+  if (cleanLabel.includes('Reglas')) return 'Reglas de uso';
+  if (cleanLabel.includes('Sesgos')) return 'Sesgos';
+  if (cleanLabel.includes('Autoría') || cleanLabel.includes('Transparencia')) return 'Transparencia';
+  if (cleanLabel.includes('Aporte') || cleanLabel.includes('Valor')) return 'Aporte humano';
+  if (cleanLabel.includes('Otros criterios')) return 'Otros criterios';
+  return cleanLabel.length > 16 ? `${cleanLabel.slice(0, 15)}…` : cleanLabel;
+}
+
+function buildRadarSvg(rows, maxCount) {
+  const axisRows = rows.slice(0, 6);
+  const n = axisRows.length;
+  if (n < 3) return '';
+
+  const cx = 130;
+  const cy = 96;
+  const radius = 58;
+  const levels = [0.35, 0.68, 1];
+
+  const angleFor = idx => (-Math.PI / 2) + (idx * 2 * Math.PI) / n;
+  const pointAt = (idx, ratio) => {
+    const angle = angleFor(idx);
+    return {
+      x: cx + Math.cos(angle) * radius * ratio,
+      y: cy + Math.sin(angle) * radius * ratio
+    };
+  };
+
+  const gridPolygons = levels.map(level => {
+    const pts = axisRows.map((_, idx) => {
+      const p = pointAt(idx, level);
+      return `${p.x.toFixed(1)},${p.y.toFixed(1)}`;
+    }).join(' ');
+    return `<polygon class="stats-radar-grid" points="${pts}" fill="none" stroke="rgba(234, 88, 12, 0.18)" stroke-width="1"></polygon>`;
+  }).join('');
+
+  const spokes = axisRows.map((_, idx) => {
+    const end = pointAt(idx, 1);
+    return `<line x1="${cx}" y1="${cy}" x2="${end.x.toFixed(1)}" y2="${end.y.toFixed(1)}" stroke="rgba(234, 88, 12, 0.22)" stroke-width="1"></line>`;
+  }).join('');
+
+  const dataCoords = axisRows.map((row, idx) => {
+    const ratio = Math.max(0.18, Math.min(1, row.count / Math.max(maxCount, 1)));
+    return { ...pointAt(idx, ratio), row };
+  });
+
+  const dataPoints = dataCoords.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+  const dots = dataCoords.map(p => `
+    <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3.8" fill="#ea580c" stroke="#fff" stroke-width="1.5">
+      <title>${escapeHtml(p.row.label)}: ${formatNumber(p.row.count)}</title>
+    </circle>
+  `).join('');
+
+  const labels = axisRows.map((row, idx) => {
+    const labelPoint = pointAt(idx, 1.27);
+    const cos = Math.cos(angleFor(idx));
+    const anchor = cos > 0.25 ? 'start' : cos < -0.25 ? 'end' : 'middle';
+    return `
+      <text x="${labelPoint.x.toFixed(1)}" y="${labelPoint.y.toFixed(1)}" text-anchor="${anchor}" dominant-baseline="middle" class="stats-radar-label">
+        ${escapeHtml(shortenIndicatorAxisLabel(row.label))}
+      </text>
+    `;
+  }).join('');
+
+  return `
+    <div class="stats-radar-wrap">
+      <svg class="stats-radar-svg" viewBox="0 0 260 192" role="img" aria-label="Radar de indicadores éticos a fortalecer">
+        ${gridPolygons}
+        ${spokes}
+        <polygon class="stats-radar-area" points="${dataPoints}" fill="rgba(249, 115, 22, 0.22)" stroke="#ea580c" stroke-width="2.2"></polygon>
+        ${dots}
+        ${labels}
+      </svg>
+    </div>
+  `;
+}
+
+function renderIndicatorsChart(container, rows, totalCompleted) {
+  if (!container) return;
+  const normalized = normalizeStatsCollection(rows)
+    .filter(row => row && row.label)
+    .map(row => ({
+      label: String(row.label).trim(),
+      count: Number(row.count || row.value || 0)
+    }))
+    .filter(row => Number.isFinite(row.count) && row.count > 0);
+
+  if (!normalized.length) {
+    renderEmptyStatsState(container);
+    return;
+  }
+
+  const max = Math.max(...normalized.map(row => row.count), 1);
+  const totalOccurrences = normalized.reduce((sum, row) => sum + row.count, 0) || 1;
+  const radarHtml = buildRadarSvg(normalized, max);
+
+  const barsHtml = normalized.map((row, idx) => {
+    const pctWidth = Math.round((row.count / max) * 100);
+    const pctShare = Math.round((row.count / totalOccurrences) * 100);
+    const tone = idx === 0 ? '#dc2626' : idx === 1 ? '#ea580c' : '#f59e0b';
+    return `
+      <div class="stats-bar-row">
+        <div class="stats-bar-label">
+          <span class="stats-bar-title">
+            <span class="stats-color-dot" style="background:${tone}"></span>
+            <span>${escapeHtml(row.label)}</span>
+          </span>
+          <span class="stats-bar-values">
+            <strong>${formatNumber(row.count)}</strong>
+            <small class="stats-pct-pill stats-pct-pill--warm">${pctShare}%</small>
+          </span>
+        </div>
+        <div class="stats-bar-track">
+          <div class="stats-bar-fill stats-bar-fill--alert" style="width:${Math.max(pctWidth, 6)}%; --bar-fill:${tone}"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  container.innerHTML = `${radarHtml}<div class="stats-indicators-list">${barsHtml}</div>`;
 }
 
 function renderStatsBars(container, rows) {
@@ -3994,26 +4375,29 @@ function renderStatsBars(container, rows) {
     .filter(row => Number.isFinite(row.count) && row.count > 0);
 
   if (!normalized.length) {
-    container.innerHTML = `
-      <div class="stats-empty-container">
-        <span class="stats-empty-icon">📊</span>
-        <p class="stats-empty">Sin registros suficientes en este momento</p>
-      </div>
-    `;
+    renderEmptyStatsState(container);
     return;
   }
 
+  const total = normalized.reduce((sum, row) => sum + row.count, 0) || 1;
   const max = Math.max(...normalized.map(row => row.count), 1);
-  container.innerHTML = normalized.map(row => {
-    const pct = Math.round((row.count / max) * 100);
+  container.innerHTML = normalized.map((row, idx) => {
+    const pctWidth = Math.round((row.count / max) * 100);
+    const pctShare = Math.round((row.count / total) * 100);
     return `
       <div class="stats-bar-row">
         <div class="stats-bar-label">
-          <span>${escapeHtml(row.label)}</span>
-          <span>${formatNumber(row.count)}</span>
+          <span class="stats-bar-title">
+            <span class="stats-rank-badge">#${idx + 1}</span>
+            <span>${escapeHtml(row.label)}</span>
+          </span>
+          <span class="stats-bar-values">
+            <strong>${formatNumber(row.count)}</strong>
+            <small class="stats-pct-pill">${pctShare}%</small>
+          </span>
         </div>
         <div class="stats-bar-track">
-          <div class="stats-bar-fill" style="width:${pct}%"></div>
+          <div class="stats-bar-fill" style="width:${Math.max(pctWidth, 4)}%"></div>
         </div>
       </div>
     `;
@@ -4028,21 +4412,95 @@ function renderStats(data) {
   const education = sanitizeStatsRows(data.education || data.byEducation, 'generic');
   const insight = data.insight || {};
 
-  if (elements.statVisits) elements.statVisits.textContent = formatNumber(summary.visits || summary.totalVisits);
-  if (elements.statCompleted) elements.statCompleted.textContent = formatNumber(summary.completed || summary.totalCompleted);
-  if (elements.statAverage) elements.statAverage.textContent = summary.averageScore != null ? Number(summary.averageScore).toFixed(1) : '—';
-  if (elements.statTopLevel) elements.statTopLevel.textContent = resolveTopLevel(summary, levels);
+  const scopedVisits = Number(summary.visits ?? summary.totalVisits ?? 0);
+  const completedCount = Number(summary.completed ?? summary.totalCompleted ?? 0);
+  const globalVisitsCount = Math.max(
+    Number(summary.globalVisits ?? summary.totalVisits ?? scopedVisits ?? 0),
+    scopedVisits
+  );
 
-  renderStatsBars(elements.statsLevels, levels);
-  renderStatsBars(elements.statsProfiles, profiles);
-  renderStatsBars(elements.statsIndicators, indicators);
+  const hasCountry = Boolean(window.state?.country);
+  let countryVisitsCount = summary.countryVisits != null
+    ? Number(summary.countryVisits)
+    : (data.scope?.type === 'country' ? scopedVisits : (window.state?.lastCountryVisits ?? null));
+
+  if (data.scope?.type === 'country' && countryVisitsCount != null && window.state) {
+    window.state.lastCountryVisits = countryVisitsCount;
+  } else if (summary.countryVisits != null && window.state) {
+    window.state.lastCountryVisits = Number(summary.countryVisits);
+  }
+
+  if (elements.statGlobalVisits) {
+    elements.statGlobalVisits.textContent = formatNumber(globalVisitsCount);
+  }
+
+  if (elements.statVisits) {
+    if (hasCountry) {
+      elements.statVisits.textContent = formatNumber(countryVisitsCount != null ? countryVisitsCount : scopedVisits);
+    } else {
+      elements.statVisits.textContent = formatNumber(scopedVisits);
+    }
+  }
+
+  if (elements.statCountryVisitsMeta) {
+    if (hasCountry && globalVisitsCount > 0 && countryVisitsCount != null) {
+      const sharePct = Math.min(100, Math.max(1, Math.round((countryVisitsCount / globalVisitsCount) * 100)));
+      elements.statCountryVisitsMeta.textContent = statsText(
+        'stat_country_visits_share',
+        '{pct}% del total general',
+        { pct: sharePct }
+      );
+    } else if (!hasCountry) {
+      elements.statCountryVisitsMeta.textContent = statsText('stat_country_visits_pending', 'Se vincula al elegir país');
+    } else {
+      elements.statCountryVisitsMeta.textContent = '';
+    }
+  }
+
+  if (elements.statCompleted) {
+    elements.statCompleted.textContent = formatNumber(completedCount);
+  }
+  if (elements.statCompletedMeta) {
+    const scopeName = data.scope?.type === 'country' && window.state?.country
+      ? window.state.country
+      : statsText('stats_scope_global', 'Global');
+    elements.statCompletedMeta.textContent = scopeName;
+  }
+
+  const avgScore = summary.averageScore != null ? Number(summary.averageScore) : null;
+  if (elements.statAverage) {
+    elements.statAverage.textContent = avgScore != null ? avgScore.toFixed(1) : '—';
+  }
+  renderAverageGauge(elements.statAverageGauge, avgScore);
+
+  const topLevel = resolveTopLevel(summary, levels);
+  if (elements.statTopLevel) {
+    elements.statTopLevel.textContent = topLevel;
+  }
+  if (elements.statTopLevelMeta) {
+    const totalLevels = levels.reduce((sum, item) => sum + item.count, 0);
+    const topItem = levels.find(item => item.label === topLevel) || levels[0];
+    if (topItem && totalLevels > 0) {
+      const topPct = Math.round((topItem.count / totalLevels) * 100);
+      elements.statTopLevelMeta.textContent = `${topPct}% (${formatNumber(topItem.count)})`;
+    } else {
+      elements.statTopLevelMeta.textContent = '';
+    }
+  }
+
+  renderLevelsChart(elements.statsLevels, levels, completedCount);
+  renderProfilesChart(elements.statsProfiles, profiles);
+  renderIndicatorsChart(elements.statsIndicators, indicators, completedCount);
   renderStatsBars(elements.statsEducation, education);
 
   if (elements.statsInsight) {
     const focus = insight.focus || (indicators[0] ? indicators[0].label : 'Criterios de uso responsable');
     const recommendation = insight.recommendation || 'Reforzar acuerdos explícitos sobre transparencia, verificación, protección de datos y aporte humano.';
     elements.statsInsight.innerHTML = `
-      <p><strong>Foco observado:</strong> ${escapeHtml(focus)}</p>
+      <div class="stats-insight-focus">
+        <span class="stats-insight-badge">Foco prioritario</span>
+        <strong>${escapeHtml(focus)}</strong>
+      </div>
       <p>${escapeHtml(recommendation)}</p>
     `;
   }
@@ -4471,6 +4929,9 @@ document.addEventListener('DOMContentLoaded', () => {
   initNeuralNetBackground();
 
   updateCountryGlobalUI();
+  if (state.country && typeof sendVisitToServer === 'function') {
+    sendVisitToServer();
+  }
   if (!state.country) openCountryGate({ required: true });
 });
 

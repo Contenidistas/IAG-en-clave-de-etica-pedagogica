@@ -145,3 +145,37 @@ test('the global statistics layer remains available without a country filter', a
   assert.equal(body.summary.completed, 11);
   assert.ok(body.profiles.some(row => row.count < 5), 'global buckets are not country-suppressed');
 });
+
+test('stats expose both globalVisits and countryVisits across country and global scopes', async () => {
+  const baseDb = database({ colombia: 10, uruguay: 12 });
+  const dbWithTotalSessions = {
+    prepare(sql) {
+      const inner = baseDb.prepare(sql);
+      return {
+        bind(...values) {
+          inner.bind(...values);
+          return this;
+        },
+        async first() {
+          const row = await inner.first();
+          const isCountryQuery = sql.includes('country_code = ?');
+          return {
+            ...row,
+            totalSessions: isCountryQuery ? row.completed + row.visits : 380,
+          };
+        },
+        all: () => inner.all(),
+      };
+    },
+  };
+
+  const countryRes = await stats('https://example.test/stats?country=uy&countryName=Uruguay', dbWithTotalSessions);
+  assert.equal(countryRes.body.summary.globalVisits, 380);
+  assert.equal(countryRes.body.summary.countryVisits, 12);
+  assert.equal(countryRes.body.summary.visits, 12);
+
+  const globalWithFocusRes = await stats('https://example.test/stats?focusCountry=uy&focusCountryName=Uruguay', dbWithTotalSessions);
+  assert.equal(globalWithFocusRes.body.summary.globalVisits, 380);
+  assert.equal(globalWithFocusRes.body.summary.countryVisits, 12);
+  assert.equal(globalWithFocusRes.body.summary.countryCode, 'uy');
+});

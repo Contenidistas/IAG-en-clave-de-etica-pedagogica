@@ -825,9 +825,20 @@ function getAnalyticsSessionId() {
 function sendVisitToServer() {
   if (!CONFIG.dataEndpoint) return Promise.resolve(false);
 
+  const countryName = state.country || '';
+  const countryCode = state.countryCode || (window.CountryContext?.codeFor(countryName) ?? '');
+  const countrySyncKey = countryCode ? `${countryCode}:${countryName}` : '';
+
   try {
-    if (window.appStorage.session.getItem('iagVisitSent') === 'true') return Promise.resolve(false);
+    const visitSent = window.appStorage.session.getItem('iagVisitSent') === 'true';
+    const lastCountryKey = window.appStorage.session.getItem('iagVisitCountry') || '';
+    if (visitSent && (!countrySyncKey || lastCountryKey === countrySyncKey)) {
+      return Promise.resolve(false);
+    }
     window.appStorage.session.setItem('iagVisitSent', 'true');
+    if (countrySyncKey) {
+      window.appStorage.session.setItem('iagVisitCountry', countrySyncKey);
+    }
   } catch (err) {
     console.warn('No se pudo acceder a sessionStorage para controlar visitas:', err);
   }
@@ -837,8 +848,8 @@ function sendVisitToServer() {
     timestamp: new Date().toISOString(),
     sessionId: getAnalyticsSessionId(),
     page: 'index',
-    country: state.country || '',
-    countryCode: state.countryCode || (window.CountryContext?.codeFor(state.country) ?? ''),
+    country: countryName,
+    countryCode: countryCode,
     consentTracking: !!state.consentTracking,
     anonymous: true,
     ...(window.ProgramContext ? window.ProgramContext.payload(state) : {})
@@ -857,6 +868,7 @@ function sendVisitToServer() {
     .catch(err => {
     try {
       window.appStorage.session.removeItem('iagVisitSent');
+      window.appStorage.session.removeItem('iagVisitCountry');
     } catch (storageErr) {
       console.warn('No se pudo restablecer el control de visita:', storageErr);
     }

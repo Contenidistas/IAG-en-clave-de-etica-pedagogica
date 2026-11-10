@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS feedback (
 
 CREATE INDEX IF NOT EXISTS idx_events_type ON events(event_type);
 CREATE INDEX IF NOT EXISTS idx_events_session ON events(session_id);
+CREATE INDEX IF NOT EXISTS idx_events_session_type ON events(session_id, event_type);
 CREATE INDEX IF NOT EXISTS idx_events_timestamp ON events(timestamp);
 CREATE INDEX IF NOT EXISTS idx_events_country_type ON events(country_code, event_type);
 CREATE INDEX IF NOT EXISTS idx_events_program_cohort_phase ON events(program_code, cohort_code, measurement_phase, event_type);

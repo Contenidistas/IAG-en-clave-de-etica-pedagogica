@@ -186,6 +186,31 @@ async function handleEvent(request, env) {
 
   const eventId = eventResult.meta.last_row_id;
 
+  if (payload.sessionId && payload.countryCode) {
+    try {
+      const updateVisitCountry = env.DB.prepare(`
+        UPDATE events
+        SET country = ?, country_code = ?
+        WHERE session_id = ?
+          AND event_type = 'visit'
+          AND (country_code IS NULL OR country_code = '' OR country_code != ?)
+      `);
+      if (updateVisitCountry && typeof updateVisitCountry.bind === 'function') {
+        const bound = updateVisitCountry.bind(
+          payload.country,
+          payload.countryCode,
+          payload.sessionId,
+          payload.countryCode
+        );
+        if (bound && typeof bound.run === 'function') {
+          await bound.run();
+        }
+      }
+    } catch (err) {
+      console.warn('No se pudo actualizar el país de la sesión de visita:', err);
+    }
+  }
+
   if (eventType === 'completion') {
     await insertAnswers(env, eventId, payload.path);
   }
@@ -477,12 +502,48 @@ function publicStatsRows(rows, scope) {
   return rows.filter(row => Number(row.count || 0) >= MIN_PUBLIC_BUCKET);
 }
 
-async function buildStats(env, searchParams) {
-  const scope = resolveStatsScope(searchParams);
-  const filter = countryFilter(scope);
-  const summaryStatement = env.DB.prepare(`
+function resolveFocusCountryScope(searchParams, scope) {
+  if (scope.type === 'country') {
+    return scope;
+  }
+  const focusCode = clean(searchParams?.get('focusCountry')).toLowerCase();
+  const focusName = boundedClean(searchParams?.get('focusCountryName'), 80);
+  if (!focusCode && !focusName) return null;
+  if (COUNTRY_NAMES_BY_CODE[focusCode]) {
+    return {
+      type: 'country',
+      countryCode: focusCode,
+      countryName: COUNTRY_NAMES_BY_CODE[focusCode],
+    };
+  }
+  if (focusCode === 'other' && focusName && focusName !== 'Otro') {
+    return {
+      type: 'country',
+      countryCode: 'other',
+      countryName: focusName,
+    };
+  }
+  const matchedCode = Object.entries(COUNTRY_NAMES_BY_CODE)
+    .find(([, name]) => name.toLocaleLowerCase('es') === focusName.toLocaleLowerCase('es'))?.[0];
+  if (matchedCode) {
+    return {
+      type: 'country',
+      countryCode: matchedCode,
+      countryName: COUNTRY_NAMES_BY_CODE[matchedCode],
+    };
+  }
+  return null;
+}
+
+async function querySummaryRow(env, targetScope = { type: 'global' }) {
+  const filter = countryFilter(targetScope);
+  const statement = env.DB.prepare(`
     SELECT
       COUNT(DISTINCT CASE WHEN event_type = 'visit' THEN session_id END) AS visits,
+      COUNT(DISTINCT CASE
+        WHEN session_id IS NOT NULL AND session_id != '' THEN session_id
+        ELSE 'event-' || id
+      END) AS totalSessions,
       SUM(CASE WHEN event_type = 'visit' THEN 1 ELSE 0 END) AS pageViews,
       SUM(CASE WHEN event_type = 'completion' THEN 1 ELSE 0 END) AS completed,
       SUM(CASE WHEN event_type = 'feedback' THEN 1 ELSE 0 END) AS feedback,
@@ -490,9 +551,22 @@ async function buildStats(env, searchParams) {
     FROM events
     ${filter.sql ? `WHERE ${filter.sql}` : ''}
   `);
-  const summaryRow = filter.values.length
-    ? await summaryStatement.bind(...filter.values).first()
-    : await summaryStatement.first();
+  return filter.values.length
+    ? await statement.bind(...filter.values).first()
+    : await statement.first();
+}
+
+function resolveSessionCount(row) {
+  if (row && row.totalSessions !== undefined && row.totalSessions !== null) {
+    return Math.max(Number(row.totalSessions || 0), Number(row.visits || 0), Number(row.completed || 0));
+  }
+  return Number(row?.visits || 0);
+}
+
+async function buildStats(env, searchParams) {
+  const scope = resolveStatsScope(searchParams);
+  const focusCountryScope = resolveFocusCountryScope(searchParams, scope);
+  const summaryRow = await querySummaryRow(env, scope);
 
   const completed = Number(summaryRow?.completed || 0);
   if (scope.type === 'country' && completed < MIN_COUNTRY_COMPLETIONS) {
@@ -506,6 +580,17 @@ async function buildStats(env, searchParams) {
       updatedAt: new Date().toISOString(),
     };
   }
+
+  const globalRow = scope.type === 'country'
+    ? await querySummaryRow(env, { type: 'global' })
+    : summaryRow;
+  const countryRow = scope.type === 'country'
+    ? summaryRow
+    : (focusCountryScope ? await querySummaryRow(env, focusCountryScope) : null);
+
+  const scopedVisits = resolveSessionCount(summaryRow);
+  const globalVisits = Math.max(resolveSessionCount(globalRow), scopedVisits);
+  const countryVisits = countryRow ? resolveSessionCount(countryRow) : null;
 
   const levels = publicStatsRows(await groupedRows(
     env,
@@ -539,9 +624,15 @@ async function buildStats(env, searchParams) {
       minBucketSize: scope.type === 'country' ? MIN_PUBLIC_BUCKET : undefined,
     },
     summary: {
-      visits: Number(summaryRow?.visits || 0),
+      visits: scopedVisits,
+      globalVisits,
+      countryVisits,
+      countryCode: focusCountryScope?.countryCode || '',
+      countryName: focusCountryScope?.countryName || '',
       pageViews: Number(summaryRow?.pageViews || 0),
       completed,
+      globalCompleted: Number(globalRow?.completed || completed || 0),
+      countryCompleted: countryRow ? Number(countryRow?.completed || 0) : null,
       feedback: Number(summaryRow?.feedback || 0),
       averageScore: Number(summaryRow?.averageScore || 0),
       topLevel: levels.length ? levels[0].label : '',

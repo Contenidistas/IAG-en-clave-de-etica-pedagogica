@@ -633,48 +633,89 @@
         <div id="statsStatus" class="stats-status">Cargando estadísticas...</div>
 
         <div id="statsContent" class="stats-content hidden">
-          <div class="stats-kpis">
-            <div class="stats-kpi">
-              <span class="stats-kpi-label" data-i18n="stat_visits_label">Sesiones registradas</span>
+          <div class="stats-kpis stats-kpis--five">
+            <div class="stats-kpi stats-kpi--global-visits">
+              <div class="stats-kpi-head">
+                <span class="stats-kpi-badge" aria-hidden="true">🌐</span>
+                <span class="stats-kpi-label" data-i18n="stat_global_visits_label">Visitas generales</span>
+              </div>
+              <strong id="statGlobalVisits">0</strong>
+              <small id="statGlobalVisitsMeta" class="stats-kpi-meta" data-i18n="stat_global_visits_meta">Total acumulado en la plataforma</small>
+            </div>
+            <div class="stats-kpi stats-kpi--country-visits">
+              <div class="stats-kpi-head">
+                <span id="statCountryVisitsFlag" class="stats-kpi-badge" aria-hidden="true">📍</span>
+                <span id="statCountryVisitsLabel" class="stats-kpi-label" data-i18n="stat_visits_label">Sesiones del país</span>
+              </div>
               <strong id="statVisits">0</strong>
+              <small id="statCountryVisitsMeta" class="stats-kpi-meta"></small>
             </div>
-            <div class="stats-kpi">
-              <span class="stats-kpi-label" data-i18n="stat_completed_label">Cuestionarios completados</span>
+            <div class="stats-kpi stats-kpi--completed">
+              <div class="stats-kpi-head">
+                <span class="stats-kpi-badge" aria-hidden="true">✅</span>
+                <span class="stats-kpi-label" data-i18n="stat_completed_label">Cuestionarios completados</span>
+              </div>
               <strong id="statCompleted">0</strong>
+              <small id="statCompletedMeta" class="stats-kpi-meta"></small>
             </div>
-            <div class="stats-kpi">
-              <span class="stats-kpi-label" data-i18n="stat_average_label">Puntaje promedio</span>
-              <strong id="statAverage">0</strong>
+            <div class="stats-kpi stats-kpi--average">
+              <div class="stats-kpi-head">
+                <span class="stats-kpi-badge" aria-hidden="true">🎯</span>
+                <span class="stats-kpi-label" data-i18n="stat_average_label">Puntaje promedio</span>
+              </div>
+              <div class="stats-kpi-gauge-row">
+                <strong id="statAverage">0</strong>
+                <div id="statAverageGauge" class="stats-kpi-gauge" aria-hidden="true"></div>
+              </div>
             </div>
-            <div class="stats-kpi">
-              <span class="stats-kpi-label" data-i18n="stat_top_level_label">Nivel más frecuente</span>
+            <div class="stats-kpi stats-kpi--top-level">
+              <div class="stats-kpi-head">
+                <span class="stats-kpi-badge" aria-hidden="true">🏅</span>
+                <span class="stats-kpi-label" data-i18n="stat_top_level_label">Nivel más frecuente</span>
+              </div>
               <strong id="statTopLevel">—</strong>
+              <small id="statTopLevelMeta" class="stats-kpi-meta"></small>
             </div>
           </div>
 
           <div class="stats-grid">
-            <article class="stats-card">
-              <h3 data-i18n="stat_chart_levels">Distribución por nivel</h3>
-              <div id="statsLevels" class="stats-bars"></div>
+            <article class="stats-card stats-card--levels">
+              <div class="stats-card-header">
+                <h3 data-i18n="stat_chart_levels">Distribución por nivel</h3>
+                <span class="stats-card-chip" data-i18n="stat_chip_maturity">Escala de madurez</span>
+              </div>
+              <div id="statsLevels" class="stats-bars stats-chart-panel"></div>
             </article>
 
-            <article class="stats-card">
-              <h3 data-i18n="stat_chart_profiles">Perfiles participantes</h3>
-              <div id="statsProfiles" class="stats-bars"></div>
+            <article class="stats-card stats-card--profiles">
+              <div class="stats-card-header">
+                <h3 data-i18n="stat_chart_profiles">Perfiles participantes</h3>
+                <span class="stats-card-chip" data-i18n="stat_chip_composition">Composición</span>
+              </div>
+              <div id="statsProfiles" class="stats-bars stats-chart-panel"></div>
             </article>
 
             <article class="stats-card stats-card--improvement">
-              <h3 data-i18n="stat_chart_indicators">Indicadores a fortalecer</h3>
-              <div id="statsIndicators" class="stats-bars"></div>
+              <div class="stats-card-header">
+                <h3 data-i18n="stat_chart_indicators">Indicadores a fortalecer</h3>
+                <span class="stats-card-chip stats-card-chip--alert" data-i18n="stat_chip_radar">Radar de foco ético</span>
+              </div>
+              <div id="statsIndicators" class="stats-bars stats-chart-panel"></div>
             </article>
 
-            <article class="stats-card">
-              <h3 data-i18n="stat_chart_education">Distribución por formación</h3>
-              <div id="statsEducation" class="stats-bars"></div>
+            <article class="stats-card stats-card--education">
+              <div class="stats-card-header">
+                <h3 data-i18n="stat_chart_education">Distribución por formación</h3>
+                <span class="stats-card-chip" data-i18n="stat_chip_levels">Niveles educativos</span>
+              </div>
+              <div id="statsEducation" class="stats-bars stats-chart-panel"></div>
             </article>
 
             <article class="stats-card stats-card--insight">
-              <h3 data-i18n="stat_chart_insight">Lectura pedagógica</h3>
+              <div class="stats-card-header">
+                <h3 data-i18n="stat_chart_insight">Lectura pedagógica</h3>
+                <span class="stats-card-chip stats-card-chip--insight" data-i18n="stat_chip_synthesis">Síntesis</span>
+              </div>
               <div id="statsInsight" class="stats-insight"></div>
             </article>
           </div>

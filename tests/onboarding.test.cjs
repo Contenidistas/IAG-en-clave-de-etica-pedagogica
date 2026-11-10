@@ -234,6 +234,74 @@ test('statistics request the selected country code and can switch back to the gl
   assert.equal(w.state.statsScope, 'global');
 });
 
+test('designating a country registers a country-linked visit and renders dual counters and interactive charts', async t => {
+  const eventPayloads = [];
+  const fetchImpl = async (url, options = {}) => {
+    const href = String(url);
+    const parsed = new URL(href, 'http://localhost/');
+    if (parsed.pathname.endsWith('/events') && options.body) {
+      eventPayloads.push(JSON.parse(options.body));
+      return { ok: true, json: async () => ({ ok: true }) };
+    }
+    if (parsed.pathname.endsWith('/stats')) {
+      return {
+        ok: true,
+        json: async () => ({
+          scope: { type: 'country', countryCode: 'uy', countryName: 'Uruguay', available: true },
+          summary: {
+            visits: 254,
+            globalVisits: 410,
+            countryVisits: 254,
+            completed: 250,
+            averageScore: 74.1,
+            topLevel: 'Nivel avanzado'
+          },
+          levels: [
+            { label: 'Nivel avanzado', count: 121 },
+            { label: 'Prácticas consolidadas', count: 64 },
+            { label: 'Desarrollo progresivo', count: 34 },
+            { label: 'Amplio margen de mejora', count: 17 }
+          ],
+          profiles: [
+            { label: 'docente', count: 182 },
+            { label: 'estudiante', count: 49 },
+            { label: 'especializado', count: 19 }
+          ],
+          indicators: [
+            { label: 'Otros criterios de reflexión', count: 220 },
+            { label: 'Verificación de información', count: 214 },
+            { label: 'Reglas claras de uso', count: 175 },
+            { label: 'Sesgos y contexto', count: 152 }
+          ],
+          education: [
+            { label: 'Formación Docente', count: 95 },
+            { label: 'Enseñanza Media Superior', count: 80 }
+          ],
+          insight: {
+            focus: 'Verificación de información',
+            recommendation: 'Reforzar contraste de fuentes.'
+          }
+        })
+      };
+    }
+    return { ok: true, json: async () => ({ opinions: [] }) };
+  };
+
+  const { $ , click } = await app(t, { fetchImpl });
+  click('[data-gate-country="Uruguay"]');
+  click('#countryGateConfirm');
+  await new Promise(resolve => setImmediate(resolve));
+
+  assert.ok(eventPayloads.some(p => p.eventType === 'visit' && p.country === 'Uruguay' && p.countryCode === 'uy'));
+  assert.equal($('#statGlobalVisits').textContent, '410');
+  assert.equal($('#statVisits').textContent, '254');
+  assert.match($('#statCountryVisitsLabel').textContent, /Uruguay/);
+  assert.ok($('#statAverageGauge .stats-gauge-svg'));
+  assert.ok($('#statsLevels .stats-donut-svg'));
+  assert.ok($('#statsProfiles .stats-stacked-bar'));
+  assert.ok($('#statsIndicators .stats-radar-svg'));
+});
+
 test('Dominican Republic uses national education levels and other countries use an explicit UNESCO fallback', async t => {
   const { w, $, click, change } = await app(t);
   click('[data-country="República Dominicana"]');
