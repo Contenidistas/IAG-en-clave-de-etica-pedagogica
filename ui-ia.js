@@ -25,7 +25,8 @@ const screens = {
 const TRANSLATIONS = {
   es: {
     and_word: "y",
-    footer_created_by: "Creado por",
+    footer_created_by: "Desarrollado por",
+    footer_research_team: "Equipo investigador:",
     footer_based_on: "Basado en marcos de",
     footer_updated_text: "Sitio en constante actualización con nuevas funcionalidades y mejoras",
     footer_ia_declaration: "Declaración de uso de IA",
@@ -382,7 +383,8 @@ const TRANSLATIONS = {
 
   en: {
     and_word: "and",
-    footer_created_by: "Created by",
+    footer_created_by: "Developed by",
+    footer_research_team: "Research team:",
     footer_based_on: "Based on frameworks from",
     footer_updated_text: "Site constantly updated with new features and improvements",
     footer_ia_declaration: "AI usage statement",
@@ -730,7 +732,8 @@ const TRANSLATIONS = {
 
   pt: {
     and_word: "e",
-    footer_created_by: "Criado por",
+    footer_created_by: "Desenvolvido por",
+    footer_research_team: "Equipe de pesquisa:",
     footer_based_on: "Baseado em marcos de",
     footer_updated_text: "Site em constante atualização com novas funcionalidades e melhorias",
     footer_ia_declaration: "Declaração de uso de IA",
@@ -1069,7 +1072,8 @@ const TRANSLATIONS = {
 
   fr: {
     and_word: "et",
-    footer_created_by: "Créé par",
+    footer_created_by: "Développé par",
+    footer_research_team: "Équipe de recherche :",
     footer_based_on: "Basé sur les cadres de",
     footer_updated_text: "Site en constante mise à jour avec de nouvelles fonctionnalités et améliorations",
     footer_ia_declaration: "Déclaration d'utilisation de l'IA",

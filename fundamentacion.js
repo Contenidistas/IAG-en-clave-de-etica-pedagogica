@@ -49,7 +49,8 @@ const FW_TRANSLATIONS = {
     fw_article1_title: "Percepciones del uso de IAG en futuras maestras",
     fw_article2_label: "Artículo 2026",
     fw_article2_title: "Cuando el ocultamiento se hace visible",
-    footer_created_by: "Creado por",
+    footer_created_by: "Desarrollado por",
+    footer_research_team: "Equipo investigador:",
   },
   en: {
     app_title: "Generative AI in Pedagogical Ethics",
@@ -95,7 +96,8 @@ const FW_TRANSLATIONS = {
     fw_article1_title: "Perceptions of GAI use among future teachers",
     fw_article2_label: "Article 2026",
     fw_article2_title: "When concealment becomes visible",
-    footer_created_by: "Created by",
+    footer_created_by: "Developed by",
+    footer_research_team: "Research team:",
   },
   pt: {
     app_title: "IAG sob a ótica da ética pedagógica",
@@ -141,7 +143,8 @@ const FW_TRANSLATIONS = {
     fw_article1_title: "Percepções do uso de IAG em futuras professoras",
     fw_article2_label: "Artigo 2026",
     fw_article2_title: "Quando o ocultamento se torna visível",
-    footer_created_by: "Criado por",
+    footer_created_by: "Desenvolvido por",
+    footer_research_team: "Equipe de pesquisa:",
   },
   fr: {
     app_title: "IAG sous l'angle de l'éthique pédagogique",
@@ -187,7 +190,8 @@ const FW_TRANSLATIONS = {
     fw_article1_title: "Perceptions de l'usage de l'IAG chez les futures enseignantes",
     fw_article2_label: "Article 2026",
     fw_article2_title: "Quand la dissimulation devient visible",
-    footer_created_by: "Créé par",
+    footer_created_by: "Développé par",
+    footer_research_team: "Équipe de recherche :",
   }
 };
 
